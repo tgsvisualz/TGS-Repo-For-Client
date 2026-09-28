@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "assets": "node scripts/assets-manifest.mjs",
     "build:artifact": "vite build --mode artifact && node scripts/artifact-fragment.mjs"
   },
   "dependencies": {
