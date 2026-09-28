@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- PLACEHOLDER (BRAND-FAVICON): swap for the client's final mark. -->
+  <rect width="64" height="64" fill="#0B0A09"/>
+  <path d="M17 15 L32 50 L47 15" fill="none" stroke="#EDE6DC" stroke-width="3.2" stroke-linecap="square"/>
+  <rect x="10" y="18" width="44" height="11" fill="#0B0A09" opacity=".62"/>
+</svg>

@@ -1,0 +1,175 @@
+/*
+ * This week: three drops as hairline-separated rows. Light carries the sequence: the live
+ * drop is brightest, the veiled one waits in half-light, the archived one has gone dim.
+ */
+
+.heading h2 {
+  max-width: 26ch;
+}
+
+.rows {
+  margin-top: var(--space-9);
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  padding-block: var(--space-7);
+  border-bottom: 1px solid var(--line);
+}
+
+/* ── Numeral + status ─────────────────────────────────────────── */
+
+/* Numeral and chip share a baseline. */
+.id {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.numeral {
+  color: var(--fg-2);
+  font-size: var(--fs-display-m);
+  line-height: 1;
+}
+
+.live .numeral {
+  color: var(--fg);
+}
+
+.archived .numeral {
+  color: var(--fg-3);
+}
+
+/* ── Dates + availability ─────────────────────────────────────── */
+
+.facts {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--fs-small);
+  line-height: var(--lh-body);
+}
+
+.date {
+  color: var(--fg);
+}
+
+.archived .date {
+  color: var(--fg-2);
+}
+
+.availability {
+  color: var(--fg-2);
+}
+
+.archived .availability {
+  color: var(--fg-3);
+}
+
+/* ── Thumbnail strip ──────────────────────────────────────────── */
+
+/* Phones: the strip scrolls inside its own row, bleeding to the screen edges. */
+.strip {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-2) calc(-1 * var(--gutter)) 0;
+  padding: 0 var(--gutter) var(--space-2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-hover) transparent;
+}
+
+.thumb {
+  flex: 0 0 7.5rem;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.thumbName {
+  margin-top: var(--space-3);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-title);
+}
+
+.thumbChip {
+  margin-top: var(--space-2);
+}
+
+/* Sold out and archived pieces sit back, statically. */
+.faded .thumbMedia {
+  opacity: 0.42;
+}
+
+.faded .thumbName {
+  color: var(--fg-3);
+}
+
+@media (min-width: 48rem) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+    column-gap: var(--space-5);
+    padding-block: var(--space-8);
+  }
+
+  .id {
+    justify-content: flex-start;
+    gap: var(--space-6);
+  }
+
+  .strip {
+    grid-column: 1 / -1;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .thumb {
+    flex: 0 1 8rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  .row {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    column-gap: var(--space-5);
+  }
+
+  .id {
+    grid-column: 1 / span 3;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  /* Cap tops line up with the top edge of the thumbnails. */
+  .numeral {
+    margin-top: -0.19em;
+  }
+
+  .facts {
+    grid-column: 4 / span 2;
+    margin-top: -0.3em;
+  }
+
+  .strip {
+    grid-column: 6 / -1;
+    margin: 0;
+  }
+
+  /* Six slots across the strip, whatever the row holds, so thumbnails line up row to row. */
+  .thumb {
+    flex: 0 0 calc((100% - 5 * var(--space-4)) / 6);
+  }
+}

@@ -1,0 +1,117 @@
+/*
+ * The fixed header. Its two looks live on pseudo-elements and only their opacity animates:
+ * ::before  the soft top scrim over the hero (at rest)
+ * ::after   the glass once scrolled, fading out at its bottom edge (no 1px divider)
+ * The header element itself never takes opacity, filter or backdrop-filter: that would make it
+ * the backdrop root and break the dropdown panel's own blur.
+ */
+
+.header {
+  /* Local (no token for it): the scrim ↔ glass cross-fade. */
+  --header-fade: 320ms;
+
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: var(--z-header);
+  padding-top: env(safe-area-inset-top, 0px);
+  color: var(--fg);
+}
+
+.header::before,
+.header::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity var(--header-fade) var(--ease);
+}
+
+.header::before {
+  inset: 0 0 auto;
+  height: calc(100% + 56px);
+  background: var(--scrim-top);
+}
+
+.header::after {
+  inset: 0 0 -8px;
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to bottom, black calc(100% - 22px), transparent);
+  opacity: 0;
+}
+
+.header[data-scrolled]::before {
+  opacity: 0;
+}
+
+.header[data-scrolled]::after {
+  opacity: 1;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  max-width: var(--content-max);
+  height: var(--header-h);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Grid auto-placement: [wordmark | triggers | pill] on desktop, [Menu | wordmark | Join] below. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 2px;
+}
+
+.row[data-layout='desktop'] .brand {
+  justify-self: start;
+}
+
+.row[data-layout='mobile'] .brand {
+  justify-self: center;
+}
+
+.cta {
+  justify-self: end;
+}
+
+/* ── Mobile row ─────────────────────────────────────────── */
+.menuButton {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 44px;
+  height: 44px;
+  margin-left: -2px;
+  padding-inline: 2px 6px;
+  color: var(--fg);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-regular);
+  line-height: 1;
+  letter-spacing: 0.005em;
+}
+
+.menuButton :global(svg) {
+  color: var(--fg-2);
+  transition: color var(--dur-hover) var(--ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .menuButton:hover :global(svg) {
+    color: var(--fg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header::before,
+  .header::after {
+    transition-duration: var(--dur-menu);
+  }
+}

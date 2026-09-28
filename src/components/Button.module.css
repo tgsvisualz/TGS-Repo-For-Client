@@ -1,0 +1,147 @@
+@layer components {
+  .root {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    border: 1px solid transparent;
+    border-radius: var(--r-pill);
+    font-family: var(--font-sans);
+    font-size: var(--fs-small);
+    font-weight: var(--fw-medium);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      background-color var(--dur-hover) var(--ease),
+      color var(--dur-hover) var(--ease);
+  }
+
+  .md {
+    padding: 0.75rem 1.35rem;
+  }
+
+  .sm {
+    padding: 0.55rem 1rem;
+    font-size: var(--fs-caption);
+  }
+
+  .label {
+    position: relative;
+  }
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    height: 1em;
+    transition: transform var(--dur-hover) var(--ease-out);
+  }
+
+  /* ── Variants ── */
+  .pill {
+    background-color: var(--fg);
+    color: var(--fg-inverse);
+  }
+
+  .ghost {
+    border-color: var(--line-strong);
+    background-color: transparent;
+    color: var(--fg);
+  }
+
+  .text {
+    padding: 0.35em 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--fg);
+  }
+
+  /* Text variant: a resting hairline, and a bone line drawn in over it on hover. */
+  .text .label::before,
+  .text .label::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -0.35em;
+    left: 0;
+    height: 1px;
+  }
+
+  .text .label::before {
+    background: var(--line-strong);
+  }
+
+  .text .label::after {
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform var(--dur-hover) var(--ease-out);
+  }
+
+  /* ── States ── */
+  .root:active {
+    transform: scale(0.97);
+  }
+
+  .root:is(:disabled, [aria-disabled='true']) {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pill:hover {
+      /* Bone lifted a touch toward pure light. */
+      background-color: color-mix(in srgb, var(--fg) 55%, white);
+    }
+
+    .ghost:hover {
+      background-color: var(--fill-hover);
+    }
+
+    .root:hover .icon {
+      transform: translate(var(--icon-nudge-x, 2px), var(--icon-nudge-y, 0px));
+    }
+
+    .text:hover .label::after {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+  }
+
+  /* 44px hit area on touch, without changing the drawn size. */
+  @media (pointer: coarse) {
+    .root::before {
+      content: '';
+      position: absolute;
+      inset-block: min(0px, (100% - 44px) / 2);
+      inset-inline: min(0px, (100% - 44px) / 2);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .root:active,
+    .root:hover .icon {
+      transform: none;
+    }
+
+    .text .label::after {
+      opacity: 0;
+      transform: none;
+      transition: opacity var(--dur-hover) var(--ease);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) and (hover: hover) and (pointer: fine) {
+    .text:hover .label::after {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,320 @@
+/*
+ * Velato base: reset, page defaults, type and layout utilities, and the asset-ID overlay.
+ * Loaded after fonts.css and tokens.css.
+ *
+ * Cascade layers, lowest first: reset < base < utilities < components (the shared
+ * src/components CSS Modules). Feature CSS stays UNLAYERED, so it always wins over all
+ * four: a className passed to a shared component overrides its defaults whatever the
+ * specificity or load order. Do not wrap feature CSS in @layer.
+ *
+ * Never set padding on :root/html: the claude.ai preview host pads :root with safe-area insets.
+ */
+@layer reset, base, utilities, components;
+
+/* ── Reset ─────────────────────────────────────────────────── */
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    height: auto;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  button {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  /* Lists keep their semantics (Safari drops them with list-style: none) unless role="list" is set. */
+  :where(ul, ol)[role='list'] {
+    padding: 0;
+    list-style: none;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/*
+ * Host-proof page ground, deliberately UNLAYERED. A host page (the claude.ai preview frame)
+ * injects its own unlayered `body { margin; font; background }`, and unlayered rules beat
+ * every @layer. Declared here, after the host's styles, these win on order.
+ */
+html {
+  color-scheme: dark;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+}
+
+/* ── Page defaults ─────────────────────────────────────────── */
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Cormorant ships 300–500 only: never fake a bold. */
+    font-synthesis-weight: none;
+    scroll-padding-top: var(--header-h);
+    scroll-behavior: smooth;
+    scrollbar-color: var(--bg-hover) var(--bg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    min-height: 100svh;
+    overflow-x: clip;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-regular);
+    line-height: var(--lh-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  /* The skip-link target takes focus programmatically; it needs no ring. */
+  main[tabindex='-1']:focus {
+    outline: none;
+  }
+
+  ::selection {
+    background: var(--accent);
+    /* Palette bone on purpose: stays legible on garnet inside a .theme-bone section too. */
+    color: var(--c-bone);
+  }
+
+  ::placeholder {
+    color: var(--fg-3);
+    opacity: 1;
+  }
+
+  /*
+   * Asset-ID overlay: Shift+A or #assets (see components/AssetOverlay) prints every slot's ID.
+   * Placeholder roots are position: relative. Their ::after belongs to this label, so the
+   * !important flags keep a component's own ::after from hiding it while the overlay is on.
+   */
+  html.show-asset-ids [data-asset-id]::after {
+    content: attr(data-asset-id) !important;
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    z-index: 5 !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 2px 6px !important;
+    border: 0 !important;
+    background: color-mix(in srgb, var(--bg) 85%, transparent) !important;
+    color: var(--fg) !important;
+    font: 500 10px/1.3 var(--font-sans) !important;
+    letter-spacing: 0.04em !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: none !important;
+  }
+}
+
+/* ── Utilities ─────────────────────────────────────────────── */
+@layer utilities {
+  /* Display (Cormorant Garamond). Italic accents: <em> or .t-accent, once per heading. */
+  .t-display-xl,
+  .t-display-l,
+  .t-display-m,
+  .t-display-s {
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    line-height: var(--lh-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .t-display-xl {
+    font-size: var(--fs-display-xl);
+  }
+
+  .t-display-l {
+    font-size: var(--fs-display-l);
+  }
+
+  .t-display-m {
+    font-size: var(--fs-display-m);
+  }
+
+  .t-display-s {
+    font-size: var(--fs-display-s);
+    font-weight: var(--fw-regular);
+  }
+
+  /* Text and UI (Jost). */
+  .t-title {
+    font-family: var(--font-sans);
+    font-size: var(--fs-title);
+    font-weight: var(--fw-regular);
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-title);
+  }
+
+  .t-body-l {
+    font-family: var(--font-sans);
+    font-size: var(--fs-body-l);
+    line-height: var(--lh-body);
+    letter-spacing: 0;
+  }
+
+  .t-small {
+    font-family: var(--font-sans);
+    font-size: var(--fs-small);
+    line-height: var(--lh-body);
+    letter-spacing: 0;
+  }
+
+  .t-caption {
+    font-family: var(--font-sans);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-body);
+    letter-spacing: 0;
+  }
+
+  .t-label {
+    font-family: var(--font-sans);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-medium);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-2);
+  }
+
+  .t-accent {
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Layout */
+  .container {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .section {
+    padding-block: var(--section-pad);
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+  }
+}

@@ -1,0 +1,168 @@
+/* The Veil: type and space only. One pool of light, low and to the left, behind the words. */
+
+.root {
+  position: relative;
+  isolation: isolate;
+}
+
+.root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 55% 60% at 34% 56%,
+    color-mix(in srgb, var(--fg) 4%, transparent) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--space-5);
+}
+
+/* ── Margin label + gloss ─────────────────────────────────────── */
+
+.label {
+  color: var(--fg-3);
+}
+
+.gloss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-5);
+  row-gap: var(--space-1);
+  color: var(--fg-3);
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-tight);
+}
+
+.headword {
+  color: var(--fg-2);
+  font-size: 1.75rem;
+  font-weight: var(--fw-light);
+  line-height: 1;
+}
+
+.syllables {
+  letter-spacing: 0.06em;
+}
+
+.pos {
+  font-size: 1.0625rem;
+  line-height: 1;
+}
+
+.meaning {
+  color: var(--fg-2);
+}
+
+.meaning::before {
+  content: '—';
+  margin-right: 0.5em;
+  color: var(--fg-3);
+}
+
+/* ── The statement ────────────────────────────────────────────── */
+
+.body {
+  max-width: 24ch;
+  margin-top: var(--space-6);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: var(--fs-display-m);
+  font-weight: var(--fw-light);
+  line-height: 1.12;
+  letter-spacing: var(--tracking-display);
+  text-wrap: pretty;
+}
+
+.coda {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+}
+
+/* A hairline that runs out to the edge of the text column. */
+.coda::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.coda p {
+  color: var(--fg-3);
+}
+
+@media (min-width: 64rem) {
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-5);
+    row-gap: 0;
+    align-items: baseline;
+  }
+
+  .label {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+  }
+
+  .gloss {
+    grid-column: 3 / -1;
+    grid-row: 1;
+  }
+
+  .body {
+    grid-column: 3 / span 9;
+    margin-top: var(--space-7);
+  }
+
+  .coda {
+    grid-column: 3 / -1;
+    margin-top: var(--space-9);
+  }
+}
+
+/*
+ * The signature: words brighten from shadow as the paragraph crosses the viewport, in reading
+ * order. One named view timeline on the paragraph; each word takes a slice of it (--p is the
+ * word's position, 0 → 1). Without support, or with reduced motion, nothing here applies and
+ * the text is fully visible.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .body {
+      view-timeline: --velato-veil block;
+    }
+
+    /* Longhands: CSS Modules would localise `auto` inside the `animation` shorthand. */
+    .word {
+      animation-name: brighten;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --velato-veil;
+      /* First word from 10–18% of the paragraph's pass; the last is lit by 42% (about centred). */
+      animation-range:
+        cover calc(10% + var(--p) * 24%)
+        cover calc(18% + var(--p) * 24%);
+    }
+  }
+}
+
+@keyframes brighten {
+  from {
+    opacity: 0.22;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

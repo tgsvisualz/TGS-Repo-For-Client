@@ -1,0 +1,130 @@
+/*
+ * Shared by the Drop teaser, This week and the footer: the frosted veil over veiled pieces
+ * and the "N° 014" numeral. Unlayered on purpose (feature CSS wins over shared components).
+ */
+
+/* ── Veil ─────────────────────────────────────────────────────── */
+
+/*
+ * 120% of the slot: the lower sixth is a soft hem that fades out below the frame, so when the
+ * veil lifts, the piece shows through a gradient edge (like cloth), never a hard line.
+ */
+.veil {
+  position: absolute;
+  inset: 0 0 -20% 0;
+  z-index: 1;
+  display: block;
+  container-type: inline-size;
+  background:
+    /* A faint diagonal sheen, as if light caught the fabric. */
+    linear-gradient(
+      118deg,
+      transparent 18%,
+      color-mix(in srgb, var(--fg) 6%, transparent) 36%,
+      transparent 52%,
+      color-mix(in srgb, var(--fg) 3%, transparent) 64%,
+      transparent 74%
+    ),
+    /* Lit from above, darkest at the hem. */
+    linear-gradient(to bottom, color-mix(in srgb, var(--fg) 5%, transparent), transparent 55%),
+    /* Lighter than the nav glass so a silhouette hints through the blur: intrigue, not a wall. */
+    color-mix(in srgb, var(--bg) 52%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(0.85);
+  backdrop-filter: blur(14px) saturate(0.85);
+  /* Mask alpha only: any opaque token works as "fully shown". */
+  -webkit-mask-image: linear-gradient(to bottom, var(--bg) 83.4%, transparent 100%);
+  mask-image: linear-gradient(to bottom, var(--bg) 83.4%, transparent 100%);
+  pointer-events: none;
+  transition:
+    transform 500ms var(--ease-out),
+    opacity 500ms var(--ease-out);
+}
+
+/* Centred on the slot (50% of the frame is 41.67% of the 120% veil). */
+.mark {
+  position: absolute;
+  top: calc(50% / 1.2);
+  left: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--fg-2);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+
+.words {
+  color: var(--fg-2);
+}
+
+/* Narrow slots (thumbnails, phones' small cards) keep only the icon. */
+@container (max-width: 13.5rem) {
+  .words {
+    display: none;
+  }
+}
+
+/* The peek: hover on fine pointers, eased. */
+@media (hover: hover) and (pointer: fine) {
+  [data-cursor='peek']:hover .veil {
+    opacity: 0.5;
+    transform: translateY(-16%);
+  }
+}
+
+/* Keyboard focus peeks too, instantly (keyboard-initiated actions are never animated). */
+[data-cursor='peek']:focus-visible .veil {
+  opacity: 0.5;
+  transform: translateY(-16%);
+  transition-duration: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .veil {
+    transition: opacity var(--dur-swap) var(--ease);
+  }
+
+  [data-cursor='peek']:is(:hover, :focus-visible) .veil {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .veil {
+    background: Canvas;
+  }
+}
+
+/* ── N° 014 ───────────────────────────────────────────────────── */
+
+/* Baseline-aligned so the numerals (not the small numero) give the element its baseline. */
+.number {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  font-variant-numeric: lining-nums;
+  white-space: nowrap;
+}
+
+/*
+ * Hung at cap height, small and italic, like a folio mark. Cormorant's capitals start 0.19em
+ * into a line-height: 1 box, so the offset is (0.19 × (1 − 0.32)) ÷ 0.32 ≈ 0.41 of its own em.
+ */
+.numero {
+  align-self: flex-start;
+  margin-top: 0.41em;
+  margin-right: 0.12em;
+  font-size: 0.32em;
+  font-style: italic;
+  font-weight: var(--fw-regular);
+  letter-spacing: 0;
+}
+
+.code {
+  font-variant-numeric: lining-nums;
+}

@@ -1,0 +1,264 @@
+/*
+ * Drop 014 teaser. Phones: numeral lockup, then a scroll-snap row of veiled pieces.
+ * Desktop: a 12-column lookbook spread (a tall feature on the left, the rest stepping down
+ * in varied widths), then the list sign-up.
+ */
+
+.root {
+  position: relative;
+  isolation: isolate;
+}
+
+/* A low pool of light where the numeral stands. */
+.root::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: min(70vh, 48rem);
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 50% 70% at 22% 30%,
+    color-mix(in srgb, var(--fg) 4%, transparent) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ── Header: N° 014, the unveil, the countdown ────────────────── */
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'eyebrow'
+    'title'
+    'when'
+    'lede'
+    'clock';
+  align-items: end;
+}
+
+.eyebrow {
+  grid-area: eyebrow;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  grid-area: title;
+  color: var(--fg);
+  font-size: clamp(var(--fs-display-xl), 32vw, 9rem);
+  line-height: 1;
+}
+
+.when {
+  grid-area: when;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  color: var(--fg);
+}
+
+.whenLead {
+  color: var(--fg-3);
+}
+
+.lede {
+  grid-area: lede;
+  max-width: 34ch;
+  margin-top: var(--space-5);
+  color: var(--fg-2);
+}
+
+.clock {
+  grid-area: clock;
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+/* Phones: the countdown fills the column without crowding the captions. */
+.countdown {
+  font-size: clamp(2.125rem, 10.5vw, 3.75rem);
+}
+
+@media (min-width: 64rem) {
+  .header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'eyebrow .'
+      'title   clock'
+      'when    lede';
+    column-gap: var(--space-8);
+  }
+
+  .title {
+    font-size: var(--fs-display-xl);
+  }
+
+  .when {
+    align-self: start;
+    margin-top: var(--space-5);
+  }
+
+  /* The countdown sets this column's width; the lede wraps inside it. */
+  .clock {
+    justify-self: end;
+    margin: 0 0 0.2em;
+    padding: 0;
+    border: 0;
+  }
+
+  .countdown {
+    font-size: var(--fs-display-m);
+  }
+
+  .lede {
+    contain: inline-size;
+    align-self: start;
+    max-width: none;
+    margin-top: var(--space-5);
+  }
+}
+
+/* ── The veiled pieces ────────────────────────────────────────── */
+
+/* Phones and tablets: one row that scrolls on its own; the page never scrolls sideways. */
+.grid {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin: var(--space-8) calc(-1 * var(--gutter)) 0;
+  padding: 0 var(--gutter) var(--space-4);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-hover) transparent;
+}
+
+.piece {
+  flex: 0 0 min(72vw, 21rem);
+  scroll-snap-align: start;
+}
+
+.card {
+  display: block;
+  color: var(--fg);
+}
+
+.media {
+  /* Placeholder root: keep the art in its frame when the veil lifts. */
+  overflow: hidden;
+}
+
+/* In the phone row every card shares one frame, so the captions line up across the scroll. */
+@media (max-width: 63.99rem) {
+  .feature .media {
+    aspect-ratio: 4 / 5;
+  }
+}
+
+.caption {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: var(--fs-display-s);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.gloss {
+  color: var(--fg-3);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-style: italic;
+  line-height: var(--lh-title);
+}
+
+.gloss i {
+  color: var(--fg-2);
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-small);
+}
+
+.kind {
+  color: var(--fg-2);
+}
+
+.price {
+  color: var(--fg);
+}
+
+@media (min-width: 64rem) {
+  /*
+   * The spread. Row 1: the feature (5 cols) with two pieces stepping down beside it.
+   * Row 2: three pieces in 3 / 4 / 2 columns, stepping down again, offset from row 1.
+   */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-5);
+    row-gap: var(--space-10);
+    margin: var(--space-10) 0 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .piece:nth-child(1) {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+  }
+
+  .piece:nth-child(2) {
+    grid-column: 7 / span 3;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .piece:nth-child(3) {
+    grid-column: 10 / span 3;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .piece:nth-child(4) {
+    grid-column: 2 / span 3;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .piece:nth-child(5) {
+    grid-column: 6 / span 4;
+    grid-row: 2;
+    align-self: start;
+    margin-top: var(--space-10);
+  }
+
+  .piece:nth-child(6) {
+    grid-column: 11 / span 2;
+    grid-row: 2;
+    align-self: end;
+  }
+
+  .feature .name {
+    font-size: var(--fs-display-m);
+    font-weight: var(--fw-light);
+  }
+}
