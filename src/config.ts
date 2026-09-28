@@ -9,7 +9,7 @@ export const FEATURES: { hero3d: boolean } = {
    * Also: `?3d=off|on` in the URL, the 3D / Still toggle in the hero, or `VITE_HERO_3D=off`
    * at build time to strip the 3D chunk entirely.
    */
-  hero3d: false,
+  hero3d: true,
 }
 
 /** Weekly drop rhythm, in the viewer's local time. */

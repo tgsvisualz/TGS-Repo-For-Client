@@ -2,8 +2,12 @@ import { useCallback, useState, useSyncExternalStore, type RefObject } from 'rea
 import { BREAKPOINTS, FEATURES } from '../../config'
 import { HERO_3D_BUILD_ENABLED, type Hero3DQuality } from '../../hero3d'
 import { canUseWebGL, readPref, useInView, useMediaQuery, usePrefersReducedMotion, writePref } from '../../lib'
+import { isSoftwareRenderer } from './renderer'
 
-/** The visitor's stored choice. 'auto' = 3D unless they prefer reduced motion. */
+/**
+ * The visitor's stored choice. 'auto' = 3D unless they prefer reduced motion or the browser only
+ * has a software GL driver (VMs, remote desktops, blocklisted GPUs), where it would crawl.
+ */
 export type HeroMode = 'auto' | '3d' | 'still'
 
 /** Mirrored on the section as data-hero3d. */
@@ -23,11 +27,14 @@ function readMode(): HeroMode {
   return stored === '3d' || stored === 'still' ? stored : 'auto'
 }
 
-/** `?3d=on|off` overrides the stored mode for this visit only. Read once. */
-function readUrlOverride(): 'on' | 'off' | null {
+/**
+ * `?3d=on|off` overrides the stored mode for this visit only; `?3d=high` also forces the high
+ * quality tier (demos, and headless checks on software GL). Read once.
+ */
+function readUrlOverride(): 'on' | 'off' | 'high' | null {
   try {
     const value = new URLSearchParams(window.location.search).get('3d')
-    return value === 'on' || value === 'off' ? value : null
+    return value === 'on' || value === 'off' || value === 'high' ? value : null
   } catch {
     return null
   }
@@ -76,13 +83,15 @@ export interface Hero3D {
  *    ▲                │  └──────onError / render throw──▶ failed (sticky for this page view)
  *    └────disable─────┴──────────────── (from loading or ready)
  *
- * enabled = possible && !failed && (?3d=on | ?3d=off | mode '3d' | mode 'auto' && !reducedMotion).
+ * enabled = possible && !failed && (?3d=on | ?3d=off | mode '3d' | mode 'auto' && !reducedMotion && !softwareGL).
  * Each enable is a new mount generation, so an onReady from an unmounted showroom can never
  * mark a newer mount ready.
  */
 export function useHero3D(sectionRef: RefObject<HTMLElement | null>): Hero3D {
   const [possible] = useState(detectPossible)
   const [lowMemory] = useState(() => (hints().deviceMemory ?? 8) <= 4)
+  // Probed only when 3D is possible, so no extra WebGL context is created otherwise.
+  const [softwareGL] = useState(() => possible && isSoftwareRenderer())
   const [override, setOverride] = useState(readUrlOverride)
   const [mode, setMode] = useState(readMode)
   const [failed, setFailed] = useState(false)
@@ -94,7 +103,11 @@ export function useHero3D(sectionRef: RefObject<HTMLElement | null>): Hero3D {
   const pageVisible = useSyncExternalStore(subscribeVisibility, isPageVisible, serverVisible)
 
   const wanted =
-    override === 'on' ? true : override === 'off' ? false : mode === '3d' || (mode === 'auto' && !reducedMotion)
+    override === 'on' || override === 'high'
+      ? true
+      : override === 'off'
+        ? false
+        : mode === '3d' || (mode === 'auto' && !reducedMotion && !softwareGL)
   const enabled = possible && !failed && wanted
 
   // A new generation each time the layer mounts (adjusting state while rendering, per the
@@ -125,7 +138,7 @@ export function useHero3D(sectionRef: RefObject<HTMLElement | null>): Hero3D {
     enabled,
     state,
     mountKey,
-    quality: coarsePointer || narrow || lowMemory ? 'lite' : 'high',
+    quality: override === 'high' ? 'high' : coarsePointer || narrow || lowMemory || softwareGL ? 'lite' : 'high',
     active: inView && pageVisible,
     reducedMotion,
     coarsePointer,
