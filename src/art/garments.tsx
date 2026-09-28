@@ -4,7 +4,7 @@
  * falloff, wool a pressed crease, knit faint rib lines, satin liquid bands.
  */
 import type { DressCut, Fabric, Outfit, TopCut, TrouserCut } from '../data/types'
-import { ARM, ARM_BACK, type Side } from './body'
+import { armShape, type ArmPose, type Side } from './body'
 import { across, boxOf, clamp, fmt, fold, foldOn, ribbon, rowsOutline, spline, boxOfC, type Box, type CPt, type Knot, type Pt, type Row } from './geom'
 import { FABRIC, type Tone } from './palette'
 import type { Fold, Mat, Piece } from './paint'
@@ -53,22 +53,18 @@ function band(c: readonly CPt[], tone: Tone, mat: Mat, extra: Partial<Piece> = {
   return { d: ribbon(c, 2, 2), box: boxOfC(c, 2), tone, mat, rim: 0.6, ...extra }
 }
 
-/** A sleeve that follows an arm, widened by a profile along its length (t: 0 shoulder → 1 wrist). */
-function sleeveOn(arm: readonly CPt[], widen: (t: number) => number, until = 1): CPt[] {
-  const n = arm.length - 1
-  return arm.filter((_, i) => i / n <= until + 1e-6).map((p, i) => [p[0], p[1], p[2] + widen(i / n)] as const)
-}
-
-function sleevePiece(c: readonly CPt[], tone: Tone, mat: Mat, side: Side, folds: number, view: View): Piece {
-  const d = ribbon(c, 14, view === 'back' ? 6 : 2)
-  const box = boxOfC(c, 4)
+/** A sleeve over an arm: the arm's contours widened by a profile (t: 0 shoulder → 1 wrist). */
+function sleeve(side: Side, view: View, pose: ArmPose, widen: (t: number) => number, tone: Tone, mat: Mat, folds: number): Piece {
+  const a = armShape(side, view, pose, widen)
+  const r = a.rows
+  const y0 = r[0][0] + 6
+  const y1 = r[r.length - 1][0] - 2
   const f: Fold[] = []
   for (let i = 0; i < folds; i++) {
-    const off = (i / Math.max(1, folds - 1) - 0.5) * 0.7
-    const pts: Pt[] = c.slice(2).map((p, j) => [p[0] + p[2] * off + Math.sin(j + i * 2) * 2, p[1]] as const)
-    f.push({ d: fold(pts, 7 + (i % 2) * 5), u: 0.5 + off, hi: i % 2 === 0, a: 0.8 })
+    const u = 0.2 + (i / Math.max(1, folds - 1)) * 0.6
+    f.push({ d: foldOn(r, u, u + (i % 2 ? 0.08 : -0.06), y0 + i * 10, y1, 7 + (i % 2) * 5, { shape: 'spindle', wig: 2, phase: i }), u, hi: i % 2 === 0, a: 0.85 })
   }
-  return { d, box, tone, mat, folds: f, key: side === 'L' ? 1 : 0.5 }
+  return { d: a.d, box: a.box, tone, mat, folds: f, key: side === 'L' ? 1 : 0.5 }
 }
 
 // ── Dresses ────────────────────────────────────────────────────────────────
@@ -95,18 +91,18 @@ function column(fabric: Fabric, view: View): Dressed {
     [930, 423, 577],
     [972, 424, 581],
   ]
-  const hem: Knot[] = [[424, 987, 1], [446, 993], [476, 996], [506, 992], [536, 997], [562, 993], [582, 987, 1]]
+  const hem: Knot[] = [[424, 987, 1], [452, 994], [492, 998], [534, 997], [582, 988, 1]]
   const dress = make(
     rowsOutline(rows, hem, top),
     tone,
     mat,
     (b) => [
-      H(b, [[417, 520], [418, 640], [422, 760], [427, 880], [431, 992]], 15 * wf, 1, 'flare'),
-      Lo(b, [[450, 560], [455, 700], [461, 850], [465, 996]], 14 * wf, 0.9, 'flare'),
-      H(b, [[478, 600], [481, 720], [485, 860], [489, 996]], 8 * wf, 0.8, 'flare'),
-      H(b, [[520, 690], [523, 780], [527, 880], [531, 997]], 18 * wf, 0.9, 'flare'),
-      Lo(b, [[548, 600], [550, 720], [553, 860], [556, 997]], 16 * wf, 1, 'flare'),
-      H(b, [[566, 580], [566, 720], [569, 860], [573, 992]], 8 * wf, 0.7, 'flare'),
+      H(b, [[416, 520], [418, 640], [422, 760], [427, 880], [431, 992]], 15 * wf, 1, 'flare'),
+      Lo(b, [[440, 540], [444, 680], [449, 840], [453, 996]], 18 * wf, 0.7, 'flare'),
+      H(b, [[468, 560], [472, 700], [476, 860], [480, 998]], 10 * wf, 0.7, 'flare'),
+      H(b, [[522, 690], [525, 780], [528, 880], [532, 997]], 20 * wf, 0.9, 'flare'),
+      Lo(b, [[550, 600], [552, 720], [555, 860], [558, 997]], 16 * wf, 0.9, 'flare'),
+      H(b, [[567, 580], [567, 720], [570, 860], [574, 990]], 8 * wf, 0.7, 'flare'),
       H(b, [[444, 296], [442, 336], [447, 380]], 10 * wf, 0.8),
       Lo(b, [[468, 432], [488, 520], [498, 600]], 12 * wf, 0.6),
       Lo(b, [[452, 424], [500, 430], [552, 426]], 6, 0.4),
@@ -173,7 +169,7 @@ function slip(fabric: Fabric, view: View): Dressed {
   return { upper: [dress], lower: [], over: [band(strapL, tone, mat), band(strapR, tone, mat)], sleeves: {}, bareArms: true, hem: 913 }
 }
 
-function wrap(fabric: Fabric, view: View): Dressed {
+function wrap(fabric: Fabric, view: View, pose: ArmPose): Dressed {
   const tone = FABRIC[fabric]
   const mat = matFor(fabric, 'wrap')
   const top: Knot[] =
@@ -225,15 +221,14 @@ function wrap(fabric: Fabric, view: View): Dressed {
   }
   over.push(band(tie2, tone, mat, { rim: 0.8, folds: [{ d: fold(tie2.map((c) => [c[0] + 1, c[1]] as const), 4), u: 0.4, hi: true }] }))
   over.push(band(tie1, tone, mat, { rim: 0.8, folds: [{ d: fold(tie1.map((c) => [c[0] - 1, c[1]] as const), 5), u: 0.4, hi: true }] }))
-  const arms = view === 'front' ? ARM : ARM_BACK
-  const widen = (t: number): number => 6 - t * 1.5
+  const widen = (t: number): number => 7 - t * 2
   return {
     upper: [dress],
     lower: [],
     over,
     sleeves: {
-      L: [sleevePiece(sleeveOn(arms.L, widen), tone, mat, 'L', 3, view)],
-      R: [sleevePiece(sleeveOn(arms.R, widen), tone, mat, 'R', 3, view)],
+      L: [sleeve('L', view, pose, widen, tone, mat, 3)],
+      R: [sleeve('R', view, pose, widen, tone, mat, 3)],
     },
     bareArms: false,
     hem: 799,
@@ -293,7 +288,7 @@ function evening(fabric: Fabric, view: View): Dressed {
 
 // ── Tops ───────────────────────────────────────────────────────────────────
 
-function blouse(fabric: Fabric, view: View): Omit<Dressed, 'lower' | 'hem'> {
+function blouse(fabric: Fabric, view: View, pose: ArmPose): Omit<Dressed, 'lower' | 'hem'> {
   const tone = FABRIC[fabric]
   const mat = matFor(fabric, 'blouse')
   const top: Knot[] = [[590, 256], [584, 238, 1], [560, 223], [530, 213], [520, 206, 1], [484, 207, 1], [474, 214], [446, 226], [418, 240, 1], [410, 258]]
@@ -316,28 +311,16 @@ function blouse(fabric: Fabric, view: View): Omit<Dressed, 'lower' | 'hem'> {
   ])
   const collarK: Knot[] = [[482, 212, 1], [480, 186], [490, 180], [502, 179], [514, 180], [523, 185], [522, 208, 1], [502, 214]]
   const collar = make(collarK, tone, mat, (b) => [H(b, [[484, 190], [502, 184], [520, 188]], 4, 0.8)], { rim: 0.7 })
-  const arms = view === 'front' ? ARM : ARM_BACK
-  // Bishop sleeve: full through the forearm, gathered into a cuff.
-  const widen = (t: number): number => (t < 0.55 ? 7 + t * 12 : t < 0.8 ? 14 + (t - 0.55) * 64 : Math.max(4, 30 - (t - 0.8) * 130))
-  const cuff = (s: Side): Piece => {
-    const a = arms[s]
-    const w = a[a.length - 1]
-    const pw = a[a.length - 2]
-    const c: CPt[] = [[pw[0] + (w[0] - pw[0]) * 0.55, pw[1] + (w[1] - pw[1]) * 0.55, 21], [w[0], w[1], 19]]
-    return band(c, tone, mat, { rim: 0.8 })
-  }
+  // Bishop sleeve: full through the forearm, gathered at the wrist.
+  const widen = (t: number): number => (t < 0.5 ? 8 + t * 10 : t < 0.84 ? 13 + (t - 0.5) * 70 : Math.max(5, 37 - (t - 0.84) * 200))
   const sleeves: Partial<Record<Side, Piece[]>> = {
-    L: [sleevePiece(sleeveOn(arms.L, widen), tone, mat, 'L', 4, view)],
-    R: [sleevePiece(sleeveOn(arms.R, widen), tone, mat, 'R', 4, view)],
-  }
-  if (view === 'front') {
-    sleeves.L?.push(cuff('L'))
-    sleeves.R?.push(cuff('R'))
+    L: [sleeve('L', view, pose, widen, tone, mat, 4)],
+    R: [sleeve('R', view, pose, widen, tone, mat, 4)],
   }
   return { upper: [body], over: [collar], sleeves, bareArms: false }
 }
 
-function knit(fabric: Fabric, view: View): Omit<Dressed, 'lower' | 'hem'> {
+function knit(fabric: Fabric, view: View, pose: ArmPose): Omit<Dressed, 'lower' | 'hem'> {
   const tone = FABRIC[fabric]
   const mat: Mat = 'knit'
   const top: Knot[] = [[590, 254], [584, 236, 1], [560, 223], [534, 212], [520, 205, 1], [510, 212], [501, 215], [490, 212], [483, 206, 1], [468, 214], [440, 228], [418, 240, 1], [410, 256]]
@@ -374,15 +357,14 @@ function knit(fabric: Fabric, view: View): Omit<Dressed, 'lower' | 'hem'> {
     (b) => [H(b, [[440, 290], [438, 350], [446, 410], [450, 450]], 18, 1), Lo(b, [[470, 340], [500, 350], [530, 340]], 14, 0.4)],
     { extra: ribs },
   )
-  const arms = view === 'front' ? ARM : ARM_BACK
-  const widen = (t: number): number => 4 + (t > 0.85 ? 2 : 0)
+  const widen = (t: number): number => 5 + (t > 0.85 ? 2 : 0)
   const neck: CPt[] = [[482, 206, 7], [491, 212, 7], [501, 215, 7], [511, 212, 7], [521, 205, 7]]
   return {
     upper: [body],
     over: view === 'front' ? [band(neck, tone, mat, { rim: 0.5 })] : [],
     sleeves: {
-      L: [sleevePiece(sleeveOn(arms.L, widen), tone, mat, 'L', 2, view)],
-      R: [sleevePiece(sleeveOn(arms.R, widen), tone, mat, 'R', 2, view)],
+      L: [sleeve('L', view, pose, widen, tone, mat, 2)],
+      R: [sleeve('R', view, pose, widen, tone, mat, 2)],
     },
     bareArms: false,
   }
@@ -481,7 +463,6 @@ function wideLeg(fabric: Fabric, cut: TrouserCut): { lower: Piece[]; over: Piece
           H(b, [[542, 620], [533, 720], [539, 820], [551, 920], [559, 994]], 7, 1),
           Lo(b, [[572, 600], [578, 760], [584, 994]], 14, 0.9),
           H(b, [[592, 600], [598, 760], [600, 990]], 7, 0.7),
-          H(b, [[402, 972], [430, 980], [462, 974]], 6, 0.6),
         ]
       : [
           H(b, [[420, 520], [410, 640], [404, 760], [399, 880], [397, 996]], 16, 1, 'flare'),
@@ -490,8 +471,8 @@ function wideLeg(fabric: Fabric, cut: TrouserCut): { lower: Piece[]; over: Piece
           H(b, [[520, 640], [530, 760], [540, 880], [548, 998]], 15, 0.9, 'flare'),
           Lo(b, [[556, 600], [566, 760], [574, 900], [580, 999]], 14, 1, 'flare'),
           H(b, [[590, 580], [598, 720], [604, 860], [608, 996]], 9, 0.7, 'flare'),
-          H(b, [[392, 966], [420, 974], [452, 968]], 6, 0.6),
-          H(b, [[534, 968], [566, 976], [600, 970]], 6, 0.5),
+          H(b, [[394, 944], [412, 962], [436, 972]], 7, 0.35),
+          H(b, [[538, 950], [560, 966], [586, 974]], 7, 0.3),
           Lo(b, [[470, 426], [468, 472], [466, 522]], 6, 0.7),
           Lo(b, [[532, 428], [534, 474], [536, 522]], 6, 0.7),
         ],
@@ -510,9 +491,9 @@ function tailored(fabric: Fabric): { lower: Piece[]; over: Piece[]; hem: number 
     mat,
     (b) => [
       // Pressed creases: a crisp line of light down the front of each leg.
-      H(b, [[441, 476], [446, 600], [451, 780], [453, 968]], 3.2, 1.6),
+      H(b, [[441, 476], [446, 600], [451, 780], [453, 968]], 4, 2.4),
       Lo(b, [[445, 480], [450, 600], [455, 780], [457, 968]], 5, 0.9),
-      H(b, [[548, 484], [545, 620], [549, 800], [555, 970]], 3, 1.4),
+      H(b, [[548, 484], [545, 620], [549, 800], [555, 970]], 3.6, 2.2),
       Lo(b, [[552, 486], [549, 620], [553, 800], [559, 970]], 5, 0.9),
       H(b, [[420, 520], [420, 680], [426, 860], [430, 966]], 12, 0.6),
       Lo(b, [[488, 640], [494, 800], [500, 968]], 10, 0.7),
@@ -552,7 +533,7 @@ function pleated(fabric: Fabric): { lower: Piece[]; over: Piece[]; hem: number }
 
 // ── Assembly ───────────────────────────────────────────────────────────────
 
-export function dress(outfit: Outfit, view: View): Dressed {
+export function dress(outfit: Outfit, view: View, pose: ArmPose): Dressed {
   if (outfit.kind === 'dress') {
     const cut: DressCut = outfit.cut
     switch (cut) {
@@ -561,7 +542,7 @@ export function dress(outfit: Outfit, view: View): Dressed {
       case 'slip':
         return slip(outfit.fabric, view)
       case 'wrap':
-        return wrap(outfit.fabric, view)
+        return wrap(outfit.fabric, view, pose)
       case 'evening':
         return evening(outfit.fabric, view)
     }
@@ -569,9 +550,9 @@ export function dress(outfit: Outfit, view: View): Dressed {
   const topCut: TopCut = outfit.top
   const t =
     topCut === 'blouse'
-      ? blouse(outfit.topFabric, view)
+      ? blouse(outfit.topFabric, view, pose)
       : topCut === 'knit'
-        ? knit(outfit.topFabric, view)
+        ? knit(outfit.topFabric, view, pose)
         : topCut === 'bodysuit'
           ? bodysuit(outfit.topFabric, view)
           : draped(outfit.topFabric, view)

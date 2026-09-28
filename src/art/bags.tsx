@@ -13,8 +13,10 @@ export type BagMode = 'still' | 'carry'
 
 export interface BagDraw {
   node: ReactElement
-  /** Bounds in local space (unscaled). */
+  /** Bounds in local space (unscaled), including straps or chains trailing on the plinth. */
   box: Box
+  /** The bag itself with its handle: what the framing and plinth are sized to. */
+  core: Box
   /** Where a hand holds it (local). */
   grip: Pt
   /** Strap attachment points (local), for straps the figure draws. */
@@ -31,21 +33,21 @@ export function bagMat(shape: BagShape, fabric: Fabric): Mat {
 
 /** Product-shot scale: evens out the visual size of very different shapes. */
 export const STILL_SCALE: Record<BagShape, number> = {
-  'top-handle': 1.02,
-  shoulder: 0.94,
-  tote: 0.98,
-  crossbody: 1.18,
-  clutch: 0.92,
-  mini: 1.22,
-  evening: 1.28,
-  pouch: 1.16,
+  'top-handle': 1.1,
+  shoulder: 1.02,
+  tote: 1.04,
+  crossbody: 1.34,
+  clutch: 1.0,
+  mini: 1.36,
+  evening: 1.42,
+  pouch: 1.3,
 }
 
 /** Scale when carried by a figure (figure units: a 28 cm bag is ~160 units). */
 export const CARRY_SCALE: Record<BagShape, number> = {
   'top-handle': 0.5,
-  shoulder: 0.52,
-  tote: 0.6,
+  shoulder: 0.42,
+  tote: 0.56,
   crossbody: 0.46,
   clutch: 0.44,
   mini: 0.5,
@@ -121,7 +123,7 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
       k.push(strap(p, handle, t, mat, L, 'h'))
       k.push(<path key="hh" d={fold(handle.slice(1, 5).map(([x, y]) => [x + 2, y + 2] as const), 4)} fill={t.sheen} opacity="0.55" />)
       const g = gusset(L, [150, 0], [122, -200], 12)
-      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.4, key: 0 }, L, 'g'))
+      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.3, key: 0, dim: 0.35 }, L, 'g'))
       const bodyPts: Pt[] = [[-150, 0], [150, 0], [122, -200], [-122, -200]]
       const bb = boxOf(bodyPts)
       k.push(
@@ -160,29 +162,37 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
         ),
       )
       k.push(metalBits(p, L, 'cl', rounded([[-15, -116], [15, -116], [15, -95], [-15, -95]], 5), { x: -15, y: -116, w: 30, h: 21 }, [-6 * gSide, -110]))
-      return { node: <g>{k}</g>, box: { x: -164, y: -330, w: 328, h: 332 }, grip: [0, -316], attach: [[-72, -196], [72, -196]] }
+      return { node: <g>{k}</g>, box: { x: -164, y: -330, w: 328, h: 332 }, core: { x: -164, y: -330, w: 328, h: 332 }, grip: [0, -316], attach: [[-72, -196], [72, -196]] }
     }
 
     case 'shoulder': {
+      // Hobo: a slouchy half-moon whose ends rise toward the strap.
       if (still) {
-        const s: CPt[] = [[-160, -150, 9], [-156, -250, 9], [-122, -366, 9], [-60, -428, 9], [0, -440, 9], [60, -428, 9], [122, -366, 9], [156, -250, 9], [160, -150, 9]]
+        const s: CPt[] = [[-128, -198, 9], [-127, -252, 9], [-112, -304, 9], [-78, -346, 9], [-26, -370, 9], [28, -372, 9], [78, -352, 9], [112, -312, 9], [127, -258, 9], [128, -198, 9]]
         k.push(strap(p, s, t, mat, L, 's'))
+        const bk: Pt[] = [[-134, -272], [-120, -272], [-120, -252], [-134, -252]]
+        k.push(metalBits(p, L, 'bk', rounded(bk, 2), boxOf(bk), [-129, -268]))
+        k.push(<path key="bkh" d={rounded([[-130, -268], [-124, -268], [-124, -256], [-130, -256]], 1)} fill={t.deep} />)
       }
       const body: Knot[] = [
-        [-174, -158, 1],
-        [-122, -127],
-        [-60, -114],
-        [0, -110],
-        [60, -114],
-        [122, -127],
-        [174, -158, 1],
-        [168, -100],
-        [144, -46],
-        [92, -10],
-        [0, 3],
-        [-92, -10],
-        [-144, -46],
-        [-168, -100],
+        [-128, -198, 1],
+        [-96, -156],
+        [-50, -128],
+        [0, -121],
+        [50, -128],
+        [96, -156],
+        [128, -198, 1],
+        [155, -168],
+        [174, -118],
+        [172, -64],
+        [146, -22],
+        [84, 0],
+        [0, 5],
+        [-84, 0],
+        [-146, -22],
+        [-172, -64],
+        [-174, -118],
+        [-155, -168],
       ]
       const bb = boxOf(body)
       k.push(
@@ -195,72 +205,73 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
             mat,
             ao: 0.25,
             folds: [
-              hi(bb, [[-150, -128], [-110, -80], [-50, -34], [0, -14]], 14, 0.9),
-              lo(bb, [[-80, -112], [-56, -66], [-14, -24]], 16, 0.7),
-              hi(bb, [[20, -108], [40, -64], [70, -26]], 10, 0.6),
-              lo(bb, [[130, -128], [110, -80], [70, -30]], 14, 0.7),
-              hi(bb, [[-150, -150], [-60, -118], [0, -114], [60, -118], [150, -150]], 5, 0.8 * edge),
+              hi(bb, [[-150, -150], [-128, -100], [-80, -46], [-20, -16]], 14, 0.9),
+              lo(bb, [[-92, -146], [-66, -92], [-20, -34]], 16, 0.7),
+              hi(bb, [[30, -124], [48, -78], [80, -32]], 10, 0.55),
+              lo(bb, [[140, -160], [120, -104], [74, -36]], 14, 0.7),
+              hi(bb, [[-122, -190], [-60, -134], [0, -125], [60, -134], [122, -190]], 5, 0.8 * edge),
             ],
           },
           L,
           'b',
         ),
       )
-      k.push(metalBits(p, L, 'r1', ellipse(-166, -156, 7, 7), { x: -173, y: -163, w: 14, h: 14 }, [-168, -159]))
-      k.push(metalBits(p, L, 'r2', ellipse(166, -156, 7, 7), { x: 159, y: -163, w: 14, h: 14 }, [164, -159]))
-      return { node: <g>{k}</g>, box: { x: -180, y: still ? -448 : -166, w: 360, h: still ? 452 : 170 }, grip: [0, -440], attach: [[-166, -156], [166, -156]] }
+      k.push(metalBits(p, L, 'r1', ellipse(-128, -196, 7, 7), { x: -135, y: -203, w: 14, h: 14 }, [-130, -199]))
+      k.push(metalBits(p, L, 'r2', ellipse(128, -196, 7, 7), { x: 121, y: -203, w: 14, h: 14 }, [126, -199]))
+      const bx: Box = { x: -180, y: still ? -380 : -206, w: 360, h: still ? 386 : 212 }
+      return { node: <g>{k}</g>, box: bx, core: bx, grip: [0, -372], attach: [[-128, -196], [128, -196]] }
     }
 
     case 'tote': {
-      const back = arch(-68, 68, -300, 108, 15)
-      k.push(strap(p, back, sideTone(t), mat, L, 'hb', 0.5))
-      const rimBack: Knot[] = [[-128, -290, 1], [-126, -303, 1], [126, -303, 1], [128, -290, 1]]
-      k.push(piece(p, { d: spline(rimBack, true), box: boxOf(rimBack), tone: sideTone(t), mat, rim: 0.3 }, L, 'rb'))
-      k.push(<path key="in" d={spline([[-122, -291, 1], [-120, -299, 1], [120, -299, 1], [122, -291, 1]], true)} fill={STAGE.shadow} opacity="0.9" />)
-      const g = gusset(L, [140, 0], [128, -290], 18)
-      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.4, key: 0 }, L, 'g'))
-      const bodyPts: Pt[] = [[-140, 0], [140, 0], [128, -290], [-128, -290]]
+      const back = arch(-66, 66, -300, 118, 15)
+      k.push(strap(p, back, sideTone(t), mat, L, 'hb', 0.4))
+      const rimBack: Knot[] = [[-146, -290, 1], [-143, -304, 1], [143, -304, 1], [146, -290, 1]]
+      k.push(piece(p, { d: spline(rimBack, true), box: boxOf(rimBack), tone: sideTone(t), mat, rim: 0.3, dim: 0.3 }, L, 'rb'))
+      k.push(<path key="in" d={spline([[-138, -291, 1], [-136, -300, 1], [136, -300, 1], [138, -291, 1]], true)} fill={STAGE.shadow} opacity="0.92" />)
+      const g = gusset(L, [132, 0], [146, -290], 16)
+      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.3, key: 0, dim: 0.35 }, L, 'g'))
+      const bodyPts: Pt[] = [[-132, 0], [132, 0], [146, -290], [-146, -290]]
       const bb = boxOf(bodyPts)
       k.push(
         piece(
           p,
           {
-            d: rounded(bodyPts, [10, 10, 5, 5]),
+            d: rounded(bodyPts, [10, 10, 4, 4]),
             box: bb,
             tone: t,
             mat,
-            ao: 0.3,
+            ao: 0.35,
+            dim: L === 'top' ? 0.18 : 0,
             folds: [
-              hi(bb, [[-124, -288], [0, -290], [124, -288]], 5, 0.9 * edge),
-              hi(bb, [[-100, -280], [-104, -150], [-110, -20]], 16, 0.5),
-              lo(bb, [[-10, -270], [-6, -150], [0, -30]], 22, 0.35),
-              hi(bb, [[60, -270], [66, -150], [72, -30]], 12, 0.3),
-              hi(bb, [[-134, -10], [0, -6], [134, -10]], 4, 0.6 * edge),
+              hi(bb, [[-140, -288], [0, -291], [140, -288]], 4, 0.9 * edge),
+              lo(bb, [[-126, -282], [0, -284], [126, -282]], 8, 0.5),
+              lo(bb, [[-70, -270], [-66, -150], [-60, -30]], 26, 0.28),
+              lo(bb, [[64, -270], [60, -150], [56, -30]], 26, 0.28),
+              hi(bb, [[-126, -10], [0, -6], [126, -10]], 3, 0.5 * edge),
             ],
           },
           L,
           'b',
         ),
       )
-      const front = arch(-62, 62, -286, 104, 15)
+      const front = arch(-60, 60, -286, 112, 15)
       k.push(strap(p, front, t, mat, L, 'hf'))
-      k.push(<path key="hfh" d={fold(front.slice(1, 5).map(([x, y]) => [x + 2, y + 3] as const), 4)} fill={t.sheen} opacity="0.5" />)
-      for (const x of [-62, 62]) {
-        const tab: Pt[] = [[x - 11, -300], [x + 11, -300], [x + 11, -266], [x - 11, -266]]
-        k.push(piece(p, { d: rounded(tab, 3), box: boxOf(tab), tone: t, mat, rim: 0.6 }, L, `t${x}`))
+      for (const x of [-60, 60]) {
+        const tab: Pt[] = [[x - 11, -300], [x + 11, -300], [x + 11, -262], [x - 11, -262]]
+        k.push(piece(p, { d: rounded(tab, 3), box: boxOf(tab), tone: t, mat, rim: 0.5 }, L, `t${x}`))
       }
-      return { node: <g>{k}</g>, box: { x: -160, y: -404, w: 320, h: 406 }, grip: [0, -392], attach: [[-62, -286], [62, -286]] }
+      return { node: <g>{k}</g>, box: { x: -164, y: -404, w: 328, h: 406 }, core: { x: -164, y: -404, w: 328, h: 406 }, grip: [0, -396], attach: [[-60, -286], [60, -286]] }
     }
 
     case 'crossbody': {
       if (still) {
-        const r: CPt[] = [[102, -140, 6], [132, -100, 6], [146, -40, 6], [164, 2, 6], [210, 12, 6], [270, 10, 6], [330, 16, 6]]
-        const l: CPt[] = [[-102, -140, 6], [-128, -96, 6], [-140, -36, 6], [-160, 4, 6], [-210, 14, 6], [-262, 10, 6]]
+        const r: CPt[] = [[102, -140, 6], [132, -100, 6], [146, -40, 6], [164, 2, 6], [200, 12, 6], [236, 10, 6], [262, 14, 6]]
+        const l: CPt[] = [[-102, -140, 6], [-128, -96, 6], [-140, -36, 6], [-160, 4, 6], [-196, 14, 6], [-228, 10, 6]]
         k.push(strap(p, l, t, mat, L, 'sl'))
         k.push(strap(p, r, t, mat, L, 'sr'))
       }
       const g = gusset(L, [110, 0], [106, -150], 12)
-      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.4, key: 0 }, L, 'g'))
+      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.3, key: 0, dim: 0.35 }, L, 'g'))
       const bodyPts: Pt[] = [[-110, 0], [110, 0], [106, -150], [-106, -150]]
       const bb = boxOf(bodyPts)
       k.push(piece(p, { d: rounded(bodyPts, 12), box: bb, tone: t, mat, folds: [hi(bb, [[-100, -10], [0, -6], [100, -10]], 4, 0.6 * edge)] }, L, 'b'))
@@ -285,12 +296,12 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
         ),
       )
       k.push(metalBits(p, L, 'cl', rounded([[-18, -70], [18, -70], [18, -58], [-18, -58]], 3), { x: -18, y: -70, w: 36, h: 12 }, [-8 * gSide, -66]))
-      return { node: <g>{k}</g>, box: still ? { x: -270, y: -160, w: 610, h: 180 } : { x: -122, y: -160, w: 244, h: 162 }, grip: [0, -150], attach: [[-104, -146], [104, -146]] }
+      return { node: <g>{k}</g>, box: still ? { x: -236, y: -160, w: 504, h: 180 } : { x: -122, y: -160, w: 244, h: 162 }, core: { x: -122, y: -160, w: 244, h: 162 }, grip: [0, -150], attach: [[-104, -146], [104, -146]] }
     }
 
     case 'clutch': {
       const g = gusset(L, [180, 0], [178, -150], 10)
-      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.4, key: 0 }, L, 'g'))
+      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.3, key: 0, dim: 0.35 }, L, 'g'))
       const bodyPts: Pt[] = [[-180, 0], [180, 0], [178, -150], [-178, -150]]
       const bb = boxOf(bodyPts)
       k.push(piece(p, { d: rounded(bodyPts, 10), box: bb, tone: t, mat, ao: 0.2, folds: [hi(bb, [[-170, -8], [0, -5], [170, -8]], 4, 0.5)] }, L, 'b'))
@@ -316,7 +327,7 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
         ),
       )
       k.push(metalBits(p, L, 'cl', ellipse(0, -60, 7, 9), { x: -7, y: -69, w: 14, h: 18 }, [-3 * gSide, -64]))
-      return { node: <g>{k}</g>, box: { x: -186, y: -156, w: 372, h: 158 }, grip: [-10, -118], attach: [[-178, -150], [178, -150]] }
+      return { node: <g>{k}</g>, box: { x: -186, y: -156, w: 372, h: 158 }, core: { x: -186, y: -156, w: 372, h: 158 }, grip: [-10, -118], attach: [[-178, -150], [178, -150]] }
     }
 
     case 'mini': {
@@ -324,9 +335,8 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
       k.push(strap(p, s, t, mat, L, 's'))
       const topFace: Knot[] = [[-90, -150, 1], [90, -150, 1], [83, -170, 1], [-83, -170, 1]]
       k.push(piece(p, { d: spline(topFace, true), box: boxOf(topFace), tone: { ...t, deep: t.base, base: t.lit }, mat, rim: 0.5 }, L, 'tf'))
-      const g = gusset(L, [95, 0], [90, -150], 14)
-      const g2: Pt[] = [...g.slice(0, 3), [g[2][0] - 6 * gSide, -168], g[3]]
-      k.push(piece(p, { d: spline(g2.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g2), tone: sideTone(t), mat, rim: 0.4, key: 0 }, L, 'g'))
+      const g = gusset(L, [95, 0], [90, -150], 13)
+      k.push(piece(p, { d: spline(g.map((q) => [q[0], q[1], 1] as const), true), box: boxOf(g), tone: sideTone(t), mat, rim: 0.3, key: 0, dim: 0.5 }, L, 'g'))
       const bodyPts: Pt[] = [[-95, 0], [95, 0], [90, -150], [-90, -150]]
       const bb = boxOf(bodyPts)
       k.push(
@@ -340,8 +350,9 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
             folds: [
               hi(bb, [[-86, -118], [0, -114], [86, -118]], 4, 0.8),
               lo(bb, [[-86, -112], [0, -108], [86, -112]], 5, 0.6),
-              hi(bb, [[-60, -140], [-66, -80], [-70, -10]], 22, 0.6),
-              hi(bb, [[40, -140], [44, -80], [46, -10]], 10, 0.4),
+              ...(mat === 'satin'
+                ? [hi(bb, [[-60, -140], [-66, -80], [-70, -10]], 22, 0.6), hi(bb, [[40, -140], [44, -80], [46, -10]], 10, 0.4)]
+                : [lo(bb, [[0, -104], [2, -60], [0, -14]], 30, 0.25)]),
             ],
           },
           L,
@@ -349,14 +360,14 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
         ),
       )
       k.push(metalBits(p, L, 'cl', rounded([[-9, -116], [9, -116], [9, -98], [-9, -98]], 4), { x: -9, y: -116, w: 18, h: 18 }, [-3 * gSide, -110]))
-      return { node: <g>{k}</g>, box: { x: -110, y: -254, w: 220, h: 256 }, grip: [0, -246], attach: [[-48, -168], [48, -168]] }
+      return { node: <g>{k}</g>, box: { x: -110, y: -254, w: 220, h: 256 }, core: { x: -110, y: -254, w: 220, h: 256 }, grip: [0, -246], attach: [[-48, -168], [48, -168]] }
     }
 
     case 'evening': {
       const grip: Pt = [0, -236]
       if (still) {
-        k.push(chainPath(p, [[-86, -152], [-116, -108], [-134, -40], [-160, 2], [-214, 11], [-276, 6]], 'cl'))
-        k.push(chainPath(p, [[86, -152], [110, -100], [128, -32], [156, 4], [222, 12], [262, 9]], 'cr'))
+        k.push(chainPath(p, [[-86, -152], [-116, -108], [-134, -40], [-158, 2], [-196, 11], [-226, 6]], 'cl'))
+        k.push(chainPath(p, [[86, -152], [110, -100], [128, -32], [154, 4], [196, 12], [230, 9]], 'cr'))
       } else {
         k.push(chainPath(p, [[-86, -152], [-50, -196], grip], 'cl', 2.6))
         k.push(chainPath(p, [[86, -152], [50, -196], grip], 'cr', 2.6))
@@ -388,7 +399,7 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
       k.push(metalBits(p, L, 'fr', ribbon(frame, 3, 3), boxOfC(frame), [-40 * gSide, -157]))
       k.push(metalBits(p, L, 'k1', ellipse(-6, -168, 6.5, 6.5), { x: -13, y: -175, w: 13, h: 13 }, [-8, -170]))
       k.push(metalBits(p, L, 'k2', ellipse(6, -168, 6.5, 6.5), { x: -1, y: -175, w: 13, h: 13 }, [4, -170]))
-      return { node: <g>{k}</g>, box: still ? { x: -280, y: -178, w: 546, h: 192 } : { x: -110, y: -240, w: 220, h: 242 }, grip, attach: [[-86, -152], [86, -152]] }
+      return { node: <g>{k}</g>, box: still ? { x: -232, y: -178, w: 466, h: 192 } : { x: -110, y: -240, w: 220, h: 242 }, core: { x: -110, y: -180, w: 220, h: 182 }, grip, attach: [[-86, -152], [86, -152]] }
     }
 
     case 'pouch': {
@@ -426,7 +437,7 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
             ao: 0.3,
             folds: rays.map(([a, b, h], i) => {
               const mid: Pt = [(a[0] + b[0]) / 2 + (i - 2) * 4, (a[1] + b[1]) / 2]
-              return h ? hi(bb, [a, mid, b], 16, 0.9) : lo(bb, [a, mid, b], 18, 0.9)
+              return h ? hi(bb, [a, mid, b], 16, leather ? 0.24 : 0.9) : lo(bb, [a, mid, b], 18, leather ? 0.36 : 0.9)
             }),
           },
           L,
@@ -454,7 +465,7 @@ export function bag(p: Paint, shape: BagShape, fabric: Fabric, L: LightDir, mode
       const tail: CPt[] = [[44, -186, 3.2], [54, -150, 3.2], [58, -112, 3.2]]
       k.push(piece(p, { d: ribbon(tail, 1, 1), box: boxOfC(tail), tone: sideTone(t), mat, rim: 0.7 }, L, 'ct'))
       k.push(metalBits(p, L, 'bd', ellipse(58, -106, 5, 6.5), { x: 53, y: -113, w: 10, h: 13 }, [56, -109]))
-      return { node: <g>{k}</g>, box: { x: -118, y: -242, w: 236, h: 246 }, grip: [0, -198], attach: [[-50, -186], [50, -186]] }
+      return { node: <g>{k}</g>, box: { x: -118, y: -242, w: 236, h: 246 }, core: { x: -118, y: -242, w: 236, h: 246 }, grip: [0, -198], attach: [[-50, -186], [50, -186]] }
     }
   }
 }

@@ -29,11 +29,11 @@ export const STAGE = {
 
 export const FABRIC: Record<Fabric, Tone> = {
   noir: { deep: '#070606', base: '#100F0E', lit: '#221E1B', sheen: '#4A423B', rim: '#7C6F62' },
-  bone: { deep: '#37322C', base: '#857C6F', lit: '#CFC6B8', sheen: '#ECE5DA', rim: '#F4EEE4' },
+  bone: { deep: '#2A2621', base: '#6E665A', lit: '#C3BAAB', sheen: '#E6DED2', rim: '#EFE8DD' },
   garnet: { deep: '#180407', base: '#380C13', lit: '#5C1520', sheen: '#8E2A36', rim: '#B34A56' },
   smoke: { deep: '#0F0E0D', base: '#282422', lit: '#4A4541', sheen: '#7A726B', rim: '#A0978D' },
   ash: { deep: '#191715', base: '#3A3632', lit: '#6B655E', sheen: '#978F86', rim: '#BBB2A7' },
-  champagne: { deep: '#2A2319', base: '#675945', lit: '#B8A58A', sheen: '#E8D8BE', rim: '#F2E6D2' },
+  champagne: { deep: '#231D15', base: '#5E5140', lit: '#B8A58A', sheen: '#E8D8BE', rim: '#F2E6D2' },
   oxblood: { deep: '#110305', base: '#2A090E', lit: '#4A1219', sheen: '#7A2630', rim: '#9E444E' },
 }
 
@@ -68,7 +68,7 @@ export interface VeilInk {
 }
 
 export const VEIL: Record<VeilTone, VeilInk> = {
-  ivory: { color: '#E8E0D4', alpha: 0.55, hi: '#FAF5EC', hiA: 0.34, lo: '#3A342E' },
+  ivory: { color: '#E8E0D4', alpha: 0.42, hi: '#FAF5EC', hiA: 0.26, lo: '#3A342E' },
   tulle: { color: '#0E0D0C', alpha: 0.8, hi: '#9A8E80', hiA: 0.2, lo: '#050404' },
   smoke: { color: '#6E6862', alpha: 0.65, hi: '#C9C0B5', hiA: 0.3, lo: '#24211F' },
 }

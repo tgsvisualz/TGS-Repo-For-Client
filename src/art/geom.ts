@@ -27,11 +27,15 @@ export function fmt(n: number): string {
   return v === 0 ? '0' : String(v)
 }
 
-/** Catmull-Rom spline through knots, as cubic Béziers. */
-export function spline(pts: readonly Knot[], closed = false, tension = 1): string {
+/** Whole units: for soft features (folds, sheen) where a tenth of a unit is never seen. */
+const fmt0 = (n: number): string => String(Math.round(n))
+
+/** Catmull-Rom spline through knots, as cubic Béziers. `coarse` rounds to whole units. */
+export function spline(pts: readonly Knot[], closed = false, tension = 1, coarse = false): string {
   const n = pts.length
   if (n === 0) return ''
-  let d = `M${fmt(pts[0][0])} ${fmt(pts[0][1])}`
+  const f = coarse ? fmt0 : fmt
+  let d = `M${f(pts[0][0])} ${f(pts[0][1])}`
   if (n === 1) return d
   const at = (i: number): Knot => (closed ? pts[((i % n) + n) % n] : pts[i < 0 ? 0 : i > n - 1 ? n - 1 : i])
   const k = tension / 6
@@ -42,15 +46,10 @@ export function spline(pts: readonly Knot[], closed = false, tension = 1): strin
     const p0 = p1[2] ? p1 : at(i - 1)
     const p3 = p2[2] ? p2 : at(i + 2)
     d +=
-      `C${fmt(p1[0] + (p2[0] - p0[0]) * k)} ${fmt(p1[1] + (p2[1] - p0[1]) * k)} ` +
-      `${fmt(p2[0] - (p3[0] - p1[0]) * k)} ${fmt(p2[1] - (p3[1] - p1[1]) * k)} ${fmt(p2[0])} ${fmt(p2[1])}`
+      `C${f(p1[0] + (p2[0] - p0[0]) * k)} ${f(p1[1] + (p2[1] - p0[1]) * k)} ` +
+      `${f(p2[0] - (p3[0] - p1[0]) * k)} ${f(p2[1] - (p3[1] - p1[1]) * k)} ${f(p2[0])} ${f(p2[1])}`
   }
   return closed ? d + 'Z' : d
-}
-
-/** Straight-edged polygon. */
-export function poly(pts: readonly Pt[]): string {
-  return pts.map((p, i) => `${i ? 'L' : 'M'}${fmt(p[0])} ${fmt(p[1])}`).join('') + 'Z'
 }
 
 /** Polygon with rounded corners (radius per corner or one for all). */
@@ -77,7 +76,7 @@ export function rounded(pts: readonly Pt[], r: number | readonly number[]): stri
  * A closed outline around a centreline with a width per point. Zero width at an end gives a
  * point (folds); a cap length gives a rounded end (limbs, straps).
  */
-export function ribbon(c: readonly CPt[], capStart = 0, capEnd = 0): string {
+export function ribbon(c: readonly CPt[], capStart = 0, capEnd = 0, coarse = false): string {
   const n = c.length
   const left: Knot[] = []
   const right: Knot[] = []
@@ -113,7 +112,7 @@ export function ribbon(c: readonly CPt[], capStart = 0, capEnd = 0): string {
     const t = tan[0]
     pts.push([s[0] - t[0] * capStart, s[1] - t[1] * capStart])
   }
-  return spline(pts, true)
+  return spline(pts, true, 1, coarse)
 }
 
 /** Left and right edge of a row set at height y (linear between rows, clamped at the ends). */
@@ -148,7 +147,7 @@ export interface FoldOpts {
 
 /** A fold ribbon that follows a row set from (u0, y0) to (u1, y1). */
 export function foldOn(rows: readonly Row[], u0: number, u1: number, y0: number, y1: number, w: number, o: FoldOpts = {}): string {
-  const steps = o.steps ?? 6
+  const steps = o.steps ?? 5
   const wig = o.wig ?? 0
   const phase = o.phase ?? 0
   const c: CPt[] = []
@@ -159,7 +158,7 @@ export function foldOn(rows: readonly Row[], u0: number, u1: number, y0: number,
     const prof = o.shape === 'flare' ? Math.min(1, Math.sin(Math.min(1, t * 1.6) * Math.PI * 0.5)) : Math.pow(Math.sin(Math.PI * t), 0.7)
     c.push([x, y, w * prof])
   }
-  return ribbon(c)
+  return ribbon(c, 0, 0, true)
 }
 
 /** A free fold ribbon along given points (spindle profile). */
@@ -170,7 +169,7 @@ export function fold(pts: readonly Pt[], w: number, shape: 'spindle' | 'flare' =
     const prof = shape === 'flare' ? Math.min(1, Math.sin(Math.min(1, t * 1.6) * Math.PI * 0.5)) : Math.pow(Math.sin(Math.PI * t), 0.7)
     return [p[0], p[1], w * prof]
   })
-  return ribbon(c)
+  return ribbon(c, 0, 0, true)
 }
 
 /** Closed outline of a row set: left side down, the hem knots (left to right), right side up. */
@@ -229,14 +228,6 @@ export function ellipse(cx: number, cy: number, rx: number, ry: number, rot = 0)
   )
 }
 
-/** Point on an ellipse at angle t (radians), rotated like ellipse(). */
-export function onEllipse(cx: number, cy: number, rx: number, ry: number, rot: number, t: number): Pt {
-  const a = (rot * Math.PI) / 180
-  const x = rx * Math.cos(t)
-  const y = ry * Math.sin(t)
-  return [cx + x * Math.cos(a) - y * Math.sin(a), cy + x * Math.sin(a) + y * Math.cos(a)]
-}
-
 /** FNV-1a 32-bit. */
 export function hash(s: string): number {
   let h = 0x811c9dc5
@@ -245,21 +236,4 @@ export function hash(s: string): number {
     h = Math.imul(h, 0x01000193)
   }
   return h >>> 0
-}
-
-/** Deterministic PRNG (mulberry32) seeded from a spec hash. */
-export function rng(seed: number): () => number {
-  let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-/** Mirror a knot list around x = cx. */
-export function mirrorX<T extends Knot | CPt>(pts: readonly T[], cx: number): T[] {
-  return pts.map((p) => [2 * cx - p[0], ...p.slice(1)] as unknown as T)
 }

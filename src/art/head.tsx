@@ -13,12 +13,12 @@ import { acrossLight, lightAt, piece, type LightDir, type Paint } from './paint'
 // ── Head ───────────────────────────────────────────────────────────────────
 
 export function head(p: Paint, model: ModelId, L: LightDir): ReactElement {
-  return piece(p, { d: headPath(), box: headBox(), tone: SKIN[model], mat: 'skin', aoTop: 0.25 }, L, 'head')
+  return piece(p, { d: headPath(), box: headBox(), tone: SKIN[model], mat: 'skin', aoTop: 0.3, dim: 0.28, rim: 0.5, key: 0.6 }, L, 'head')
 }
 
 // ── Hair ───────────────────────────────────────────────────────────────────
 
-function coils(p: Paint, cx: number, cy: number, rx: number, ry: number, color: string, seed: number): ReactNode {
+function coils(cx: number, cy: number, rx: number, ry: number, color: string, seed: number): ReactNode {
   // Close coils: tiny arcs scattered over the bun, strongest on the lit half.
   let d = ''
   let s = seed
@@ -32,21 +32,7 @@ function coils(p: Paint, cx: number, cy: number, rx: number, ry: number, color: 
     const k = 2.2 + (i % 3)
     d += `M${fmt(x - k)} ${fmt(y)}a${fmt(k)} ${fmt(k * 0.8)} 0 0 1 ${fmt(k * 2)} 0`
   }
-  void p
   return <path d={d} fill="none" stroke={color} strokeWidth="1.3" strokeLinecap="round" opacity="0.4" />
-}
-
-/** Hair that sits behind the head and neck (low buns, chignon), front view. */
-export function hairBehind(p: Paint, model: ModelId, L: LightDir): ReactElement | null {
-  const t = HAIR[model]
-  if (model === 'B') {
-    return piece(p, { d: ellipse(473, 160, 17, 13, -12), box: { x: 454, y: 145, w: 38, h: 30 }, tone: t, mat: 'hair' }, L, 'hb')
-  }
-  if (model === 'C') {
-    const d = ellipse(469, 164, 24, 17, -16) + ellipse(537, 168, 15, 11, 12)
-    return piece(p, { d, box: { x: 443, y: 145, w: 112, h: 38 }, tone: t, mat: 'hair' }, L, 'hb')
-  }
-  return null
 }
 
 /** Hair over the head, front view. */
@@ -78,7 +64,7 @@ export function hairFront(p: Paint, model: ModelId, L: LightDir): ReactElement {
             box: { x: 482, y: 17, w: 54, h: 46 },
             tone: t,
             mat: 'hair',
-            extra: coils(p, 509, 40, 22, 18, t.sheen, 7),
+            extra: coils(509, 40, 22, 18, t.sheen, 7),
             folds: [{ d: fold([[492, 30], [505, 22], [522, 26]], 6), u: 0.3, hi: true, a: 0.7 }],
           },
           L,
@@ -173,7 +159,7 @@ export function hairRear(p: Paint, model: ModelId, L: LightDir): ReactElement {
     return (
       <g key="hair">
         {piece(p, { d: skull, box, tone: t, mat: 'hair', folds: [{ d: fold([[478, 80], [492, 66], [512, 62]], 6), u: 0.3, hi: true, a: 0.6 }] }, L, 'sk')}
-        {piece(p, { d: ellipse(509, 40, 25, 21, 4), box: { x: 482, y: 17, w: 54, h: 46 }, tone: t, mat: 'hair', extra: coils(p, 509, 40, 22, 18, t.sheen, 11) }, L, 'bun')}
+        {piece(p, { d: ellipse(509, 40, 25, 21, 4), box: { x: 482, y: 17, w: 54, h: 46 }, tone: t, mat: 'hair', extra: coils(509, 40, 22, 18, t.sheen, 11) }, L, 'bun')}
       </g>
     )
   }
@@ -253,37 +239,38 @@ const PROFILE: Record<ModelId, readonly (readonly [number, number])[]> = {
   ],
 }
 
-/** Front layer: falls over the face and rests on the shoulders, to the bust. */
+/** Front layer: falls over the face, rests on the shoulders and dissolves at the waist. */
 const DRAPE_FRONT: readonly (readonly [number, number])[] = [
-  [184, 53],
-  [206, 66],
-  [226, 86],
-  [244, 99],
-  [290, 105],
-  [350, 108],
-  [398, 106],
+  [184, 51],
+  [206, 62],
+  [226, 84],
+  [246, 102],
+  [290, 108],
+  [350, 110],
+  [410, 109],
+  [450, 106],
 ]
-/** Back layer: behind the body, widening past the shoulders to the hip. */
+/** Back layer: behind the body, falling past the shoulders to the hip. */
 const DRAPE_BACK: readonly (readonly [number, number])[] = [
-  [184, 58],
-  [208, 80],
-  [230, 108],
-  [262, 124],
-  [322, 136],
-  [400, 145],
-  [470, 149],
-  [520, 146],
+  [184, 55],
+  [208, 72],
+  [230, 102],
+  [262, 118],
+  [322, 126],
+  [400, 131],
+  [470, 133],
+  [530, 131],
 ]
 /** Seen from behind: one long layer trailing down the back. */
 const DRAPE_REAR: readonly (readonly [number, number])[] = [
-  [184, 55],
-  [208, 72],
-  [230, 100],
-  [262, 118],
-  [330, 132],
-  [420, 143],
-  [510, 150],
-  [590, 146],
+  [184, 53],
+  [208, 68],
+  [230, 98],
+  [262, 114],
+  [330, 124],
+  [420, 132],
+  [510, 136],
+  [600, 134],
 ]
 
 export type VeilLayer = 'front' | 'back' | 'rear'
@@ -318,7 +305,7 @@ function veilRows(o: VeilOpts): { rows: Row[]; hem: Knot[]; top: number; bottom:
   })
   const last = rows[rows.length - 1]
   const yL = last[0]
-  const depth = o.layer === 'front' ? 50 : o.layer === 'back' ? 74 : 96
+  const depth = o.layer === 'front' ? 44 : o.layer === 'back' ? 64 : 90
   const c = centre(yL + depth)
   const hw = (last[2] - last[1]) / 2
   const hem: Knot[] = [
@@ -357,18 +344,22 @@ export function veil(p: Paint, o: VeilOpts): ReactElement {
   const box = boxOf(outline)
   const L = o.light
   const H = bottom - top
-  const a = ink.alpha * (o.layer === 'back' ? 0.78 : 1)
   const back = L === 'back'
+  const tulle = o.tone === 'tulle'
+  // Backlit, the veil's face is in shadow: it thins to a haze and glows at its edges.
+  const a = ink.alpha * (tulle ? 0.82 : 0.56) * (o.layer === 'back' ? 0.62 : o.layer === 'rear' ? 0.82 : 1) * (back ? (tulle ? 0.6 : 0.3) : 1)
+  const col = ink.color
 
-  // Sheer body: dense where it doubles over the crown, thinning and dissolving at the hem.
+  // Sheer body: dense where it doubles over the crown, thinning, dissolving well before the hem.
   const body = p.linear(
     [
-      [0, ink.color, a],
-      [0.22, ink.color, a * 0.9],
-      [0.5, ink.color, a * 0.7],
-      [0.78, ink.color, a * 0.42],
-      [0.93, ink.color, a * 0.14],
-      [1, ink.color, 0],
+      [0, col, a * 0.95],
+      [0.14, col, a],
+      [0.34, col, a * 0.7],
+      [0.56, col, a * 0.42],
+      [0.76, col, a * 0.16],
+      [0.9, col, a * 0.03],
+      [1, col, 0],
     ],
     0,
     top,
@@ -376,54 +367,53 @@ export function veil(p: Paint, o: VeilOpts): ReactElement {
     bottom,
   )
   const kids: ReactNode[] = []
+  const full = { x: fmt(box.x - 6), y: fmt(top - 6), width: fmt(box.w + 12), height: fmt(H + 12) }
+
+  // The fabric doubles over the head: a soft denser hood that also softens the head's edge.
+  if (o.layer !== 'back') {
+    const hy = o.layer === 'rear' ? 112 : 108
+    const hx = centre(hy)
+    const hr = PROFILE[o.model][PROFILE[o.model].length - 1][1] + 16
+    kids.push(<rect key="hood" {...full} fill={p.radial([[0, col, a * 0.62], [0.5, col, a * 0.42], [1, col, 0]], hx, hy - 4, hr, 92)} />)
+  }
 
   // Light: the key side glows, the far side falls into shadow.
   if (!back) {
-    const kx = L === 'left' ? box.x + box.w * 0.18 : L === 'right' ? box.x + box.w * 0.82 : centre(top + 60)
-    const ky = L === 'top' ? top + 40 : top + H * 0.3
-    kids.push(
-      <rect
-        key="kl"
-        x={fmt(box.x - 5)}
-        y={fmt(top - 5)}
-        width={fmt(box.w + 10)}
-        height={fmt(H + 10)}
-        fill={p.radial([[0, ink.hi, ink.hiA * 1.1], [0.45, ink.hi, ink.hiA * 0.45], [1, ink.hi, 0]], kx, ky, box.w * 0.62, H * 0.62)}
-      />,
-    )
-    if (o.tone !== 'tulle') {
+    const kx = L === 'left' ? box.x + box.w * 0.2 : L === 'right' ? box.x + box.w * 0.8 : centre(top + 60)
+    const ky = L === 'top' ? top + 30 : top + H * 0.26
+    kids.push(<rect key="kl" {...full} fill={p.radial([[0, ink.hi, ink.hiA * 1.15], [0.4, ink.hi, ink.hiA * 0.5], [1, ink.hi, 0]], kx, ky, box.w * 0.6, H * 0.55)} />)
+    if (!tulle) {
       kids.push(
         <rect
           key="sh"
-          x={fmt(box.x - 5)}
-          y={fmt(top - 5)}
-          width={fmt(box.w + 10)}
-          height={fmt(H + 10)}
+          {...full}
           fill={
             L === 'top'
-              ? p.linear([[0, ink.lo, 0], [0.45, ink.lo, 0.1], [1, ink.lo, 0.45]], 0, top, 0, bottom)
-              : acrossLight(p, [[0, ink.lo, 0], [0.45, ink.lo, 0.08], [0.8, ink.lo, 0.42], [1, ink.lo, 0.55]], box, L)
+              ? p.linear([[0, ink.lo, 0], [0.4, ink.lo, 0.12], [1, ink.lo, 0.5]], 0, top, 0, bottom)
+              : acrossLight(p, [[0, ink.lo, 0], [0.4, ink.lo, 0.1], [0.75, ink.lo, 0.45], [1, ink.lo, 0.6]], box, L)
           }
         />,
       )
     }
+  } else {
+    kids.push(<rect key="kl" {...full} fill={p.radial([[0, ink.hi, tulle ? 0.1 : 0.2], [1, ink.hi, 0]], centre(top + 90), top + 90, box.w * 0.5, H * 0.35)} />)
   }
 
-  // Folds fall from under the head and spread toward the hem.
-  const us = o.layer === 'front' ? [0.1, 0.24, 0.38, 0.52, 0.66, 0.8, 0.92] : [0.06, 0.18, 0.3, 0.7, 0.82, 0.94]
-  const y0 = o.layer === 'front' ? 176 : 200
-  const hiG = p.linear([[0, ink.hi, 0], [0.25, ink.hi, 1], [0.7, ink.hi, 0.6], [1, ink.hi, 0]], 0, 0, 0, 1, true)
-  const loG = p.linear([[0, ink.lo, 0], [0.3, ink.lo, 1], [1, ink.lo, 0]], 0, 0, 0, 1, true)
+  // Gathers: soft pleats radiating from the crown comb, fanning out toward the hem.
+  const us = o.layer === 'back' ? [0.06, 0.2, 0.8, 0.94] : [0.1, 0.27, 0.41, 0.6, 0.76, 0.9]
+  const hiG = p.linear([[0, ink.hi, 0], [0.18, ink.hi, 0.7], [0.45, ink.hi, 1], [0.8, ink.hi, 0.35], [1, ink.hi, 0]], 0, 0, 0, 1, true)
+  const loG = p.linear([[0, ink.lo, 0], [0.25, ink.lo, 0.8], [0.6, ink.lo, 0.6], [1, ink.lo, 0]], 0, 0, 0, 1, true)
+  const yStart = o.layer === 'back' ? 190 : top + 10
   us.forEach((u, i) => {
     const hi = i % 2 === 0
-    const u1 = 0.5 + (u - 0.5) * 1.12
-    const w = (hi ? 13 : 16) + ((i * 7) % 5) * 2
-    const fd = foldOn(rows, u, u1, y0 + (i % 3) * 14, bottom + 6, w, { wig: 3, phase: i, shape: 'flare' })
-    const k = hi ? ink.hiA * 1.25 * (back ? 0.5 : lightAt(u, L)) : 0.32
+    const u0 = 0.5 + (u - 0.5) * (o.layer === 'back' ? 0.9 : 0.4)
+    const w = (hi ? 16 : 24) + ((i * 7) % 5) * 3
+    const fd = foldOn(rows, u0, u, yStart + (i % 3) * 8, bottom - 4, w, { wig: 2.5, phase: i * 1.3, shape: 'flare', steps: 6 })
+    const k = hi ? ink.hiA * (back ? 0.3 : 0.55 * lightAt(u, L)) : tulle ? 0.24 : 0.14
     kids.push(<path key={`f${i}`} d={fd} fill={hi ? hiG : loG} opacity={fmt(clamp(k, 0, 1))} />)
   })
 
-  // Highlight where the fabric rounds over the crown.
+  // Where the fabric rounds over the crown it catches the key.
   if (o.layer !== 'back' && !back) {
     const prof = PROFILE[o.model]
     const yTop = prof[0][0]
@@ -434,32 +424,48 @@ export function veil(p: Paint, o: VeilOpts): ReactElement {
       pts.push([c - w1 * 0.8, yTop + 26], [c - w1 * 0.35, yTop + 9], [c + 2, yTop + 5], [c + w1 * 0.4, yTop + 10], [c + w1 * 0.8, yTop + 26])
     } else {
       const sgn = L === 'left' ? -1 : 1
-      for (const [y, hw] of prof.slice(1)) {
-        pts.push([centre(y) + sgn * Math.max(0, hw - 7), y])
-      }
+      for (const [y, hw] of prof.slice(1, -1)) pts.push([centre(y) + sgn * Math.max(0, hw - 8), y])
     }
-    const kd = fold(pts, 11)
-    kids.push(<path key="dome" d={kd} fill={hiG} opacity={fmt(clamp(ink.hiA * 1.7, 0, 1))} />)
+    kids.push(<path key="dome" d={fold(pts, 12)} fill={hiG} opacity={fmt(clamp(ink.hiA * 1.5, 0, 1))} />)
   }
 
-  // Denser at the silhouette, where the sheer fabric folds away from the eye.
-  const edgeA = back ? 1 : 0.8
-  const edge = p.linear([[0, ink.color, a * 0.75 * edgeA], [0.6, ink.color, a * 0.5 * edgeA], [0.9, ink.color, a * 0.15], [1, ink.color, 0]], 0, top, 0, bottom)
-  kids.push(<use key="ed" href={s.href} fill="none" stroke={edge} strokeWidth="22" />)
-  // A fine lit edge (both edges when backlit).
-  const lit =
-    back || L === 'top'
-      ? p.linear([[0, ink.hi, 0.9], [0.25, ink.hi, 0.15], [0.75, ink.hi, 0.15], [1, ink.hi, 0.9]], box.x, 0, box.x + box.w, 0)
-      : acrossLight(p, [[0, ink.hi, 0.9], [0.3, ink.hi, 0.2], [0.7, ink.hi, 0.05], [1, ink.hi, 0.3]], box, L)
-  kids.push(<use key="le" href={s.href} fill="none" stroke={lit} strokeWidth="3" opacity={fmt(clamp((back ? 0.95 : 0.6) * (o.tone === 'tulle' ? 0.55 : 1), 0, 1))} />)
+  // Denser toward the silhouette, where the sheer cloth turns away: soft, never a line.
+  const edgeFade = (k: number): string =>
+    p.linear([[0, col, a * k], [0.35, col, a * k * 0.7], [0.62, col, a * k * 0.2], [0.8, col, 0]], 0, top, 0, bottom)
+  kids.push(<use key="e1" href={s.href} fill="none" stroke={edgeFade(0.3)} strokeWidth="60" />)
   if (back) {
-    kids.push(<use key="bg" href={s.href} fill="none" stroke={lit} strokeWidth="16" opacity={fmt(o.tone === 'tulle' ? 0.14 : 0.28)} />)
+    // Backlit sheer fabric glows at its silhouette.
+    const glow = p.linear([[0, ink.hi, 0.9], [0.5, ink.hi, 0.5], [0.8, ink.hi, 0.12], [1, ink.hi, 0]], 0, top, 0, bottom)
+    kids.push(<use key="g1" href={s.href} fill="none" stroke={glow} strokeWidth="16" opacity={fmt(tulle ? 0.16 : 0.3)} />)
+    kids.push(<use key="g2" href={s.href} fill="none" stroke={glow} strokeWidth="4" opacity={fmt(tulle ? 0.4 : 0.7)} />)
+  } else {
+    // The rolled edge on the key side catches a thread of light high up.
+    const lit =
+      L === 'top'
+        ? p.linear([[0, ink.hi, 0.8], [0.25, ink.hi, 0.2], [0.5, ink.hi, 0]], 0, top, 0, bottom)
+        : p.linear(L === 'left' ? [[0, ink.hi, 0.7], [0.35, ink.hi, 0.1], [0.6, ink.hi, 0]] : [[0.4, ink.hi, 0], [0.65, ink.hi, 0.1], [1, ink.hi, 0.7]], box.x, top, box.x + box.w, top + H * 0.9)
+    kids.push(<use key="le" href={s.href} fill="none" stroke={lit} strokeWidth="10" opacity={fmt(tulle ? 0.2 : 0.28)} />)
   }
 
+  // Sheer cloth has no hard edge: fade the last few units of the silhouette via a mask.
+  const mid = p.id('vm')
+  p.defs.push(
+    <mask key={mid} id={mid} maskUnits="userSpaceOnUse" x={fmt(box.x - 20)} y={fmt(top - 20)} width={fmt(box.w + 40)} height={fmt(H + 40)}>
+      <use href={s.href} fill="#fff" />
+      <g fill="none" stroke="#000">
+        <use href={s.href} strokeWidth="34" strokeOpacity="0.16" />
+        <use href={s.href} strokeWidth="22" strokeOpacity="0.2" />
+        <use href={s.href} strokeWidth="13" strokeOpacity="0.26" />
+        <use href={s.href} strokeWidth="6" strokeOpacity="0.36" />
+      </g>
+    </mask>,
+  )
   return (
     <g key={`veil-${o.layer}`} data-part="veil" style={VEIL_STYLE}>
-      <use href={s.href} fill={body} />
-      <g clipPath={s.clip}>{kids}</g>
+      <g mask={`url(#${mid})`}>
+        <use href={s.href} fill={body} />
+        <g clipPath={s.clip}>{kids}</g>
+      </g>
     </g>
   )
 }
