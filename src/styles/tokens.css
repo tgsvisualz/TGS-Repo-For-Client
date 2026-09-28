@@ -1,0 +1,183 @@
+/*
+ * Velato design tokens.
+ * Mood: mysterious, seductive, minimalist. A candlelit room where nothing is fully shown.
+ *
+ * The site commits to one dark look. Components style themselves through the ROLE tokens
+ * (--bg, --fg, --line, --accent...), never the raw palette, so the reserved light
+ * "bone" set below can re-skin a section by class. Never key themes off [data-theme]
+ * on <html>: the claude.ai preview frame stamps that attribute itself.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* ── Palette ─────────────────────────────────────────────── */
+  /* Ink: warm near-blacks (never pure #000). */
+  --c-ink-0: #0b0a09;
+  --c-ink-1: #121110;
+  --c-ink-2: #1b1917;
+  --c-ink-3: #26221f;
+  --c-ink-4: #332e2a;
+
+  /* Bone: warm off-whites for text. bone-3 is the dimmest colour allowed for text (5.2:1 on ink-0). */
+  --c-bone: #ede6dc;
+  --c-bone-2: #b9b0a4;
+  --c-bone-3: #8a8278;
+  --c-bone-4: #5f5952; /* decorative strokes only, never text */
+
+  /* Garnet: the single accent. Use sparingly: live dots, countdown separators, the open chevron. */
+  --c-garnet: #7e1f2b;        /* fills, dots */
+  --c-garnet-bright: #c95a66; /* text/icons on ink-0 or ink-1 only (4.8:1 on ink-0) */
+
+  /* ── Roles (components use these) ───────────────────────── */
+  --bg: var(--c-ink-0);
+  --bg-raised: var(--c-ink-1);
+  --bg-panel: var(--c-ink-2);
+  --bg-hover: var(--c-ink-3);
+  --fg: var(--c-bone);
+  --fg-2: var(--c-bone-2);
+  --fg-3: var(--c-bone-3);
+  --fg-inverse: var(--c-ink-0);
+  --line: rgb(237 230 220 / 0.12);
+  --line-strong: rgb(237 230 220 / 0.22);
+  --fill-hover: rgb(255 255 255 / 0.06);
+  --fill-press: rgb(255 255 255 / 0.1);
+  --accent: var(--c-garnet);
+  --accent-text: var(--c-garnet-bright);
+  --focus-ring: var(--c-bone);
+
+  /* Glass (floating chrome: nav panels, header when scrolled, toggles) */
+  --glass-bg: rgb(18 16 15 / 0.72);
+  --glass-bg-strong: rgb(14 13 12 / 0.86);
+  --glass-border: rgb(237 230 220 / 0.1);
+  --glass-blur: 20px;
+
+  /* Scrims for text over imagery */
+  --scrim-bottom: linear-gradient(to top, rgb(11 10 9 / 0.88) 0%, rgb(11 10 9 / 0.45) 38%, rgb(11 10 9 / 0) 72%);
+  --scrim-top: linear-gradient(to bottom, rgb(11 10 9 / 0.7) 0%, rgb(11 10 9 / 0) 100%);
+
+  /* ── Type ─────────────────────────────────────────────────── */
+  --font-display: "Cormorant Garamond", "Cormorant", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: "Jost Variable", "Jost", "Futura", "Avenir Next", "Century Gothic", "Segoe UI", system-ui, sans-serif;
+
+  --fs-display-xl: clamp(3.5rem, 1.9rem + 7vw, 9rem);
+  --fs-display-l: clamp(2.75rem, 1.6rem + 5vw, 6rem);
+  --fs-display-m: clamp(2.125rem, 1.35rem + 3.2vw, 3.75rem);
+  --fs-display-s: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
+  --fs-title: 1.375rem;
+  --fs-body-l: 1.125rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-caption: 0.8125rem;
+  --fs-label: 0.72rem;
+
+  --lh-display: 1.04;
+  --lh-title: 1.25;
+  --lh-body: 1.55;
+  --lh-tight: 1.15;
+
+  --tracking-display: -0.02em;
+  --tracking-title: -0.01em;
+  --tracking-label: 0.16em;
+  --tracking-wordmark: 0.42em;
+
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+
+  /* ── Space (rem so it scales with text) ─────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+  --space-11: 12rem;
+
+  --gutter: clamp(16px, 4vw, 48px);
+  --section-pad: clamp(5rem, 3rem + 8vw, 11rem);
+  --content-max: 1440px;
+  --measure: 62ch;
+  --header-h: 72px;
+
+  /* ── Shape ────────────────────────────────────────────────── */
+  --r-0: 0;          /* imagery, cards: sharp, like a printed lookbook */
+  --r-1: 2px;        /* chips */
+  --r-2: 8px;        /* rows and previews inside glass panels */
+  --r-panel: 12px;   /* floating glass panels (per the nav reference) */
+  --r-pill: 999px;
+
+  /* Bigger surfaces cast deeper shadows than small chips. */
+  --shadow-chip: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-panel: 0 30px 80px -20px rgb(0 0 0 / 0.85), 0 12px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 60px 120px -30px rgb(0 0 0 / 0.9);
+
+  /* ── Motion ───────────────────────────────────────────────── */
+  /* Enter/exit: ease-out. On-screen movement: ease-in-out. Hover/colour: ease. Never ease-in. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease: ease;
+
+  --dur-press: 140ms;
+  --dur-tip: 160ms;
+  --dur-hover: 200ms;
+  --dur-menu: 220ms;
+  --dur-menu-exit: 150ms;
+  --dur-glide: 240ms;
+  --dur-swap: 180ms;
+  --dur-drawer: 380ms;
+  --dur-drawer-exit: 280ms;
+  --dur-reveal: 700ms;
+  --dur-hero: 1200ms;
+  --stagger: 60ms;
+
+  /* ── Layers ───────────────────────────────────────────────── */
+  --z-stage: 0;
+  --z-canvas: 1;
+  --z-overlay: 2;
+  --z-header: 50;
+  --z-menu: 60;
+  --z-grain: 90;
+  --z-cursor: 100;
+}
+
+/* Reserved light set: apply `.theme-bone` to a section to invert it (print-style card). */
+.theme-bone {
+  color-scheme: light;
+  --bg: #ede6dc;
+  --bg-raised: #e4dccf;
+  --bg-panel: #dbd2c4;
+  --bg-hover: #d2c8b8;
+  --fg: #141210;
+  --fg-2: #4a443e;
+  --fg-3: #655e56;
+  --fg-inverse: #ede6dc;
+  --line: rgb(20 18 16 / 0.14);
+  --line-strong: rgb(20 18 16 / 0.26);
+  --fill-hover: rgb(0 0 0 / 0.05);
+  --fill-press: rgb(0 0 0 / 0.09);
+  --accent: #7e1f2b;
+  --accent-text: #7e1f2b;
+  --focus-ring: #141210;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Reduced motion: movement becomes short cross-fades. Components read these tokens. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-menu: 120ms;
+    --dur-glide: 0ms;
+    --dur-swap: 120ms;
+    --dur-drawer: 200ms;
+    --dur-drawer-exit: 150ms;
+    --dur-reveal: 200ms;
+    --dur-hero: 400ms;
+    --stagger: 0ms;
+  }
+}
