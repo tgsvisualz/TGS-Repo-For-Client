@@ -355,9 +355,11 @@ export const formatPrice = (value: number): string => priceFormat.format(value)
 /** "014" */
 export const dropCode = (n: number): string => String(n).padStart(3, '0')
 
-/** "Thursday 1 Oct" */
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+/** "Thursday 1 Oct" (three-letter months; some ICU versions print "Sept"). */
 export const formatDay = (d: Date): string =>
-  new Intl.DateTimeFormat(DATE_LOCALE, { weekday: 'long', day: 'numeric', month: 'short' }).format(d)
+  `${new Intl.DateTimeFormat(DATE_LOCALE, { weekday: 'long' }).format(d)} ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`
 
 /** "Thu" */
 export const formatWeekdayShort = (d: Date): string => new Intl.DateTimeFormat(DATE_LOCALE, { weekday: 'short' }).format(d)

@@ -22,9 +22,10 @@
 
 /* ── Numeral + status ─────────────────────────────────────────── */
 
+/* Numeral and chip share a baseline. */
 .id {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--space-4);
 }
