@@ -3,7 +3,14 @@
  *   still stage (--z-stage) → 3D layer (--z-canvas) → shade + fog (--z-canvas, later in DOM)
  *   → text overlay (--z-overlay). The fixed header (72px) floats above all of it.
  */
+/*
+ * Local: --title-size, the headline size. The display token, capped by height so the text
+ * block never slides under the header on short, wide windows. HeroStill reads it too (the
+ * trio keeps clear of the headline).
+ */
 .hero {
+  --title-size: min(var(--fs-display-xl), 16.5svh);
+
   position: relative;
   isolation: isolate;
   height: 100svh;
@@ -19,6 +26,7 @@
   inset: 0;
   z-index: var(--z-canvas);
   opacity: 0;
+  will-change: opacity;
   transition: opacity var(--dur-hero) var(--ease-out);
 }
 
@@ -125,9 +133,9 @@
 .title {
   color: var(--fg);
   font-family: var(--font-display);
-  font-size: var(--fs-display-xl);
+  font-size: var(--title-size);
   font-weight: var(--fw-light);
-  line-height: 0.98;
+  line-height: var(--lh-display);
   letter-spacing: var(--tracking-display);
 }
 

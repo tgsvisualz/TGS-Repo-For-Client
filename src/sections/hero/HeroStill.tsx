@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Placeholder } from '../../components'
 import { cx, MEDIA } from '../../lib'
 import styles from './HeroStill.module.css'
@@ -55,11 +55,10 @@ export function HeroStill({ pointerTarget, receded, paused }: HeroStillProps) {
     recededRef.current = receded
   }, [receded])
 
-  // Veils sway only where repainting them each frame is affordable (not on software GL).
-  useEffect(() => {
-    const root = rootRef.current
-    if (root && !isSoftwareRenderer()) root.dataset.sway = ''
-  }, [])
+  // Real GPU? Probed once during the first render, while the GPU is still idle (a WebGL context
+  // opened mid-animation can block for seconds on a software rasteriser). Only there do the
+  // veils sway, the dust drift and the reflections blur: on software GL each would cost frames.
+  const [gpu] = useState(() => !isSoftwareRenderer())
 
   useEffect(() => {
     const section = pointerTarget.current
@@ -163,6 +162,7 @@ export function HeroStill({ pointerTarget, receded, paused }: HeroStillProps) {
       ref={rootRef}
       className={styles.still}
       aria-hidden="true"
+      data-gpu={gpu ? '' : undefined}
       data-receded={receded ? '' : undefined}
       data-paused={paused ? '' : undefined}
     >
@@ -181,7 +181,7 @@ export function HeroStill({ pointerTarget, receded, paused }: HeroStillProps) {
         <div key={assetId} className={cx(styles.figure, SLOT_CLASS[slot])} data-depth={slot === 'a' ? '1' : '0.7'}>
           <span className={styles.pool} />
           <div className={styles.reflection}>
-            <Placeholder assetId={assetId} ratio={RATIO} backdrop={false} decorative className={styles.art} />
+            <Placeholder assetId={assetId} ratio={RATIO} backdrop={false} decorative className={styles.reflectionArt} />
           </div>
           <Placeholder assetId={assetId} ratio={RATIO} backdrop={false} decorative className={cx(styles.art, styles.body)}>
             {slot === 'a' ? null : <span className={styles.recess} />}

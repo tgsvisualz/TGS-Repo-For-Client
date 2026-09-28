@@ -14,7 +14,11 @@ const TEXT_ENTRY = [
 ].join(', ')
 
 /** data-cursor values that turn the ring into a labelled disc. */
-const LABELS: Record<string, string> = { view: 'View', peek: 'Peek', orbit: 'Orbit' }
+const LABELS = new Map([
+  ['view', 'View'],
+  ['peek', 'Peek'],
+  ['orbit', 'Orbit'],
+])
 
 /** Ring follow per frame at 60fps (scaled by the real frame time, up to MAX_DT). */
 const RING_LERP = 0.18
@@ -28,7 +32,7 @@ function stateFor(target: EventTarget | null): { state: CursorState; label: stri
   if (el.closest(TEXT_ENTRY)) return { state: 'text', label: '' }
   const hit = el.closest(INTERACTIVE)
   if (!hit) return { state: 'default', label: '' }
-  const label = LABELS[hit.getAttribute('data-cursor') ?? '']
+  const label = LABELS.get(hit.getAttribute('data-cursor') ?? '')
   return label ? { state: 'label', label } : { state: 'link', label: '' }
 }
 

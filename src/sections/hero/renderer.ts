@@ -5,8 +5,9 @@ const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i
 /**
  * True when the browser rasterises on the CPU through a software GL driver (SwiftShader,
  * llvmpipe…: VMs, remote desktops, blocklisted GPUs, headless test runs). There, repainting
- * the swaying veils (SVG, main-thread raster) every frame drops the page to ~1fps, so the
- * still stage keeps them at rest. Probed once on a throwaway canvas, then cached.
+ * the swaying veils (SVG) every frame drops the page to ~1fps and the reflections' blur stalls
+ * the first frames for seconds, so the still stage keeps the veils at rest and the reflections
+ * crisp. Probed once on a throwaway canvas (call it early, while the GPU is idle), then cached.
  */
 export function isSoftwareRenderer(): boolean {
   if (cached !== undefined) return cached
