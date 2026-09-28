@@ -1,0 +1,24 @@
+/*
+ * States are driven by data-reveal (set by Reveal.tsx): absent = natural, "pending" = held
+ * back, "in" = playing. !important makes the reveal win over a consumer's own opacity,
+ * translate and transition only while it runs; the attribute is removed afterwards.
+ */
+@layer components {
+  .root[data-reveal='pending']:not(.stagger),
+  .stagger[data-reveal='pending'] > * {
+    opacity: 0 !important;
+    translate: 0 16px !important;
+  }
+
+  .root[data-reveal='in']:not(.stagger),
+  .stagger[data-reveal='in'] > * {
+    transition-property: opacity, translate !important;
+    transition-duration: var(--dur-reveal) !important;
+    transition-timing-function: var(--ease-out) !important;
+    transition-delay: var(--reveal-delay, 0ms) !important;
+  }
+
+  .stagger[data-reveal='in'] > * {
+    transition-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--reveal-stagger, 0ms)) !important;
+  }
+}

@@ -1,0 +1,23 @@
+@layer components {
+  .root {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .eyebrow {
+    margin-bottom: var(--space-5);
+  }
+
+  .title {
+    max-width: 22ch;
+    color: var(--fg);
+  }
+
+  .lede {
+    max-width: var(--measure);
+    margin-top: var(--space-5);
+    color: var(--fg-2);
+  }
+}

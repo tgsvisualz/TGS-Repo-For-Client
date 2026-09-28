@@ -1,0 +1,89 @@
+@layer components {
+  .root {
+    display: inline-block;
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+
+  .face {
+    display: inline-flex;
+    align-items: flex-start;
+  }
+
+  .digits {
+    display: inline-flex;
+  }
+
+  .digit {
+    display: inline-block;
+    width: var(--digit-w);
+    text-align: center;
+  }
+
+  /* ── Large: display numerals, unit captions below, garnet separators ── */
+  .large {
+    /* Cormorant tabular figures are 0.491em wide. */
+    --digit-w: 0.5em;
+
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: var(--fs-display-m);
+    font-weight: var(--fw-light);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  /* Running: four equal unit columns (the widest caption sets them all), separators between. */
+  .grid {
+    display: inline-grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: start;
+    column-gap: 0.12em;
+  }
+
+  .unit {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .caption {
+    /* Styled by .t-label (rem-sized, so independent of the numerals). */
+    white-space: nowrap;
+  }
+
+  .large .sep {
+    color: var(--accent-text);
+    /* Cormorant's colon sits 0.14em below the middle of the lining figures. */
+    translate: 0 -0.14em;
+  }
+
+  .large .done {
+    font-style: italic;
+  }
+
+  /* ── Inline: "2d 14:09:33" in Jost ── */
+  .inline {
+    /* Jost tabular figures are 0.58em wide. */
+    --digit-w: 0.6em;
+
+    font-family: var(--font-sans);
+    line-height: inherit;
+    letter-spacing: 0;
+  }
+
+  .inline .face {
+    align-items: baseline;
+  }
+
+  .inline .sep {
+    padding-inline: 0.06em;
+    color: var(--accent-text);
+    translate: 0 -0.1em;
+  }
+
+  .dayMark {
+    margin-right: 0.4em;
+  }
+}

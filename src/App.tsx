@@ -1,8 +1,29 @@
-/** Phase 0 placeholder shell; the foundation phase replaces this with the full page. */
+import { AssetOverlay, Grain, SkipLink } from './components'
+import { CustomCursor } from './cursor/CustomCursor'
+import { SiteHeader } from './nav/SiteHeader'
+import { CategoryIndex } from './sections/CategoryIndex'
+import { DropTeaser } from './sections/DropTeaser'
+import { Manifesto } from './sections/Manifesto'
+import { Rotation } from './sections/Rotation'
+import { SiteFooter } from './sections/SiteFooter'
+import { Hero } from './sections/hero/Hero'
+
 export function App() {
   return (
-    <main style={{ minHeight: '100svh', display: 'grid', placeItems: 'center', background: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-display)', fontSize: 'var(--fs-display-l)' }}>
-      Velato
-    </main>
+    <>
+      <SkipLink />
+      <CustomCursor />
+      <SiteHeader />
+      <main id="main" tabIndex={-1}>
+        <Hero />
+        <Manifesto />
+        <DropTeaser />
+        <Rotation />
+        <CategoryIndex />
+      </main>
+      <SiteFooter />
+      <Grain />
+      <AssetOverlay />
+    </>
   )
 }

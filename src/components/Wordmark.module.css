@@ -1,0 +1,60 @@
+@layer components {
+  .root {
+    /* Cormorant capitals in a line-height: 1 box span 0.1935em–0.8185em (measured in Chromium). */
+    --veil-top: 0.194em;
+    --veil-hem: 0.475em; /* 45% of the way down the capitals */
+
+    position: relative;
+    display: inline-block;
+    margin-right: calc(-1 * var(--tracking-wordmark));
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-weight: var(--fw-regular);
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: var(--tracking-wordmark);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /*
+   * The veil: the same word drawn again on top, filled with a ground-coloured gradient that is
+   * clipped to the glyphs. It dims the upper capitals (55% at the crown easing to 15%) and ends
+   * in a clean hem, without darkening whatever sits behind the letters (imagery, glass).
+   */
+  .root::after {
+    content: 'Velato';
+    content: 'Velato' / '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg) 55%, transparent) var(--veil-top),
+      color-mix(in srgb, var(--bg) 15%, transparent) var(--veil-hem),
+      transparent var(--veil-hem)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .nav {
+    font-size: 1.3rem;
+  }
+
+  .display {
+    font-size: var(--fs-display-l);
+  }
+
+  .footer {
+    font-size: clamp(3rem, 13.5vw, 12.5rem);
+  }
+
+  @media (forced-colors: active) {
+    .root::after {
+      content: none;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+@layer components {
+  .root {
+    position: fixed;
+    top: var(--space-3);
+    left: var(--gutter);
+    z-index: calc(var(--z-cursor) + 1);
+    padding: 0.8rem 1.3rem;
+    border-radius: var(--r-pill);
+    background: var(--fg);
+    color: var(--fg-inverse);
+    font-family: var(--font-sans);
+    font-size: var(--fs-small);
+    font-weight: var(--fw-medium);
+    line-height: 1;
+    box-shadow: var(--shadow-panel);
+  }
+
+  /* Keyboard-initiated, so it appears instantly: no transition. */
+  .root:not(:focus) {
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

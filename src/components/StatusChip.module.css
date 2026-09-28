@@ -1,0 +1,45 @@
+@layer components {
+  .root {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75em;
+    white-space: nowrap;
+  }
+
+  .mark {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  /* An ember: garnet, faintly lit at the core so it reads on the near-black ground. */
+  .dot {
+    background: radial-gradient(circle at 50% 42%, var(--accent-text) 0%, var(--accent) 70%);
+    box-shadow: 0 0 6px 1px color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+
+  .ring {
+    border: 1px solid var(--fg-3);
+  }
+
+  .last-pieces {
+    color: var(--fg);
+  }
+
+  .sold-out,
+  .archived {
+    color: var(--fg-3);
+  }
+
+  .sold-out .text {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  @media (forced-colors: active) {
+    .dot {
+      background: CanvasText;
+    }
+  }
+}

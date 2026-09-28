@@ -1,0 +1,12 @@
+@layer components {
+  .icon {
+    display: inline-block;
+    flex: none;
+    vertical-align: middle;
+    overflow: visible;
+  }
+
+  .icon * {
+    vector-effect: non-scaling-stroke;
+  }
+}
