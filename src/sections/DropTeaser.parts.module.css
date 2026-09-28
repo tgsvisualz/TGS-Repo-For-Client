@@ -27,7 +27,8 @@
     ),
     /* Lit from above, darkest at the hem. */
     linear-gradient(to bottom, color-mix(in srgb, var(--fg) 5%, transparent), transparent 55%),
-    var(--glass-bg);
+    /* Lighter than the nav glass so a silhouette hints through the blur: intrigue, not a wall. */
+    color-mix(in srgb, var(--bg) 52%, transparent);
   -webkit-backdrop-filter: blur(14px) saturate(0.85);
   backdrop-filter: blur(14px) saturate(0.85);
   /* Mask alpha only: any opaque token works as "fully shown". */
