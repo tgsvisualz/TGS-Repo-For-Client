@@ -1,0 +1,231 @@
+/*
+ * The Index: five categories set large between hairlines. On fine pointers a preview trails
+ * the cursor behind the type; on touch each row carries a small thumbnail instead.
+ */
+
+.root {
+  position: relative;
+  isolation: isolate;
+}
+
+/*
+ * Layering inside this section (isolated): hairlines are plain borders, so they paint under
+ * the preview (fixed, z 0); the type is lifted to z 1 and always reads over the image.
+ */
+.head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  padding-bottom: var(--space-6);
+}
+
+.total {
+  color: var(--fg-3);
+}
+
+.list {
+  border-top: 1px solid var(--line);
+}
+
+.item {
+  border-bottom: 1px solid var(--line);
+}
+
+/* ── Row (phones / touch first) ───────────────────────────────── */
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label thumb'
+    'meta  thumb';
+  align-items: center;
+  column-gap: var(--space-5);
+  row-gap: var(--space-2);
+  padding-block: var(--space-5);
+  color: var(--fg);
+}
+
+.label,
+.meta,
+.arrow,
+.thumb {
+  position: relative;
+  z-index: 1;
+}
+
+.label {
+  grid-area: label;
+  font-family: var(--font-display);
+  font-size: var(--fs-display-l);
+  font-weight: var(--fw-light);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
+  color: var(--fg-2);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-body);
+}
+
+.count::after {
+  content: '·';
+  margin-left: var(--space-3);
+  color: var(--fg-3);
+}
+
+.arrow {
+  display: none;
+  color: var(--fg-2);
+}
+
+.thumb {
+  grid-area: thumb;
+  width: 3.5rem;
+}
+
+@media (min-width: 64rem) {
+  .row {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas: none;
+    column-gap: var(--space-5);
+    padding-block: var(--space-4);
+  }
+
+  .label {
+    grid-column: 1 / span 7;
+    grid-row: 1;
+  }
+
+  .meta {
+    grid-column: 8 / span 3;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--space-5);
+    font-size: var(--fs-small);
+  }
+
+  .count::after {
+    content: none;
+  }
+
+  .thumb {
+    grid-column: 11;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .arrow {
+    display: block;
+    grid-column: 12;
+    grid-row: 1;
+    justify-self: end;
+  }
+}
+
+/* ── Fine pointers: the floating preview replaces the thumbnails ── */
+
+@media (hover: hover) and (pointer: fine) {
+  .thumb {
+    display: none;
+  }
+
+  .label,
+  .meta,
+  .arrow {
+    transition:
+      opacity var(--dur-hover) var(--ease),
+      transform 280ms var(--ease);
+  }
+
+  /*
+   * While the list is hovered the other rows dim to the fg-3 level: fg at .56 and the fg-2
+   * meta at .73 both land on fg-3's value over the ground, never below the dimmest text.
+   */
+  .hovering .row:not(.current) .label {
+    opacity: 0.56;
+  }
+
+  .hovering .row:not(.current) :is(.meta, .arrow) {
+    opacity: 0.73;
+  }
+
+  .current .label {
+    transform: translateX(12px);
+  }
+
+  .current .arrow {
+    color: var(--fg);
+    transform: translate(2px, -2px);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 64rem) {
+  .meta {
+    grid-column: 8 / span 4;
+  }
+}
+
+/* The preview: fixed, positioned by script (translate3d), never in the way of the pointer. */
+.preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: clamp(240px, 21vw, 320px);
+  pointer-events: none;
+}
+
+.previewFrame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity var(--dur-menu-exit) var(--ease-out),
+    transform var(--dur-menu-exit) var(--ease-out);
+}
+
+.previewShown .previewFrame {
+  opacity: 1;
+  transform: none;
+  transition-duration: var(--dur-menu);
+}
+
+.previewImage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: 0;
+  transform: scale(1.02);
+  transition:
+    opacity var(--dur-swap) var(--ease-out),
+    transform var(--dur-swap) var(--ease-out);
+}
+
+.previewActive {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .previewFrame,
+  .previewImage,
+  .current .label,
+  .current .arrow {
+    transform: none;
+  }
+}

@@ -1,0 +1,210 @@
+/*
+ * Desktop triggers + the shared mega-dropdown viewport.
+ *
+ * The viewport is two layers:
+ * - .viewport  [data-nav-viewport]: position (translateX), size (width/height), the scale-in
+ *   from the trigger (transform-origin under the trigger's centre) and the hover bridge.
+ * - .surface: the dark glass itself (blur, border, radius, shadow), clipping, and the fade.
+ * Opacity lives on the glass layer on purpose: an ancestor with opacity < 1 would become the
+ * backdrop root and the blur would sample nothing until the fade finished.
+ *
+ * useNavController writes data-state (pre | open | closed) and data-motion
+ * (enter | glide | exit | none) plus --vp-x/-w/-h/-origin; everything below reacts to them.
+ */
+
+.nav {
+  /* Local (no token for it): the panel content cross-fade on a switch. */
+  --nav-fade: var(--dur-tip);
+
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+}
+
+.triggers {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.item {
+  display: flex;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding-inline: 12px;
+  border-radius: var(--r-pill);
+  color: var(--fg-2);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-regular);
+  line-height: 1;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  transition: color var(--dur-hover) var(--ease);
+}
+
+.trigger[aria-expanded='true'] {
+  color: var(--fg);
+}
+
+.chevron {
+  margin-top: 1px;
+  color: var(--fg-3);
+  transition:
+    transform var(--dur-swap) var(--ease-out),
+    color var(--dur-hover) var(--ease);
+}
+
+/* The open trigger's chevron flips and takes the garnet: one of the accent's few moments. */
+.trigger[aria-expanded='true'] .chevron {
+  color: var(--accent-text);
+  transform: rotate(180deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .trigger:hover {
+    color: var(--fg);
+  }
+
+  .trigger:hover .chevron {
+    color: var(--fg-2);
+  }
+
+  .trigger[aria-expanded='true']:hover .chevron {
+    color: var(--accent-text);
+  }
+}
+
+/* Keyboard-initiated changes apply instantly. */
+.nav[data-instant] .trigger,
+.nav[data-instant] .chevron {
+  transition: none;
+}
+
+/* ── Viewport ───────────────────────────────────────────── */
+.viewport {
+  --vp-pad: 4px;
+
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: var(--vp-w, 0px);
+  height: var(--vp-h, 0px);
+  transform-origin: var(--vp-origin, 0px) 0;
+  /* Same function list in every state, so each part interpolates on its own. */
+  transform: translateX(var(--vp-x, 0px)) translateY(0) scale(0.98);
+  pointer-events: none;
+}
+
+.viewport[data-state='pre'] {
+  transform: translateX(var(--vp-x, 0px)) translateY(-4px) scale(0.96);
+}
+
+.viewport[data-state='open'] {
+  transform: translateX(var(--vp-x, 0px)) translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Hover bridge: spans the gap up to the header, so trigger → panel never reads as "left". */
+.viewport::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 14px;
+}
+
+.surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-panel);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  box-shadow: var(--shadow-panel);
+  opacity: 0;
+}
+
+.viewport[data-state='open'] .surface {
+  opacity: 1;
+}
+
+/* Enter: scale up from under the trigger. */
+.viewport[data-motion='enter'] {
+  transition: transform var(--dur-menu) var(--ease-out);
+}
+
+/* Glide: slide + resize to the next trigger's panel (width/height: the one documented exception). */
+.viewport[data-motion='glide'] {
+  transition:
+    transform var(--dur-glide) var(--ease-in-out),
+    width var(--dur-glide) var(--ease-in-out),
+    height var(--dur-glide) var(--ease-in-out);
+}
+
+.viewport[data-motion='enter'] .surface,
+.viewport[data-motion='glide'] .surface {
+  transition: opacity var(--dur-menu) var(--ease-out);
+}
+
+/* Exit: faster than the entrance. */
+.viewport[data-motion='exit'] {
+  transition: transform var(--dur-menu-exit) var(--ease-out);
+}
+
+.viewport[data-motion='exit'] .surface {
+  transition: opacity var(--dur-menu-exit) var(--ease-out);
+}
+
+/* ── Panels (stacked inside the glass) ──────────────────── */
+.panel {
+  position: absolute;
+  top: var(--vp-pad);
+  left: var(--vp-pad);
+  opacity: 0;
+}
+
+.panel[data-side='before'] {
+  transform: translateX(-12px);
+}
+
+.panel[data-side='after'] {
+  transform: translateX(12px);
+}
+
+.panel[data-active='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Content cross-slides only on a switch; entering from closed shows it in place. */
+.viewport[data-motion='glide'] .panel {
+  transition:
+    opacity var(--nav-fade) var(--ease-out),
+    transform var(--nav-fade) var(--ease-out);
+}
+
+/* Reduced motion: opacity only; the glide/resize is instant (--dur-glide is 0 there). */
+@media (prefers-reduced-motion: reduce) {
+  .viewport,
+  .viewport[data-state] {
+    transform: translateX(var(--vp-x, 0px)) translateY(0) scale(1);
+  }
+
+  .panel[data-side] {
+    transform: none;
+  }
+
+  .chevron,
+  .trigger[aria-expanded='true'] .chevron {
+    transition: color var(--dur-hover) var(--ease);
+  }
+}

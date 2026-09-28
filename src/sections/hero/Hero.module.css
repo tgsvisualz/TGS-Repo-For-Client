@@ -1,0 +1,362 @@
+/*
+ * Hero layers, bottom to top (all inside the section's own stacking context):
+ *   still stage (--z-stage) → 3D layer (--z-canvas) → shade + fog (--z-canvas, later in DOM)
+ *   → text overlay (--z-overlay). The fixed header (72px) floats above all of it.
+ */
+.hero {
+  position: relative;
+  isolation: isolate;
+  height: 100svh;
+  min-height: 640px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ── 3D slot ──────────────────────────────────────────────── */
+
+.layer3d {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-canvas);
+  opacity: 0;
+  transition: opacity var(--dur-hero) var(--ease-out);
+}
+
+.hero[data-hero3d='ready'] .layer3d {
+  opacity: 1;
+}
+
+/* ── Shade: legibility and edges, above the 3D layer so both stages melt the same way ── */
+
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+  background:
+    /* Melt into the next section: no hard edge at the bottom. */
+    linear-gradient(to top, var(--bg) 0%, color-mix(in srgb, var(--bg) 78%, transparent) 7%, transparent 24%),
+    /* Keep the header readable over the lit room. */
+    linear-gradient(to bottom, color-mix(in srgb, var(--bg) 72%, transparent) 0%, transparent 19%),
+    /* Scrim behind the headline block (bottom left). */
+    radial-gradient(
+      ellipse 62% 64% at 4% 76%,
+      color-mix(in srgb, var(--bg) 84%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 58%, transparent) 42%,
+      transparent 100%
+    ),
+    /* Vignette. */
+    radial-gradient(ellipse 88% 96% at 60% 44%, transparent 52%, color-mix(in srgb, var(--bg) 86%, transparent) 100%);
+}
+
+/* ── Entrance: the fog veil lifts off the stage ─────────────── */
+
+.fog {
+  position: absolute;
+  inset: -30% 0 -40%;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg) 18%, var(--bg) 74%, transparent 100%);
+  /* Resting state is gone: if the animation never runs, nothing stays veiled. */
+  opacity: 0;
+  animation: fog-lift var(--dur-hero) var(--ease-out) both;
+}
+
+@keyframes fog-lift {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-18%);
+  }
+}
+
+/* The text rises in behind it, one line after another. */
+.enter {
+  animation: rise var(--dur-hero) var(--ease-out) calc(200ms + var(--i, 0) * var(--stagger)) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ── Overlay ──────────────────────────────────────────────── */
+
+/* Empty areas pass the pointer through (the 3D showroom takes drags on touch). */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-top: var(--header-h);
+  pointer-events: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: clamp(1.75rem, 6svh, 4.25rem);
+}
+
+.content > *,
+.bottom > * {
+  pointer-events: auto;
+}
+
+.eyebrow {
+  margin-bottom: var(--space-5);
+}
+
+.title {
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: var(--fs-display-xl);
+  font-weight: var(--fw-light);
+  line-height: 0.98;
+  letter-spacing: var(--tracking-display);
+}
+
+.line {
+  display: block;
+}
+
+/* Editorial offset: the italic line steps in toward the figures. */
+.lineAccent {
+  padding-left: 0.62em;
+}
+
+.title em {
+  font-style: italic;
+  font-weight: var(--fw-light);
+}
+
+.lede {
+  max-width: 34ch;
+  margin-top: var(--space-6);
+  color: var(--fg-2);
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-6);
+  margin-top: var(--space-6);
+}
+
+/* ── Bottom row ───────────────────────────────────────────── */
+
+.bottom {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  column-gap: var(--space-5);
+  min-height: 44px;
+  padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
+}
+
+.countdown {
+  justify-self: start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.9em;
+  white-space: nowrap;
+}
+
+.countdownLabel,
+.scroll,
+.hint {
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-label);
+}
+
+.countdownLabel {
+  color: var(--fg-3);
+  text-transform: uppercase;
+}
+
+.timer {
+  color: var(--fg);
+  font-size: var(--fs-caption);
+}
+
+.scroll {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.15em;
+  min-height: 44px;
+  padding-inline: var(--space-2);
+  color: var(--fg-3);
+}
+
+.scroll > span[aria-hidden] {
+  transition: transform var(--dur-hover) var(--ease-out);
+}
+
+.scrollWord {
+  color: var(--fg);
+  animation: breathe 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes breathe {
+  to {
+    opacity: 0.55;
+  }
+}
+
+.hero[data-paused] .scrollWord {
+  animation-play-state: paused;
+}
+
+.controls {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  color: var(--fg-2);
+  text-transform: uppercase;
+  animation: fade-in var(--dur-hero) var(--ease-out) both;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .scroll:hover > span[aria-hidden]:first-child {
+    transform: translateX(-3px);
+  }
+
+  .scroll:hover > span[aria-hidden]:last-child {
+    transform: translateX(3px);
+  }
+}
+
+/*
+ * ── Stacked (phones, portrait and near-square screens): the trio above, the text below.
+ * Keep this query in sync with HeroStill.module.css.
+ * Local: --title-size (the headline), --text-top (the text block's height from the bottom,
+ * ≈ 275px + two headline lines), so the scrim darkens exactly where the text sits.
+ */
+@media (max-width: 767px), (max-aspect-ratio: 6/5) {
+  .hero {
+    --title-size: clamp(3.25rem, 1.6rem + 6vw, 5.5rem);
+    --text-top: calc(275px + var(--title-size) * 2);
+  }
+
+  .shade {
+    background:
+      linear-gradient(
+        to top,
+        var(--bg) 0,
+        color-mix(in srgb, var(--bg) 92%, transparent) calc(var(--text-top) - 100px),
+        color-mix(in srgb, var(--bg) 84%, transparent) var(--text-top),
+        color-mix(in srgb, var(--bg) 45%, transparent) calc(var(--text-top) + 60px),
+        transparent calc(var(--text-top) + 130px)
+      ),
+      linear-gradient(to bottom, color-mix(in srgb, var(--bg) 72%, transparent) 0%, transparent 16%),
+      radial-gradient(ellipse 110% 90% at 50% 40%, transparent 50%, color-mix(in srgb, var(--bg) 80%, transparent) 100%);
+  }
+
+  .title {
+    font-size: var(--title-size);
+  }
+
+  .lineAccent {
+    padding-left: 0.5em;
+  }
+
+  .eyebrow {
+    margin-bottom: var(--space-4);
+  }
+
+  .lede {
+    max-width: 32ch;
+    margin-top: var(--space-4);
+    font-size: var(--fs-body);
+  }
+
+  .ctas {
+    margin-top: var(--space-5);
+  }
+
+  .content {
+    padding-bottom: var(--space-5);
+  }
+
+  .bottom {
+    grid-template-columns: 1fr auto;
+  }
+
+  .scroll {
+    justify-self: end;
+    padding-inline: var(--space-2) 0;
+  }
+
+  /* The row keeps only the countdown and the scroll cue. */
+  .controls {
+    display: contents;
+  }
+
+  .hint {
+    display: none;
+  }
+
+  /* Compact toggle, top right under the header. */
+  .toggle {
+    position: absolute;
+    top: calc(var(--header-h) + var(--space-3));
+    right: var(--gutter);
+  }
+}
+
+/* ── Reduced motion: short cross-fades, nothing moves ─────────── */
+
+@keyframes fog-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fog {
+    animation-name: fog-fade;
+  }
+
+  .enter {
+    animation-name: fade-in;
+  }
+
+  .scrollWord {
+    animation: none;
+  }
+
+  .scroll > span[aria-hidden] {
+    transition: none;
+  }
+}

@@ -1,0 +1,220 @@
+/*
+ * Footer: a quiet statement, four columns, the legal line, and the signature ending: the
+ * wordmark set across the whole width and cropped by the bottom of the page.
+ */
+
+.root {
+  position: relative;
+  overflow: clip;
+  padding-top: var(--space-10);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid var(--line);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-9);
+}
+
+.line {
+  max-width: 18ch;
+  color: var(--fg-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-display-m);
+  font-style: italic;
+  font-weight: var(--fw-light);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+/* ── Columns ──────────────────────────────────────────────────── */
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+}
+
+.heading {
+  margin-bottom: var(--space-4);
+  color: var(--fg-3);
+}
+
+.lines {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--fg-2);
+  font-size: var(--fs-small);
+}
+
+.links {
+  display: grid;
+  justify-items: start;
+}
+
+/* Same rhythm as the plain lines beside it: one line of text plus the list gap. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(var(--fs-small) * var(--lh-body) + var(--space-2));
+  color: var(--fg);
+  font-size: var(--fs-small);
+}
+
+/* A hairline underline appears on hover (instant: no colour animation). */
+@media (hover: hover) and (pointer: fine) {
+  .link {
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.35em;
+  }
+
+  .link:hover {
+    text-decoration-color: var(--line-strong);
+  }
+}
+
+@media (pointer: coarse) {
+  .link {
+    min-height: 44px;
+  }
+}
+
+.note {
+  margin-top: var(--space-3);
+  color: var(--fg-3);
+  font-size: var(--fs-caption);
+}
+
+.next {
+  color: var(--fg);
+  font-size: var(--fs-display-s);
+}
+
+.when {
+  margin-top: var(--space-3);
+  color: var(--fg-2);
+  font-size: var(--fs-small);
+}
+
+.countdownLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.5em;
+  margin-top: var(--space-1);
+  color: var(--fg-3);
+  font-size: var(--fs-small);
+}
+
+.countdown {
+  color: var(--fg);
+}
+
+/* ── Legal line + back to top ─────────────────────────────────── */
+
+.base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+/* Phones: two lines, no dangling separator. Wider: one line joined by a middle dot. */
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: 0 0.6em;
+  color: var(--fg-3);
+}
+
+.dot {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .legal {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .dot {
+    display: inline;
+  }
+}
+
+.up {
+  transform: rotate(-90deg);
+}
+
+/* ── The signature: VELATO, cropped by the page's bottom edge ── */
+
+.mark {
+  container-type: inline-size;
+  max-width: var(--content-max);
+  margin: var(--space-8) auto 0;
+  padding-inline: var(--gutter);
+}
+
+/*
+ * Sized so the letters span the column: V to O measures 5.855em with the wordmark tracking
+ * (measured in Chromium; the trailing tracking is cancelled by the component). Clipped at
+ * 0.61em: Cormorant's capitals run 0.19–0.82em in this box, so the top two-thirds show.
+ */
+.markCrop {
+  display: flex;
+  justify-content: center;
+  height: 0.61em;
+  overflow: clip;
+  font-size: calc(100cqw / 5.87);
+}
+
+.wordmark {
+  font-size: 1em;
+  color: color-mix(in srgb, var(--fg) 24%, transparent);
+  user-select: none;
+}
+
+@media (min-width: 48rem) {
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-5);
+  }
+}
+
+@media (min-width: 64rem) {
+  .inner {
+    gap: var(--space-10);
+  }
+
+  .columns {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-5);
+  }
+
+  .col:nth-child(1) {
+    grid-column: 1 / span 3;
+  }
+
+  .col:nth-child(2) {
+    grid-column: 4 / span 3;
+  }
+
+  .col:nth-child(3) {
+    grid-column: 7 / span 2;
+  }
+
+  .col:nth-child(4) {
+    grid-column: 10 / span 3;
+  }
+
+  .mark {
+    margin-top: var(--space-9);
+  }
+}

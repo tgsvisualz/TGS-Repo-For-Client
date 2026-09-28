@@ -1,0 +1,155 @@
+/*
+ * Custom cursor. The native cursor hides everywhere while it runs, except over text entry,
+ * where the native caret returns (and the custom one steps aside).
+ * Unlayered !important: it must beat any `cursor: pointer` set by a component or feature.
+ */
+:global(html.has-custom-cursor),
+:global(html.has-custom-cursor *) {
+  cursor: none !important;
+}
+
+:global(
+    html.has-custom-cursor
+      :is(
+        input:not([type='button'], [type='submit'], [type='reset'], [type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='image']),
+        textarea,
+        select,
+        [contenteditable]:not([contenteditable='false']),
+        [contenteditable]:not([contenteditable='false']) *
+      )
+  ) {
+  cursor: auto !important;
+}
+
+/* No position or z-index: the parts below stack (and blend) against the page, not this box. */
+.root {
+  pointer-events: none;
+}
+
+.dot,
+.ring,
+.disc {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-cursor);
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity var(--dur-hover) var(--ease-out);
+}
+
+.dot,
+.ring {
+  mix-blend-mode: difference;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+}
+
+.ring {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+}
+
+/* The disc stays in normal blend so its label reads. */
+.disc {
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+}
+
+.dotShape,
+.ringShape,
+.discShape {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transition:
+    transform var(--dur-hover) var(--ease-out),
+    opacity var(--dur-hover) var(--ease-out);
+}
+
+.dotShape {
+  background: var(--fg);
+}
+
+.ringShape {
+  border: 1px solid var(--fg);
+}
+
+.discShape {
+  display: grid;
+  place-items: center;
+  background: var(--fg);
+  color: var(--fg-inverse);
+  opacity: 0;
+  /* Starts at the ring's size and opens out to 84px. */
+  transform: scale(0.43);
+}
+
+.label {
+  /* Trailing tracking cancelled so the word sits optically centred. */
+  margin-right: calc(var(--tracking-label) * -1);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* ── States ── */
+
+.root[data-visible='false'] > * {
+  opacity: 0;
+}
+
+.root:is([data-state='link'], [data-state='label'], [data-state='text']) .dotShape {
+  opacity: 0;
+}
+
+.root[data-state='link'] .ringShape {
+  transform: scale(1.6);
+}
+
+.root[data-pressed] .ringShape {
+  transform: scale(0.85);
+}
+
+.root[data-state='link'][data-pressed] .ringShape {
+  transform: scale(1.36);
+}
+
+.root[data-state='label'] .ringShape {
+  opacity: 0;
+  transform: scale(2.33);
+}
+
+.root[data-state='label'] .discShape {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.root[data-state='label'][data-pressed] .discShape {
+  transform: scale(0.85);
+}
+
+.root[data-state='text'] .ringShape {
+  opacity: 0;
+}
+
+/* Reduced motion: no lag (handled in JS) and instant state changes. */
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .ring,
+  .disc,
+  .dotShape,
+  .ringShape,
+  .discShape {
+    transition: none;
+  }
+}
