@@ -91,10 +91,10 @@ The hero's React Three Fiber showroom is built from placeholder geometry in `src
 
 | ID | Where | Placeholder now | Replace with |
 |---|---|---|---|
-| `HERO-3D-FIG-A` | `src/hero3d/VeiledFigure3D.tsx`, centre figure | Lathe-geometry figure: deep skin tone, ivory sheer veil, black silk column gown | GLB model of the veiled model (scanned or produced), ≤ 3 MB with Draco, real-world scale in metres. Pass it via the `modelUrl` prop, which loads with `useGLTF`. |
+| `HERO-3D-FIG-A` | `src/hero3d/VeiledFigure3D.tsx` + `figure.ts` / `profiles.ts`, centre figure | Lathe-geometry figure in a slight contrapposto: deep skin tone, two-tier ivory sheer veil, black silk column gown | GLB model of the veiled model (scanned or produced), ≤ 3 MB with Draco, real-world scale in metres, feet at y 0, facing +z, shipped with the site. The `modelUrl` prop on `VeiledFigure3D` is reserved for it: its doc comment gives the steps to load it with drei `useGLTF`. It is not wired yet. |
 | `HERO-3D-FIG-B` | same, left figure | Warm golden skin tone, black tulle veil, bone wide-leg trousers, black draped top | Same as A |
 | `HERO-3D-FIG-C` | same, right figure | Light skin tone, smoke veil, garnet slip dress, black top-handle bag | Same as A |
-| `HERO-3D-ROOM` | `src/hero3d/` floor, plinth, runway lights, light bars | Procedural showroom: reflective floor, emissive runway lights | Optional: a baked GLB of the real showroom or set design |
+| `HERO-3D-ROOM` | `src/hero3d/Scene.tsx` (floor, stage, runway, light bars, lights) | Procedural showroom: satin floor, glossy stage with a mirrored top (high tier) and a glowing edge ring, 2×18 runway lights, soft light shafts, dust | Optional: a baked GLB of the real showroom or set design |
 
 The figures are told apart **only** by skin tone and the hair silhouette under the veil. The final representation of the three models (Asian, Black, white) comes from real casting and photography.
 

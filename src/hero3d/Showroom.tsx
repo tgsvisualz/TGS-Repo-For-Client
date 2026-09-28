@@ -13,9 +13,10 @@ import type { ShowroomProps } from './types'
  * hero (its own chunk), which fades it in on onReady() and falls back to the still stage on
  * onError(). Decorative: aria-hidden, no focusable content.
  *
- * Tiers: 'high' = reflective floor, post effects (Bloom, ACES, grain, vignette), dpr up to
- * 1.75. 'lite' = satin floor, no composer, dpr up to 1.25, fewer dust motes. A 'high' mount
- * that keeps missing its frame budget steps its dpr down and finally drops to 'lite'.
+ * Tiers: 'high' = mirrored plinth top, post effects (Bloom, ACES, grain, vignette), dpr up
+ * to 1.75. 'lite' = satin plinth, no composer (MSAA on the canvas instead), dpr up to 1.25,
+ * fewer dust motes. A mount that keeps missing its frame budget steps its dpr down; a 'high'
+ * one that still misses it at dpr 1 drops to 'lite'.
  */
 
 const CANVAS_STYLE: CSSProperties = { position: 'absolute', inset: 0, touchAction: 'pan-y' }

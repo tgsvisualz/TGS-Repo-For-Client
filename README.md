@@ -43,17 +43,26 @@ The 2D still stage always renders underneath the 3D canvas, which fades in only 
 | Control | Effect |
 |---|---|
 | **3D / Still toggle** (bottom-right of the hero) | Switches for this visitor; the choice is remembered in the browser |
-| `?3d=off` / `?3d=on` in the URL | Forces it for one visit |
+| `?3d=off` / `?3d=on` in the URL | Forces it off or on for one visit |
+| `?3d=high` in the URL | Forces it on at full quality, even on weak or software graphics (for demos) |
 | `FEATURES.hero3d` in `src/config.ts` | Turns the layer off for everyone |
 | `VITE_HERO_3D=off npm run build` | Strips the 3D code from the bundle entirely |
 
 **Automatic fallbacks:**
 - no WebGL;
 - "reduce motion" turned on in the OS (the default switches to Still, but the toggle can turn 3D back on);
+- software-only graphics, such as virtual machines, some remote desktops and blocklisted GPUs (the default is Still; use the toggle or `?3d=on` / `?3d=high` to force 3D);
 - data-saver mode;
 - a WebGL error or context loss mid-session.
 
-**Quality:** phones and low-memory devices get a lighter version (no reflections or post-processing), and the scene also steps down automatically if the frame rate drops.
+**Quality:**
+- Desktops get the full showroom: mirrored stage, bloom, film grain and vignette.
+- Phones, narrow windows and low-memory devices get a lighter version with no mirror and no post-processing.
+- On desktop, if the frame rate drops, the scene lowers its resolution in steps and falls back to the lighter version if needed.
+
+**The camera:** moving the cursor across the hero turns the camera a full 360° around the stage. The centre shows the fronts and the edges show the backs. On touch, drag sideways to turn.
+
+**For the pitch:** open the site on a laptop with a real GPU and move the cursor slowly across the hero. If the laptop's GPU is blocklisted or you present from a VM, add `?3d=on`.
 
 ## Swapping in the client's imagery
 1. Open the site with `#assets` in the URL, or press **Shift + A**, to see every placeholder's ID. `?view=art` shows them all on one sheet with briefs.

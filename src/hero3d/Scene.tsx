@@ -44,7 +44,7 @@ export function Scene({ tier, reducedMotion }: SceneProps) {
       <Plinth tier={tier} />
       <Runway hdr={hdr} />
       <LightBars hdr={hdr} />
-      <Lights />
+      <Lights tier={tier} />
       <Environment resolution={128} frames={1} environmentIntensity={0.3}>
         {/* Key: a wide soft box above and in front. */}
         <Lightformer form="rect" color="#FFE2C4" intensity={2.4} position={[0, 5, 5.5]} scale={[7, 2.2, 1]} target={[0, 1.2, 0]} />
@@ -80,7 +80,7 @@ function Floor() {
  */
 function Plinth({ tier }: { tier: Tier }) {
   const hdr = tier === 'high'
-  const ring = useMemo(() => glow('#FFC690', hdr, 3.2, 0.85), [hdr])
+  const ring = useMemo(() => glow('#FFC690', hdr, 6, 0.85), [hdr])
   return (
     <group>
       <mesh position-y={PLINTH_H / 2}>
@@ -94,13 +94,13 @@ function Plinth({ tier }: { tier: Tier }) {
             resolution={512}
             blur={[300, 90]}
             mixBlur={1}
-            mixStrength={14}
+            mixStrength={10}
             mixContrast={1}
             roughness={1}
             depthScale={1.1}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.3}
-            color="#120E0C"
+            color="#100D0B"
             metalness={0.5}
             envMapIntensity={0.2}
           />
@@ -120,7 +120,7 @@ function Plinth({ tier }: { tier: Tier }) {
 function Runway({ hdr }: { hdr: boolean }) {
   const lights = useRef<InstancedMesh>(null)
   const material = useMemo(() => {
-    const m = new MeshBasicMaterial({ color: glow('#FFD2A0', hdr, 2.6, 0.8), toneMapped: false })
+    const m = new MeshBasicMaterial({ color: glow('#FFD2A0', hdr, 5, 0.8), toneMapped: false })
     // Lights that pass right under the orbiting camera fade out rather than flare.
     m.onBeforeCompile = (shader) => {
       shader.fragmentShader = shader.fragmentShader.replace(
@@ -216,8 +216,15 @@ function LightBars({ hdr }: { hdr: boolean }) {
   )
 }
 
+/**
+ * Beam haze opacity. The composer blends in linear HDR and encodes afterwards, which makes a
+ * faint low-alpha haze several times brighter than on the plain canvas (blended after
+ * encoding), so the high tier needs far less of it for the same soft shafts.
+ */
+const HAZE: Record<Tier, number> = { high: 0.07, lite: 0.2 }
+
 /** Three soft shafts of warm light, one above each figure; a dim cool rim from behind. */
-function Lights() {
+function Lights({ tier }: { tier: Tier }) {
   return (
     <>
       <ambientLight intensity={0.06} color="#FFE9D6" />
@@ -227,6 +234,7 @@ function Lights() {
           position={[f.position[0], 4.6, f.position[2] + 0.7]}
           target={[f.position[0], 0.6, f.position[2]]}
           intensity={f.id === 'A' ? 62 : 46}
+          haze={HAZE[tier]}
         />
       ))}
       <Rim />
@@ -258,10 +266,13 @@ function Beam({
   position,
   target,
   intensity,
+  haze,
 }: {
   position: [number, number, number]
   target: [number, number, number]
   intensity: number
+  /** Opacity of the volumetric cone. */
+  haze: number
 }) {
   const light = useRef<SpotLightImpl>(null)
   const [aim] = useState(() => new Object3D())
@@ -289,7 +300,7 @@ function Beam({
         volumetric
         attenuation={5}
         anglePower={12}
-        opacity={0.2}
+        opacity={haze}
         radiusTop={0.04}
         radiusBottom={Math.tan(BEAM_ANGLE) * BEAM_DISTANCE}
       />
