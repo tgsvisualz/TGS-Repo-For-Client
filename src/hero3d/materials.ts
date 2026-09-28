@@ -26,6 +26,8 @@ export function silk(color: string, sheenColor: string): MeshPhysicalMaterial {
     sheenRoughness: 0.4,
     clearcoat: 0.15,
     clearcoatRoughness: 0.4,
+    // The side strip light-formers run long highlights down the folds.
+    envMapIntensity: 1.6,
   })
 }
 

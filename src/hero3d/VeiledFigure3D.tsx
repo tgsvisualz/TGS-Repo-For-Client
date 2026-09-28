@@ -61,7 +61,7 @@ export function VeiledFigure3D({ spec, reducedMotion, shadow }: VeiledFigure3DPr
         />
       ))}
 
-      {spec.bag ? <Bag leather={built.leather} brass={built.brass} /> : null}
+      {spec.bag ? <Bag leather={built.leather} brass={built.brass} shift={built.lean} /> : null}
 
       <group ref={veil} position={[0, spec.crown, 0]}>
         <mesh geometry={built.veil.geometry} material={built.veil.material} position={[0, -spec.crown, 0]} />
@@ -79,10 +79,10 @@ export function VeiledFigure3D({ spec, reducedMotion, shadow }: VeiledFigure3DPr
  * A black top-handle bag hanging from the figure's closed left hand (+x, the outer side for C),
  * turned so its face shows three-quarters to the front.
  */
-function Bag({ leather, brass }: { leather: Material; brass: Material }) {
+function Bag({ leather, brass, shift }: { leather: Material; brass: Material; shift: number }) {
   const handle = 0.05
   return (
-    <group position={[0.262, 0.752, 0.016]} rotation-y={1.05}>
+    <group position={[0.262 + shift, 0.752, 0.016]} rotation-y={1.05}>
       <mesh material={leather} position={[0, -handle, 0]}>
         <torusGeometry args={[handle, 0.0055, 8, 32, Math.PI]} />
       </mesh>

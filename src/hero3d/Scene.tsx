@@ -94,13 +94,13 @@ function Plinth({ tier }: { tier: Tier }) {
             resolution={512}
             blur={[300, 90]}
             mixBlur={1}
-            mixStrength={18}
+            mixStrength={14}
             mixContrast={1}
             roughness={1}
             depthScale={1.1}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.3}
-            color="#14100D"
+            color="#120E0C"
             metalness={0.5}
             envMapIntensity={0.2}
           />

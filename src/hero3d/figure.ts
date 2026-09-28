@@ -39,6 +39,8 @@ export interface BuiltFigure {
   parts: Part[]
   /** The veil (inner blusher + outer layer in one mesh) and its hem edge; they sway about the crown. */
   veil: { geometry: BufferGeometry; material: Material; edge: BufferGeometry; edgeMaterial: Material }
+  /** Sideways shift of the body at hand height (the bag hangs from the shifted hand). */
+  lean: number
   /** Materials the bag reuses (C only). */
   leather: Material
   brass: Material
@@ -363,8 +365,27 @@ export function buildFigure(spec: FigureSpec): BuiltFigure {
   const edgeGeometry = g(mergeGeometries([hemEdge(outerReach, 1, 0.0028), hemEdge(blusherReach, 0.965, 0.0022)]))
   const edgeMaterial = m(M.edge(spec.veil))
 
+  // Contrapposto: the weight-bearing hip slides out and the shoulders settle back over it, a
+  // gentle S through the body (feet and head stay put). Sheared in place; the normals barely
+  // change and are kept.
+  const lean = (y: number): number => spec.stance * (0.03 * Math.exp(-(((y - 0.95) / 0.45) ** 2)) - 0.006 * smoothstep(1.2, 1.7, y))
+  for (const geometry of geometries) {
+    if (geometry === sphere) continue
+    const pos = geometry.getAttribute('position')
+    for (let i = 0; i < pos.count; i++) pos.setX(i, pos.getX(i) + lean(pos.getY(i)))
+    pos.needsUpdate = true
+    geometry.computeBoundingSphere()
+  }
+  for (const part of parts) {
+    if (part.geometry === sphere && part.position) {
+      const [x, y, z] = part.position
+      part.position = [x + lean(y), y, z]
+    }
+  }
+
   return {
     parts,
+    lean: lean(0.75),
     veil: { geometry: veilGeometry, material: veilMaterial, edge: edgeGeometry, edgeMaterial },
     leather,
     brass,

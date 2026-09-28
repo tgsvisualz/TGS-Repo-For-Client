@@ -39,6 +39,8 @@ export interface FigureSpec {
   phase: number
   /** Carries the top-handle bag (outer hand). */
   bag: boolean
+  /** Contrapposto: which way the weight-bearing hip shifts (+1 = her left, −1 = her right). */
+  stance: 1 | -1
 }
 
 const INWARD = (8 * Math.PI) / 180
@@ -56,6 +58,7 @@ export const FIGURES: readonly FigureSpec[] = [
     crown: 1.775,
     phase: 1.9,
     bag: false,
+    stance: -1,
   },
   {
     id: 'A',
@@ -68,6 +71,7 @@ export const FIGURES: readonly FigureSpec[] = [
     crown: 1.79,
     phase: 0,
     bag: false,
+    stance: 1,
   },
   {
     id: 'C',
@@ -80,6 +84,7 @@ export const FIGURES: readonly FigureSpec[] = [
     crown: 1.775,
     phase: 3.7,
     bag: true,
+    stance: -1,
   },
 ]
 
