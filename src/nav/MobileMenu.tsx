@@ -116,6 +116,9 @@ function MenuItem({
   onToggle: () => void
 }) {
   const regionId = useId()
+  // A region's thumbnails mount the first time it opens (not with the menu), then stay.
+  const [visited, setVisited] = useState(expanded)
+  if (expanded && !visited) setVisited(true)
   return (
     <li className={styles.item} style={indexStyle('--i', index)}>
       <button
@@ -129,7 +132,7 @@ function MenuItem({
         <Icon name={expanded ? 'minus' : 'plus'} size={18} className={styles.itemIcon} />
       </button>
       <div id={regionId} className={styles.region} hidden={!expanded}>
-        <ItemContent item={item} />
+        {visited ? <ItemContent item={item} /> : null}
       </div>
     </li>
   )

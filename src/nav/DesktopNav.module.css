@@ -80,12 +80,41 @@
 }
 
 /* Keyboard-initiated changes apply instantly. */
-.nav[data-instant] .trigger,
-.nav[data-instant] .chevron {
+.triggers[data-instant] .trigger,
+.triggers[data-instant] .chevron {
   transition: none;
 }
 
 /* ── Viewport ───────────────────────────────────────────── */
+/*
+ * The geometry written by the controller is registered as NON-inherited: custom properties
+ * inherit by default, and every open/switch would otherwise restyle all ~9,500 SVG nodes of
+ * the panels' art (measured: two ~70ms recalcs of 13k elements per open, before this).
+ */
+@property --vp-x {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --vp-w {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --vp-h {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --vp-origin {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
 .viewport {
   --vp-pad: 4px;
 
@@ -97,16 +126,22 @@
   transform-origin: var(--vp-origin, 0px) 0;
   /* Same function list in every state, so each part interpolates on its own. */
   transform: translateX(var(--vp-x, 0px)) translateY(0) scale(0.98);
-  pointer-events: none;
+  /*
+   * Closed = hidden (not hit-testable, not painted). Deliberately visibility and not
+   * pointer-events: toggling pointer-events here cost a whole-document style recalc
+   * (~13k elements) on every open and close; visibility stays local.
+   */
+  visibility: hidden;
 }
 
 .viewport[data-state='pre'] {
   transform: translateX(var(--vp-x, 0px)) translateY(-4px) scale(0.96);
+  visibility: visible;
 }
 
 .viewport[data-state='open'] {
   transform: translateX(var(--vp-x, 0px)) translateY(0) scale(1);
-  pointer-events: auto;
+  visibility: visible;
 }
 
 /* Hover bridge: spans the gap up to the header, so trigger → panel never reads as "left". */
@@ -155,9 +190,11 @@
   transition: opacity var(--dur-menu) var(--ease-out);
 }
 
-/* Exit: faster than the entrance. */
+/* Exit: faster than the entrance; hidden once the fade is done. */
 .viewport[data-motion='exit'] {
-  transition: transform var(--dur-menu-exit) var(--ease-out);
+  transition:
+    transform var(--dur-menu-exit) var(--ease-out),
+    visibility 0s linear var(--dur-menu-exit);
 }
 
 .viewport[data-motion='exit'] .surface {
@@ -165,28 +202,43 @@
 }
 
 /* ── Panels (stacked inside the glass) ──────────────────── */
+/*
+ * Inactive panels rest 12px to one side and are hidden (not painted). On a switch the content
+ * moves WITH the travel: heading right, the incoming panel slides in from 12px left of its
+ * place and the outgoing one leaves 12px to the right (and the mirror image heading left).
+ */
 .panel {
   position: absolute;
   top: var(--vp-pad);
   left: var(--vp-pad);
   opacity: 0;
+  visibility: hidden;
 }
 
+/* Triggers left of the active one: a panel from there leaves/arrives on the right. */
 .panel[data-side='before'] {
-  transform: translateX(-12px);
+  transform: translateX(12px);
 }
 
 .panel[data-side='after'] {
-  transform: translateX(12px);
+  transform: translateX(-12px);
 }
 
 .panel[data-active='true'] {
   opacity: 1;
   transform: none;
+  visibility: visible;
 }
 
 /* Content cross-slides only on a switch; entering from closed shows it in place. */
 .viewport[data-motion='glide'] .panel {
+  transition:
+    opacity var(--nav-fade) var(--ease-out),
+    transform var(--nav-fade) var(--ease-out),
+    visibility 0s linear var(--nav-fade);
+}
+
+.viewport[data-motion='glide'] .panel[data-active='true'] {
   transition:
     opacity var(--nav-fade) var(--ease-out),
     transform var(--nav-fade) var(--ease-out);

@@ -70,6 +70,17 @@
   gap: 1px;
 }
 
+/* The four rows share the column evenly, so every category keeps the same rhythm. */
+.rows > li:not(.viewAllItem) {
+  display: flex;
+  flex: 1 1 0;
+}
+
+.rows > li:not(.viewAllItem) > .row {
+  flex: 1;
+  justify-content: center;
+}
+
 .row {
   padding: 0.7rem 0.8rem;
 }
@@ -78,6 +89,7 @@
   font-size: var(--fs-caption);
   line-height: 1.4;
   color: var(--fg-2);
+  text-wrap: pretty;
 }
 
 .viewAllItem {
@@ -136,6 +148,8 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  visibility: hidden;
+  transition: visibility 0s linear var(--dur-swap);
 }
 
 .slide[data-previous] {
@@ -144,6 +158,9 @@
 
 .slide[data-current] {
   z-index: 2;
+  /* inherit, not visible: a hidden (inactive) panel must stay hidden all the way down. */
+  visibility: inherit;
+  transition: none;
 }
 
 /*
@@ -200,12 +217,18 @@
 .card {
   position: relative;
   display: block;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: var(--r-2);
+  background: var(--bg-raised);
 }
 
 .cardArt {
-  border-radius: var(--r-2);
+  position: absolute;
+  inset: 0;
+  display: block;
+  height: 100%;
+  aspect-ratio: auto;
 }
 
 /* The art layer (Placeholder's first child) zooms inside the clipped card; the caption stays put. */
@@ -219,6 +242,7 @@
   }
 }
 
+/* Title · status · line, bottom-left over the scrim; the status line has a fixed height so both titles align. */
 .cardCaption {
   position: absolute;
   inset: 0;
@@ -226,7 +250,7 @@
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
-  gap: 2px;
+  gap: 3px;
   padding: 14px 14px 13px;
   background: var(--scrim-bottom);
 }
@@ -240,9 +264,15 @@
   color: var(--fg);
 }
 
+.cardMeta {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
+
 .cardCountdown {
-  margin-block: 1px 2px;
   font-size: var(--fs-caption);
+  line-height: 1;
   color: var(--fg);
 }
 
@@ -250,6 +280,7 @@
   font-size: var(--fs-caption);
   line-height: 1.35;
   color: var(--fg-2);
+  text-wrap: balance;
 }
 
 /* ── Plain list (The House) ─────────────────────────────── */
@@ -277,7 +308,9 @@
   .viewAll[data-highlight] .viewAllIcon {
     transform: none;
   }
+}
 
+@media (prefers-reduced-motion: reduce) and (hover: hover) and (pointer: fine) {
   .card:hover .cardArt > :first-child {
     transform: none;
   }

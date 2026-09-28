@@ -143,12 +143,11 @@ export function useNavController(ids: readonly NavItemId[]) {
       const m = machine.current
       const same = m.open && m.activeId === id
       if (same && !instant && !focusFirst) return
-      if (!same) {
-        openedAt.current = performance.now()
-        // Switching away from a panel that holds focus (pointer switch): keep focus on the nav.
-        const previous = m.activeId ? panels.current.get(m.activeId) : null
-        if (previous?.contains(document.activeElement)) triggers.current.get(id)?.focus({ preventScroll: true })
-      }
+      // Switching away from a panel that holds focus (a pointer switch): hand focus to the new
+      // trigger, after the commit so its focus handler already sees the new panel.
+      const previous = !same && m.activeId ? panels.current.get(m.activeId) : null
+      const handFocus = !!previous?.contains(document.activeElement)
+      if (!same) openedAt.current = performance.now()
       const motion: NavMotion = instant ? 'instant' : visible() ? 'glide' : 'enter'
       closingUntil.current = 0
       commit({
@@ -159,6 +158,7 @@ export function useNavController(ids: readonly NavItemId[]) {
         source: same && source === 'pointer' ? m.source : source,
         focusFirst,
       })
+      if (handFocus) triggers.current.get(id)?.focus({ preventScroll: true })
     }
 
     const hide = (instant: boolean) => {
@@ -344,8 +344,9 @@ export function useNavController(ids: readonly NavItemId[]) {
         if (next && navRef.current?.contains(next)) return
         const m = machine.current
         if (!m.open) return
-        // A hover-opened panel belongs to the pointer; losing focus to nowhere doesn't close it.
-        if (!next && m.source === 'pointer') return
+        // Focus lost to nowhere: a hover-opened panel belongs to the pointer, and a click on
+        // the panel's own glass (pointer still over the nav) is not a reason to close.
+        if (!next && (m.source === 'pointer' || navRef.current?.matches(':hover'))) return
         hide(true)
       },
 
@@ -443,7 +444,8 @@ export function useNavController(ids: readonly NavItemId[]) {
     // measure/apply only read refs: the snapshot is this effect's single trigger.
   }, [snapshot])
 
-  // Panel content can change size after mount (fonts, countdown): keep the viewport fitted.
+  // Keep the viewport fitted and placed while open: panel content can change size after mount
+  // (fonts, countdown) and the header row resizes with the window, moving the triggers.
   useEffect(() => {
     if (!snapshot.mounted || typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(() => {
@@ -454,6 +456,8 @@ export function useNavController(ids: readonly NavItemId[]) {
       if (g && !sameGeometry(lastGeometry.current, g)) apply(vp, g)
     })
     panels.current.forEach((el) => observer.observe(el))
+    const row = navRef.current?.closest('[data-header-row]')
+    if (row) observer.observe(row)
     return () => observer.disconnect()
   }, [snapshot.mounted])
 

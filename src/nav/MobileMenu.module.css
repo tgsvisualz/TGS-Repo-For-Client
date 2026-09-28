@@ -229,6 +229,7 @@
   font-size: var(--fs-caption);
   line-height: 1.35;
   color: var(--fg-2);
+  text-wrap: balance;
 }
 
 /* The House: plain links. */
@@ -297,6 +298,24 @@
 .overlay[data-motion='none'] .item,
 .overlay[data-motion='none'] .foot {
   transition: none;
+}
+
+/* Tablets: use the width: rows in two columns, cards at a readable size. */
+@media (min-width: 700px) {
+  .subList,
+  .links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-6);
+  }
+
+  .subList > li:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .cards {
+    max-width: 560px;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

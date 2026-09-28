@@ -1,8 +1,9 @@
-import { useEffect, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useLayoutEffect, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { Icon, Placeholder } from '../../components'
 import { getCategory } from '../../data/catalog'
 import type { CategoryId, NavLink } from '../../data/types'
 import { cx } from '../../lib'
+import type { ArtGate } from '../useArtGate'
 import styles from './panels.module.css'
 
 export interface ListPreviewPanelProps {
@@ -10,6 +11,7 @@ export interface ListPreviewPanelProps {
   viewAll: NavLink
   /** Whether this panel is the one on show (resets to the first row a moment after it hides). */
   active: boolean
+  art: ArtGate
 }
 
 interface PreviewState {
@@ -27,12 +29,19 @@ const RESET_AFTER = 320
  * preview on the right that swaps to the hovered or focused row. All four previews stay stacked
  * and cross-fade by class, so fast hovering interrupts cleanly.
  */
-export function ListPreviewPanel({ categoryId, viewAll, active }: ListPreviewPanelProps) {
+export function ListPreviewPanel({ categoryId, viewAll, active, art }: ListPreviewPanelProps) {
   const category = getCategory(categoryId)
   const rows = category.subcategories
   const [preview, setPreview] = useState<PreviewState>(FIRST)
   /** The row under the pointer or focus (rows.length = the "All …" row); null → the current preview's row. */
   const [pointed, setPointed] = useState<number | null>(null)
+  const { request } = art
+
+  // The preview on show always has its art (mounted before paint if it wasn't warmed yet).
+  const shownAsset = rows[preview.current].assetId
+  useLayoutEffect(() => {
+    if (active) request([shownAsset])
+  }, [active, shownAsset, request])
 
   useEffect(() => {
     if (active) return
@@ -46,6 +55,7 @@ export function ListPreviewPanel({ categoryId, viewAll, active }: ListPreviewPan
   const point = (index: number) => {
     setPointed(index)
     if (index < rows.length) {
+      request([rows[index].assetId])
       setPreview((state) => (state.current === index ? state : { current: index, previous: state.current }))
     }
   }
@@ -101,7 +111,9 @@ export function ListPreviewPanel({ categoryId, viewAll, active }: ListPreviewPan
               data-current={index === preview.current ? 'true' : undefined}
               data-previous={index === preview.previous ? 'true' : undefined}
             >
-              <Placeholder assetId={row.assetId} ratio={5 / 4} decorative className={styles.slideArt} />
+              {art.has(row.assetId) ? (
+                <Placeholder assetId={row.assetId} ratio={5 / 4} decorative className={styles.slideArt} />
+              ) : null}
             </div>
           ))}
         </a>
