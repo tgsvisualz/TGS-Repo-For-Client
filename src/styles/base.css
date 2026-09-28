@@ -100,6 +100,26 @@
   }
 }
 
+/*
+ * Host-proof page ground, deliberately UNLAYERED. A host page (the claude.ai preview frame)
+ * injects its own unlayered `body { margin; font; background }`, and unlayered rules beat
+ * every @layer. Declared here, after the host's styles, these win on order.
+ */
+html {
+  color-scheme: dark;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+}
+
 /* ── Page defaults ─────────────────────────────────────────── */
 @layer base {
   html {
