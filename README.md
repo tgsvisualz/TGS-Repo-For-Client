@@ -9,7 +9,7 @@ A high-fidelity **static** landing prototype for **Velato** (Italian for "veiled
   - a weekly-drop teaser with a live countdown;
   - the drop rotation;
   - a typographic category index.
-- **3D showroom hero:** a React Three Fiber runway with three veiled, masked figures and a cursor-driven 360° orbit. The veil of the figure under the cursor lifts to show her masked face (tap on touch screens; left alone, the veils lift one at a time). It is layered on top of a 2D still stage that unveils the same way, so it can always be switched off without breaking the page.
+- **3D showroom hero:** a React Three Fiber runway with three veiled, masked figures and a cursor-driven 360° orbit. The veil of the figure under the cursor lifts to show her mask on a smooth mannequin head (tap on touch screens; left alone, the veils lift one at a time). It is layered on top of a 2D still stage that unveils the same way, so it can always be switched off without breaking the page.
 
 The brief is in `BRIEF.md`, the design system in `DESIGN.md`, and the image swap list in `ASSETS.md`.
 

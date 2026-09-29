@@ -381,14 +381,14 @@ export function buildFigure(spec: FigureSpec): BuiltFigure {
     }
   }
 
-  // ── Face and mask: a sculpted head in head space, placed with the lean like the hair.
+  // ── Head, hair and mask, in head space, placed with the lean like the other head parts.
   const look = FACES[spec.id]
-  const headGeo = headGeometry(spec.skin, look)
+  const headGeo = headGeometry()
   const maskGeo = maskGeometry()
   const maskTex = maskTextures(look)
   geometries.push(headGeo, maskGeo)
   const headAt = [HEAD_CENTER[0] + lean(HEAD_CENTER[1]), HEAD_CENTER[1], HEAD_CENTER[2]] as const
-  parts.push({ key: 'head', geometry: headGeo, material: m(headMaterial()), position: headAt })
+  parts.push({ key: 'head', geometry: headGeo, material: m(headMaterial(spec.skin)), position: headAt })
   parts.push({ key: 'hair', geometry: g(hairGeometry()), material: hair, position: headAt })
   parts.push({ key: 'mask', geometry: maskGeo, material: m(maskMaterial(maskTex)), position: headAt })
 

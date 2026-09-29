@@ -1,14 +1,11 @@
-import { BufferGeometry, CanvasTexture, Color, DoubleSide, Float32BufferAttribute, MeshStandardMaterial, SphereGeometry, SRGBColorSpace } from 'three'
+import { BufferGeometry, CanvasTexture, DoubleSide, Float32BufferAttribute, MeshStandardMaterial, SphereGeometry, SRGBColorSpace } from 'three'
 import type { ModelId } from '../data/types'
 
 /**
- * A quiet, sculpted face for each figure, and the masquerade mask she wears over her eyes.
- * The head is a sphere pushed into shape (brow, eye sockets, nose, cheekbones, lips, chin),
- * with the lips tinted through vertex colours. The mask is a shell that follows the same
- * surface a few millimetres out, cut and decorated by a canvas texture: black lace with a
- * metal edge, filigree at the temples, a crest over the brow and a few crystals that catch
- * the light (and the bloom). Nothing here is detailed enough to read as a portrait: it is a
- * couture mannequin in a mask.
+ * The head and the masquerade mask. The head is a smooth oval with no features, like a couture
+ * mannequin: the mask is the face. The mask is a shell a few millimetres off the head, cut and
+ * decorated by a canvas texture: black lace with a metal edge, closed eye openings, filigree
+ * at the temples, a crest over the brow and a few crystals that catch the light (and the bloom).
  */
 
 /** The head's half-extents in metres (x, y, z) and its centre in figure space. */
@@ -19,58 +16,19 @@ const smooth = (a: number, b: number, v: number): number => {
   const t = Math.min(1, Math.max(0, (v - a) / (b - a)))
   return t * t * (3 - 2 * t)
 }
-const gauss = (d: number): number => Math.exp(-d * d)
 
 /**
- * Pushes a point of the unit sphere (z = front, y = up) into a face. Returns the displaced
- * point in unit space; the caller scales it to metres.
+ * The head's surface: a smooth oval, no features (the mask is the face). Kept as a function so
+ * the mask shell and the head share one surface. Returns the point in unit space.
  */
 function sculpt(x: number, y: number, z: number, out: [number, number, number]): [number, number, number] {
-  const front = smooth(0.05, 0.45, z)
-  // Jaw: narrower and slightly shallower toward the chin.
-  const jaw = smooth(-0.1, -0.95, y)
-  let px = x * (1 - 0.26 * jaw)
-  let pz = z * (1 - 0.05 * jaw)
-  // Cheekbones: a little fuller just under the eyes, at the sides.
-  px *= 1 + 0.035 * gauss((y + 0.05) / 0.16)
-
-  let dz = 0
-  dz += 0.035 * gauss((y - 0.2) / 0.09) // brow ridge
-  dz -= 0.05 * (gauss(Math.hypot((x - 0.35) / 0.16, (y - 0.04) / 0.1)) + gauss(Math.hypot((x + 0.35) / 0.16, (y - 0.04) / 0.1))) // eye sockets
-  // Nose: a ridge from the brow down to a soft tip, then under it.
-  const ridge = y > -0.3 ? 0.03 + 0.15 * smooth(0.15, -0.3, y) : 0.18 * gauss((y + 0.3) / 0.075)
-  const width = 0.05 + 0.065 * smooth(0.1, -0.33, y)
-  dz += ridge * gauss(x / width)
-  dz += 0.03 * gauss(Math.hypot((Math.abs(x) - 0.42) / 0.14, (y + 0.12) / 0.14)) // cheek apples
-  dz += 0.038 * gauss(x / 0.2) * gauss((y + 0.515) / 0.045) // upper lip
-  dz += 0.045 * gauss(x / 0.18) * gauss((y + 0.625) / 0.05) // lower lip
-  dz -= 0.014 * gauss(x / 0.2) * gauss((y + 0.57) / 0.014) // mouth line
-  dz -= 0.02 * gauss(x / 0.2) * gauss((y + 0.72) / 0.045) // under the lower lip
-  dz += 0.06 * gauss(x / 0.24) * gauss((y + 0.83) / 0.11) // chin
-
-  pz += dz * front
-  out[0] = px
+  out[0] = x
   out[1] = y
-  out[2] = pz
+  out[2] = z
   return out
 }
 
-/** How dark the eyes are at a point of the unit sphere (0..1): shadowed eyes behind the mask. */
-function eyeWeight(x: number, y: number, z: number): number {
-  if (z < 0.4) return 0
-  return Math.min(1, gauss(Math.hypot((Math.abs(x) - 0.35) / 0.13, (y - 0.05) / 0.07)) * 1.3)
-}
-
-/** How much of the lip colour a point of the unit sphere takes (0..1). */
-function lipWeight(x: number, y: number, z: number): number {
-  if (z < 0.5) return 0
-  const upper = gauss(x / 0.19) * gauss((y + 0.515) / 0.035)
-  const lower = gauss(x / 0.17) * gauss((y + 0.628) / 0.042)
-  return Math.min(1, 1.6 * (upper + lower)) * smooth(0.5, 0.8, z)
-}
-
 export interface FaceLook {
-  lips: string
   /** The mask's metal (edge, filigree, crest). */
   metal: string
   /** The mask's lace ground. */
@@ -79,34 +37,15 @@ export interface FaceLook {
 
 /** One mask and lip colour per model. */
 export const FACES: Record<ModelId, FaceLook> = {
-  A: { lips: '#5A1C22', metal: '#C9A24A', lace: '#0D0B0A' },
-  B: { lips: '#7E2328', metal: '#D9D3C8', lace: '#0C0B0B' },
-  C: { lips: '#8E262C', metal: '#C9A24A', lace: '#100D0B' },
+  A: { metal: '#C9A24A', lace: '#0D0B0A' },
+  B: { metal: '#D9D3C8', lace: '#0C0B0B' },
+  C: { metal: '#C9A24A', lace: '#100D0B' },
 }
 
-/** The sculpted head, in metres around its own centre, with vertex colours (skin, lips). */
-export function headGeometry(skin: string, look: FaceLook): BufferGeometry {
-  const sphere = new SphereGeometry(1, 72, 56)
-  const pos = sphere.getAttribute('position')
-  const colors = new Float32Array(pos.count * 3)
-  const skinColor = new Color(skin)
-  const lipColor = new Color(look.lips)
-  const eyeColor = new Color('#140E0C')
-  const c = new Color()
-  const p: [number, number, number] = [0, 0, 0]
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i)
-    const y = pos.getY(i)
-    const z = pos.getZ(i)
-    sculpt(x, y, z, p)
-    pos.setXYZ(i, p[0] * HEAD_SCALE[0], p[1] * HEAD_SCALE[1], p[2] * HEAD_SCALE[2])
-    c.copy(skinColor).lerp(lipColor, 0.85 * lipWeight(x, y, z)).lerp(eyeColor, 0.85 * eyeWeight(x, y, z))
-    colors[i * 3] = c.r
-    colors[i * 3 + 1] = c.g
-    colors[i * 3 + 2] = c.b
-  }
-  sphere.setAttribute('color', new Float32BufferAttribute(colors, 3))
-  sphere.computeVertexNormals()
+/** The head, in metres around its own centre: a smooth oval. */
+export function headGeometry(): BufferGeometry {
+  const sphere = new SphereGeometry(1, 64, 48)
+  sphere.scale(HEAD_SCALE[0], HEAD_SCALE[1], HEAD_SCALE[2])
   return sphere
 }
 
@@ -135,8 +74,9 @@ export function hairGeometry(): BufferGeometry {
   return cap
 }
 
-export function headMaterial(): MeshStandardMaterial {
-  return new MeshStandardMaterial({ color: '#FFFFFF', vertexColors: true, roughness: 0.52, metalness: 0 })
+/** The head in the figure's skin tone, a touch smoother than the body: a mannequin's finish. */
+export function headMaterial(skin: string): MeshStandardMaterial {
+  return new MeshStandardMaterial({ color: skin, roughness: 0.48, metalness: 0 })
 }
 
 /** The mask's reach on the unit sphere: azimuth (radians either side of the front) and height. */
@@ -279,11 +219,23 @@ export function maskTextures(look: FaceLook): MaskTextures {
   ctx.stroke()
   ctx.restore()
 
-  // Eye openings.
+  // Eye openings: closed with a fine, darker net, so the mask reads whole and nothing shows
+  // behind it.
   ctx.save()
-  ctx.globalCompositeOperation = 'destination-out'
   eyes(ctx)
-  ctx.fill()
+  ctx.clip()
+  ctx.fillStyle = '#050404'
+  ctx.fillRect(0, 0, W, H)
+  ctx.strokeStyle = look.lace
+  ctx.lineWidth = 2
+  for (let d = -H; d < W; d += 9) {
+    ctx.beginPath()
+    ctx.moveTo(d, 0)
+    ctx.lineTo(d + H, H)
+    ctx.moveTo(d + H, 0)
+    ctx.lineTo(d, H)
+    ctx.stroke()
+  }
   ctx.restore()
 
   // Metal: the edge, the eye rims, filigree curls at the temples and a crest over the brow.

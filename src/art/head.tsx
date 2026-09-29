@@ -1,7 +1,7 @@
 /**
- * Head, face, hair and veil. The face is quiet: shadowed eyes behind a masquerade mask, a hint
- * of nose and lips, all under the sheer veil. The three models differ by the hair silhouette
- * (A: close-coiled high bun, B: sleek low bun, C: soft wavy chignon), skin tone and mask metal.
+ * Head, mask, hair and veil. No facial features are drawn: the head is a smooth oval and the
+ * masquerade mask is the face. The three models differ by the hair silhouette (A: close-coiled
+ * high bun, B: sleek low bun, C: soft wavy chignon), skin tone and mask metal.
  */
 import type { ReactElement, ReactNode } from 'react'
 import type { ModelId, VeilTone } from '../data/types'
@@ -16,9 +16,8 @@ export function head(p: Paint, model: ModelId, L: LightDir): ReactElement {
   return piece(p, { d: headPath(), box: headBox(), tone: SKIN[model], mat: 'skin', aoTop: 0.3, dim: 0.28, rim: 0.5, key: 0.6 }, L, 'head')
 }
 
-// ── Face and mask (front view) ────────────────────────────────────────────
+// ── Mask (front view) ──────────────────────────────────────────────────────
 
-const LIPS: Record<ModelId, string> = { A: '#5A1C22', B: '#7E2328', C: '#8E262C' }
 const MASK_METAL: Record<ModelId, string> = { A: '#C9A24A', B: '#D9D3C8', C: '#C9A24A' }
 
 /** One side of the mask outline, from the crest to the bridge of the nose (s = -1 left, 1 right). */
@@ -42,11 +41,8 @@ export function faceFront(model: ModelId): ReactElement {
   const eyes = `${ellipse(490, 107.5, 6.4, 3.3, -6)} ${ellipse(516, 107.5, 6.4, 3.3, 6)}`
   return (
     <g key="face" transform={`rotate(${HEAD.rot} ${HEAD.cx} ${HEAD.cy})`}>
-      <path d={eyes} fill="#140E0C" opacity="0.9" />
-      <path d="M503.5 111 Q501.5 122 500.5 128 Q503.5 131.5 507.5 129" fill="none" stroke={SKIN[model].deep} strokeWidth="1.1" strokeLinecap="round" opacity="0.4" />
-      <path d="M496 140 Q500 137.4 503.5 139 Q507 137.4 511 140 Q503.5 141.8 496 140Z" fill={LIPS[model]} />
-      <path d="M497 140.6 Q503.5 146.2 510 140.6 Q503.5 142.6 497 140.6Z" fill={LIPS[model]} opacity="0.92" />
-      <path d={`${fill} ${eyes}`} fill="#0D0B0A" fillRule="evenodd" />
+      <path d={fill} fill="#0D0B0A" />
+      <path d={eyes} fill="#050404" />
       <path d={outline} fill="none" stroke={metal} strokeWidth="1.3" strokeLinejoin="round" />
       <path d={eyes} fill="none" stroke={metal} strokeWidth="0.9" />
       <path d="M503 102 Q499 97 503 90 Q507 97 503 102Z" fill="none" stroke={metal} strokeWidth="0.9" />

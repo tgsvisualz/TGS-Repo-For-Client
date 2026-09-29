@@ -134,7 +134,7 @@ The frequency test comes first:
 - **Look:** abstract, lit, low-key.
   - Figures are silhouettes shaped by light: one key light, a rim, and deep shadow. Gradients and grain carry the detail; there are no outlines and no cartoon edges.
   - Veils are long and sheer (a teardrop from the crown to mid-back), with a soft sheen.
-  - **Faces are quiet and always masked.** Each model (A, B, C) has a simple sculpted face (brow, nose, lips) with shadowed eyes behind a masquerade mask: black lace, a metal edge (gold for A and C, silver for B), filigree and a few crystals. Under the veil the mask shows only as a glint; the unveiling reveals it.
+  - **The mask is the face.** Heads are smooth mannequin ovals with no features (no eyes, nose or mouth). Each model (A, B, C) wears a masquerade mask over it: black lace with closed eye openings, a metal edge (gold for A and C, silver for B), filigree and a few crystals. Under the veil the mask shows only as a glint; the unveiling reveals it.
   - Products sit on dark plinths under a single spotlight, with a soft floor reflection.
 
 ## 8. Quality rules (from the premium-app-build skill)
@@ -164,6 +164,6 @@ The frequency test comes first:
 - Don't name real fashion houses anywhere.
 - Don't use pure black (`#000`) or pure white (`#FFF`).
 - Don't use more than one italic accent per heading.
-- Don't show an unmasked face.
+- Don't draw facial features (eyes, nose, mouth). The mask is the face.
 - Don't key themes off `[data-theme]` on `<html>`, because the claude.ai preview frame sets it.
 - Don't use `localStorage` without try/catch; the helper is in `src/lib/storage.ts`.
