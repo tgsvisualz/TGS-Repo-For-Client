@@ -6,7 +6,7 @@
 - Affordable pricing on European luxury-style clothing, from non-mainstream vendors. The aesthetic lane is the great Italian and French houses, which the site never names.
 - Catalogue: bags, purses, pants, tops, dresses.
 - Tone: mysterious, seductive, secretive, exclusive, minimalist.
-- The owner is anonymous. All models are veiled, and faces are never shown.
+- The owner is anonymous. All models are veiled and masked: a face is only ever seen behind a mask.
 
 ## Who uses it
 - **Primary:** women who want the look of European luxury without the house premium. They follow drops closely and like being early.
@@ -22,7 +22,7 @@
 ## Screen
 This is a single landing page: header with mega-dropdown, hero, The Veil (manifesto), Drop 014 teaser plus list sign-up, This week (rotation), The Index, and footer.
 
-**Hero screen (must impress):** a 3D showroom runway with three veiled figures (one Asian, one Black, one white). The camera orbits the showroom floor through 360° as the cursor moves. It is built with React Three Fiber on top of a 2D still stage that works on its own.
+**Hero screen (must impress):** a 3D showroom runway with three veiled, masked figures (one Asian, one Black, one white). The camera orbits the showroom floor through 360° as the cursor moves, and the veil of the figure under the cursor lifts away to show her face behind a masquerade mask ("Luxury, *Unmasked.*"). It is built with React Three Fiber on top of a 2D still stage that works on its own and unveils the same way.
 
 ## Primary navigation
 **Header layout:** wordmark · The Drop · Bags · Purses · Tops · Pants · Dresses · The House · "Join the list".

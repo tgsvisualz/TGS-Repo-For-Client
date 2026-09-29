@@ -9,7 +9,7 @@ Tokens live in `src/styles/tokens.css`. Components use the **role** tokens (`--b
 2. **Light is the hierarchy.** Dark ground, one pool of light per composition. Emphasis comes from brightness, size and weight, not from boxes.
 3. **Restraint.** One accent (garnet), used rarely. No decoration that does not carry meaning.
 4. **Editorial, not template.** The layout is asymmetric. Imagery has sharp corners. Rhythm comes from generous space, with no identical card grids.
-5. **Anonymous by design.** No faces and no names of real houses. Italian piece names carry the mystery, always shown with their gloss (*ombra: shadow*).
+5. **Anonymous by design.** Faces only behind a mask, and no names of real houses. Italian piece names carry the mystery, always shown with their gloss (*ombra: shadow*).
 
 ## 2. Colour
 | Role | Token | Value | Use |
@@ -127,13 +127,14 @@ The frequency test comes first:
   - Rows highlight with `--fill-hover` at `--r-2`, exactly like the reference's hovered "Forests" row.
 - **Veil reveal:** placeholders in the Drop teaser sit under a veil layer that lifts partly on hover ("Peek"), using opacity and translate only.
 - **Lantern:** in the hero, a soft light follows the cursor and lifts the dark.
+- **Unveiling:** in the hero (3D and still), the veil of the figure under the cursor rises and dissolves, and a beauty light comes up on her masked face; it settles back when the cursor moves on. Left alone, the veils lift one figure at a time. Touch: tap a figure.
 
 ## 7. Placeholder art direction
 - Every image slot renders parametric SVG art (`src/art`) until the client's photography arrives. Each slot has an asset ID (see `ASSETS.md`), and a real image replaces the art by setting `src` in `src/data/catalog.ts`.
 - **Look:** abstract, lit, low-key.
   - Figures are silhouettes shaped by light: one key light, a rim, and deep shadow. Gradients and grain carry the detail; there are no outlines and no cartoon edges.
   - Veils are long and sheer (a teardrop from the crown to mid-back), with a soft sheen.
-  - **Faces are never drawn.** The three placeholder models (A, B, C) read through skin tone on the hands and neck plus the hair silhouette under the veil, never through facial features.
+  - **Faces are quiet and always masked.** Each model (A, B, C) has a simple sculpted face (brow, nose, lips) with shadowed eyes behind a masquerade mask: black lace, a metal edge (gold for A and C, silver for B), filigree and a few crystals. Under the veil the mask shows only as a glint; the unveiling reveals it.
   - Products sit on dark plinths under a single spotlight, with a soft floor reflection.
 
 ## 8. Quality rules (from the premium-app-build skill)
@@ -163,6 +164,6 @@ The frequency test comes first:
 - Don't name real fashion houses anywhere.
 - Don't use pure black (`#000`) or pure white (`#FFF`).
 - Don't use more than one italic accent per heading.
-- Don't show a face, even in placeholder art.
+- Don't show an unmasked face.
 - Don't key themes off `[data-theme]` on `<html>`, because the claude.ai preview frame sets it.
 - Don't use `localStorage` without try/catch; the helper is in `src/lib/storage.ts`.

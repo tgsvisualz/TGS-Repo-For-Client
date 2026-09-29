@@ -264,6 +264,15 @@ export function CameraRig({ pointerTarget, reducedMotion }: CameraRigProps) {
     const flat = r * Math.cos(el)
     camera.position.set(LOOK_AT.x + flat * Math.sin(az), LOOK_AT.y + r * Math.sin(el), LOOK_AT.z + flat * Math.cos(az))
     camera.lookAt(LOOK_AT)
+    // Dev only (stripped from builds): window.__velatoCam = [x, y, z, lookX, lookY, lookZ] pins
+    // the camera for close inspection of the figures.
+    if (import.meta.env.DEV) {
+      const pin = (window as unknown as { __velatoCam?: number[] }).__velatoCam
+      if (pin) {
+        camera.position.set(pin[0]!, pin[1]!, pin[2]!)
+        camera.lookAt(pin[3]!, pin[4]!, pin[5]!)
+      }
+    }
   })
 
   return null

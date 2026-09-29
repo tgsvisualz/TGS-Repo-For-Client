@@ -9,7 +9,7 @@ import { bag, CARRY_SCALE, type BagDraw } from './bags'
 import { ANKLE, armShape, handPoints, LEG, limb, shoe, TORSO, torsoBox, wristOf, type ArmPose, type Side } from './body'
 import { dress, type View } from './garments'
 import { boxOf, fmt, fold, ribbon, spline, union, boxOfC, type Box, type CPt, type Knot, type Pt } from './geom'
-import { hairFront, hairRear, head, veil, veilExtent } from './head'
+import { faceFront, hairFront, hairRear, head, veil, veilExtent } from './head'
 import { SHOE, SKIN, FABRIC } from './palette'
 import { piece, type Fold, type LightDir, type Paint, type Piece } from './paint'
 
@@ -159,6 +159,7 @@ export function drawFigure(p: Paint, spec: FigureArtSpec, light: LightDir, o: Fi
     garment()
     add(head(p, spec.model, L))
     add(hairFront(p, spec.model, L))
+    add(faceFront(spec.model))
 
     const carry = spec.carry
     const mode = carry ? CARRY_MODE[carry.shape] : null

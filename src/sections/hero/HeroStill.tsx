@@ -50,10 +50,12 @@ export function HeroStill({ pointerTarget, receded, paused }: HeroStillProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const lanternRef = useRef<HTMLDivElement>(null)
   const recededRef = useRef(receded)
+  const pausedRef = useRef(paused)
 
   useEffect(() => {
     recededRef.current = receded
-  }, [receded])
+    pausedRef.current = paused
+  }, [receded, paused])
 
   // Real GPU? Probed once during the first render, while the GPU is still idle (a WebGL context
   // opened mid-animation can block for seconds on a software rasteriser). Only there do the
@@ -138,6 +140,9 @@ export function HeroStill({ pointerTarget, receded, paused }: HeroStillProps) {
         lit = true
         root.dataset.lantern = 'on'
       }
+      unveil.moved = performance.now()
+      unveil.hover = figureAt(event.clientX, event.clientY)
+      applyUnveil()
       wake()
     }
     const onLeave = () => {
@@ -145,14 +150,60 @@ export function HeroStill({ pointerTarget, receded, paused }: HeroStillProps) {
       aim.y = 0
       lit = false
       delete root.dataset.lantern
+      unveil.hover = null
+      applyUnveil()
       wake()
     }
+
+    // ── Unveiling: the veil of the figure under the pointer lifts away; left alone, the veils
+    //    lift one figure at a time (as in the 3D showroom).
+    const figures = Array.from(root.querySelectorAll<HTMLElement>('[data-slot]'))
+    const unveil = { hover: null as HTMLElement | null, idle: null as HTMLElement | null, moved: 0 }
+    const figureAt = (x: number, y: number): HTMLElement | null => {
+      let best: HTMLElement | null = null
+      let bestDx = Infinity
+      for (const el of figures) {
+        const r = el.getBoundingClientRect()
+        const dx = Math.abs(x - (r.left + r.width / 2))
+        if (dx > r.width * 0.3 || y < r.top || y > r.bottom) continue
+        if (dx < bestDx) {
+          bestDx = dx
+          best = el
+        }
+      }
+      return best
+    }
+    const applyUnveil = () => {
+      const lifted = unveil.hover ?? unveil.idle
+      for (const el of figures) {
+        if (el === lifted) el.dataset.lift = ''
+        else delete el.dataset.lift
+      }
+    }
+    const IDLE_ORDER = ['a', 'c', 'b']
+    let idleStep = 0
+    const idleTimer = window.setInterval(() => {
+      const idle = performance.now() - unveil.moved > 5000 && !reduce.matches && !pausedRef.current && !recededRef.current
+      if (!idle) {
+        if (unveil.idle) {
+          unveil.idle = null
+          applyUnveil()
+        }
+        return
+      }
+      // Every other step lets all veils fall, so each unveiling reads as its own moment.
+      const slot = idleStep % 2 === 0 ? IDLE_ORDER[(idleStep / 2) % IDLE_ORDER.length] : null
+      unveil.idle = slot ? (figures.find((el) => el.dataset.slot === slot) ?? null) : null
+      idleStep += 1
+      applyUnveil()
+    }, 3400)
 
     section.addEventListener('pointermove', onMove, { passive: true })
     section.addEventListener('pointerleave', onLeave)
     return () => {
       section.removeEventListener('pointermove', onMove)
       section.removeEventListener('pointerleave', onLeave)
+      window.clearInterval(idleTimer)
       cancelAnimationFrame(raf)
     }
   }, [pointerTarget])
@@ -178,7 +229,7 @@ export function HeroStill({ pointerTarget, receded, paused }: HeroStillProps) {
       </div>
 
       {FIGURES.map(({ assetId, slot }) => (
-        <div key={assetId} className={cx(styles.figure, SLOT_CLASS[slot])} data-depth={slot === 'a' ? '1' : '0.7'}>
+        <div key={assetId} className={cx(styles.figure, SLOT_CLASS[slot])} data-slot={slot} data-depth={slot === 'a' ? '1' : '0.7'}>
           <span className={styles.pool} />
           <div className={styles.reflection}>
             <Placeholder assetId={assetId} ratio={RATIO} backdrop={false} decorative className={styles.reflectionArt} />

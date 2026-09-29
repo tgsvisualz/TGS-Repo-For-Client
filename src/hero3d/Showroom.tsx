@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import type { WebGLRenderer } from 'three'
 import { CameraRig, FOV } from './CameraRig'
 import { Effects } from './Effects'
+import { RevealController } from './reveal'
 import { INK, Scene, type Tier } from './Scene'
 import type { ShowroomProps } from './types'
 
@@ -84,6 +85,7 @@ export default function Showroom({ quality, active, pointerTarget, reducedMotion
       <Suspense fallback={null}>
         <Scene tier={tier} reducedMotion={reducedMotion} />
         <CameraRig pointerTarget={pointerTarget} reducedMotion={reducedMotion} />
+        <RevealController pointerTarget={pointerTarget} reducedMotion={reducedMotion} />
         {tier === 'high' ? <Effects /> : null}
         <ReadySignal onReady={onReady} />
       </Suspense>

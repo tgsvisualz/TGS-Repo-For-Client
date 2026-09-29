@@ -1,8 +1,9 @@
 import { RoundedBox } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
-import type { Group, Material } from 'three'
+import type { Group, Material, PointLight } from 'three'
 import { buildFigure } from './figure'
+import { reveal } from './reveal'
 import type { FigureSpec } from './profiles'
 
 export interface VeiledFigure3DProps {
@@ -20,6 +21,12 @@ export interface VeiledFigure3DProps {
   modelUrl?: string
 }
 
+/** The unveiling: rates (1/s) up and down, how far the veil rises (m) and grows as it goes. */
+const LIFT = { up: 3.2, down: 1.8, rise: 0.55, grow: 0.06 }
+
+/** The beauty light in front of the face: where it sits, its reach (m), colour and intensity. */
+const BEAUTY = { at: [0.32, 1.9, 0.52] as [number, number, number], reach: 1.5, color: '#FFE3CC', rest: 0.35, lit: 1.6 }
+
 /** Sway of the veil around its crown, radians and rad/s. */
 const SWAY = { z: 0.012, x: 0.008, speed: 0.6 }
 
@@ -32,17 +39,37 @@ export function VeiledFigure3D({ spec, reducedMotion, shadow }: VeiledFigure3DPr
   useEffect(() => () => built.dispose(), [built])
 
   const veil = useRef<Group>(null)
+  const beauty = useRef<PointLight>(null)
   const clock = useRef(spec.phase * 2)
+  const lift = useRef(0)
 
   useFrame((_, delta) => {
     const g = veil.current
     if (!g) return
+    const dt = Math.min(delta, 0.1)
+
+    // Unveiling: the veil rises off the head and dissolves into the light, then settles back.
+    const target = reveal.target[spec.id]
+    const rate = target > lift.current ? LIFT.up : LIFT.down
+    lift.current += (target - lift.current) * (1 - Math.exp(-rate * dt))
+    const l = lift.current
+    const eased = l * l * (3 - 2 * l)
+    const fade = Math.min(1, eased * 1.25)
+    const uniform = built.veil.material.userData.lift as { value: number } | undefined
+    if (uniform) uniform.value = fade
+    ;(built.veil.edgeMaterial as Material & { opacity: number }).opacity = 1 - fade
+    g.visible = fade < 0.995
+    // The light finds her: a soft beauty light on the face, brighter once the veil is off.
+    if (beauty.current) beauty.current.intensity = BEAUTY.rest + (BEAUTY.lit - BEAUTY.rest) * eased
+    g.position.y = spec.crown + (reducedMotion ? 0 : LIFT.rise * eased)
+    g.scale.setScalar(reducedMotion ? 1 : 1 + LIFT.grow * eased)
+
     if (reducedMotion) {
       g.rotation.set(0, 0, 0)
       return
     }
     // Own clock: fiber's restarts at 0 whenever the frameloop resumes.
-    clock.current += Math.min(delta, 0.1)
+    clock.current += dt
     const t = clock.current * SWAY.speed
     g.rotation.z = SWAY.z * Math.sin(t + spec.phase)
     g.rotation.x = SWAY.x * Math.sin(t * 0.83 + spec.phase + 1.3)
@@ -60,6 +87,8 @@ export function VeiledFigure3D({ spec, reducedMotion, shadow }: VeiledFigure3DPr
           rotation={part.rotation ? [part.rotation[0], part.rotation[1], part.rotation[2]] : undefined}
         />
       ))}
+
+      <pointLight ref={beauty} position={BEAUTY.at} intensity={BEAUTY.rest} distance={BEAUTY.reach} decay={2} color={BEAUTY.color} />
 
       {spec.bag ? <Bag leather={built.leather} brass={built.brass} shift={built.lean} /> : null}
 

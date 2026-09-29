@@ -101,14 +101,17 @@ export function veil(spec: VeilSpec): MeshPhysicalMaterial {
     veilFace: { value: spec.face },
     veilHead: { value: spec.head },
     veilGlow: { value: new Color(spec.sheen).multiplyScalar(spec.glow) },
+    // 0 = worn, 1 = lifted away (VeiledFigure3D animates it on reveal).
+    veilLift: { value: 0 },
   }
+  material.userData.lift = uniforms.veilLift
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms)
     shader.vertexShader = shader.vertexShader
       .replace('void main() {', 'varying float vVeilY;\nvoid main() {')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvVeilY = position.y;')
     shader.fragmentShader = shader.fragmentShader
-      .replace('void main() {', 'uniform float veilFace;\nuniform float veilHead;\nuniform vec3 veilGlow;\nvarying float vVeilY;\nvoid main() {')
+      .replace('void main() {', 'uniform float veilFace;\nuniform float veilHead;\nuniform vec3 veilGlow;\nuniform float veilLift;\nvarying float vVeilY;\nvoid main() {')
       .replace(
         '#include <opaque_fragment>',
         [
@@ -116,6 +119,7 @@ export function veil(spec: VeilSpec): MeshPhysicalMaterial {
           'float veilSheer = mix( veilFace, veilHead, smoothstep( 1.44, 1.54, vVeilY ) );',
           'diffuseColor.a *= mix( 1.0, veilSheer, pow( veilFacing, 0.5 ) );',
           'outgoingLight += veilGlow * pow( 1.0 - veilFacing, 2.5 ) * ( 0.45 + 0.55 * smoothstep( 0.85, 1.75, vVeilY ) );',
+          'diffuseColor.a *= 1.0 - veilLift;',
           '#include <opaque_fragment>',
         ].join('\n'),
       )
@@ -127,6 +131,8 @@ export function veil(spec: VeilSpec): MeshPhysicalMaterial {
 /** The veil's satin pencil edge: opaque, a touch lighter than the tulle, catching the light. */
 export function edge(spec: VeilSpec): MeshPhysicalMaterial {
   return new MeshPhysicalMaterial({
+    // Fades with the veil when it lifts.
+    transparent: true,
     color: new Color(spec.color).lerp(new Color(spec.sheen), 0.35),
     roughness: 0.35,
     metalness: 0,

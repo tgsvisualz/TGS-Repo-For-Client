@@ -1,6 +1,7 @@
-import { BufferGeometry, Color, Material, SphereGeometry, Vector3 } from 'three'
+import { BufferGeometry, Material, SphereGeometry, Vector3 } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { mirrorX, path, Profile, revolve, smoothstep, sweep, TAU } from './geometry'
+import { FACES, hairGeometry, HEAD_CENTER, headGeometry, headMaterial, maskGeometry, maskMaterial, maskTextures } from './face'
 import * as M from './materials'
 import {
   ARM_CARRY,
@@ -139,8 +140,6 @@ export function buildFigure(spec: FigureSpec): BuiltFigure {
   }
 
   const skin = m(M.skin(spec.skin))
-  // The head sits in the veil's shade: the same tone, a step darker, so it never reads as a face.
-  const shade = m(M.skin(new Color(spec.skin).multiplyScalar(0.5).getStyle()))
   const hair = m(M.hair(spec.hair.color, spec.hair.sheen))
   const leather = m(M.leather())
   const brass = m(M.brass())
@@ -160,9 +159,8 @@ export function buildFigure(spec: FigureSpec): BuiltFigure {
   )
   parts.push({ key: 'torso', geometry: skinTorso, material: skin })
 
-  // ── Head: a smooth ellipsoid, never a face. Hair: a cap set back from the brow, plus a shape.
-  parts.push({ key: 'head', geometry: sphere, material: shade, position: [0, 1.605, 0.008], scale: [0.083, 0.11, 0.096] })
-  parts.push({ key: 'cap', geometry: sphere, material: hair, position: [0, 1.616, -0.012], scale: [0.088, 0.113, 0.1] })
+  // ── Hair: a cap set back from the brow, plus a shape. (The sculpted head and mask are added
+  //    after the contrapposto below, so they are placed with the body rather than sheared.)
   if (spec.hair.style === 'bun') {
     parts.push({ key: 'bun', geometry: sphere, material: hair, position: [0, 1.708, -0.048], scale: [0.05, 0.047, 0.05] })
   } else if (spec.hair.style === 'chignon') {
@@ -383,6 +381,17 @@ export function buildFigure(spec: FigureSpec): BuiltFigure {
     }
   }
 
+  // ── Face and mask: a sculpted head in head space, placed with the lean like the hair.
+  const look = FACES[spec.id]
+  const headGeo = headGeometry(spec.skin, look)
+  const maskGeo = maskGeometry()
+  const maskTex = maskTextures(look)
+  geometries.push(headGeo, maskGeo)
+  const headAt = [HEAD_CENTER[0] + lean(HEAD_CENTER[1]), HEAD_CENTER[1], HEAD_CENTER[2]] as const
+  parts.push({ key: 'head', geometry: headGeo, material: m(headMaterial()), position: headAt })
+  parts.push({ key: 'hair', geometry: g(hairGeometry()), material: hair, position: headAt })
+  parts.push({ key: 'mask', geometry: maskGeo, material: m(maskMaterial(maskTex)), position: headAt })
+
   return {
     parts,
     lean: lean(0.75),
@@ -392,6 +401,8 @@ export function buildFigure(spec: FigureSpec): BuiltFigure {
     dispose: () => {
       for (const geometry of geometries) geometry.dispose()
       M.disposeAll(materials)
+      maskTex.map.dispose()
+      maskTex.emissive.dispose()
     },
   }
 }

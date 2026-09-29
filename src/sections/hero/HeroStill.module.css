@@ -241,6 +241,23 @@
   background: transparent;
 }
 
+/*
+ * Unveiling: the veil of the figure under the pointer (or the one the idle walk picks) rises
+ * off her head and fades, showing the masked face; it settles back when the pointer moves on.
+ * `translate` composes with the sway's `transform`, so the two never fight.
+ */
+.body :global([data-part='veil']),
+.reflectionArt :global([data-part='veil']) {
+  transition:
+    opacity 900ms var(--ease-out),
+    translate 1200ms var(--ease-out);
+}
+
+.figure[data-lift] :global([data-part='veil']) {
+  opacity: 0.04;
+  translate: 0 -9%;
+}
+
 /* The veils breathe: a slow sway from the crown, each figure out of phase (real GPU only). */
 .still[data-gpu] .body :global([data-part='veil']) {
   animation: veil-sway 7s ease-in-out var(--phase) infinite alternate both;
@@ -395,6 +412,10 @@
 
 /* Same selectors as the armed rules above, so these win: nothing sways or drifts. */
 @media (prefers-reduced-motion: reduce) {
+  .figure[data-lift] :global([data-part='veil']) {
+    translate: none;
+  }
+
   .still[data-gpu] .body :global([data-part='veil']),
   .still[data-gpu] .motes,
   .still[data-gpu] .motes::before {
