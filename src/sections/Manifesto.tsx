@@ -46,7 +46,7 @@ export function Manifesto() {
         </p>
 
         <Reveal className={styles.coda}>
-          <p className="t-label">No faces · No logos · No names</p>
+          <p className="t-label">No faces · No names</p>
         </Reveal>
       </div>
     </section>

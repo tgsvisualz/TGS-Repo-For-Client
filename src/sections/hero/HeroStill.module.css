@@ -7,7 +7,7 @@
  *   --floor       floor line (the front figure's feet); --horizon where the floor fades into the dark
  *   --cx          the trio's centre; --gap centre-to-centre spacing of B and C from A
  *   --foot        where the feet sit inside a figure box (the art frames crown to toe)
- *   --text-right  right edge of the headline ("unnamed." is 3.93em wide with its indent);
+ *   --text-right  right edge of the headline ("Unmasked." is 4.31em wide with its indent);
  *                 --title-size is set on the hero section (Hero.module.css)
  */
 .still {
@@ -21,9 +21,9 @@
   --foot: 0.988;
   /* Half of a side figure's silhouette (its box is 0.4 h wide; the body fills ~56% of it). */
   --side-half: calc(var(--h-side) * 0.112);
-  --text-right: calc(max(0px, (100cqw - var(--content-max)) / 2) + var(--gutter) + var(--title-size, var(--fs-display-xl)) * 3.93);
+  --text-right: calc(max(0px, (100cqw - var(--content-max)) / 2) + var(--gutter) + var(--title-size, var(--fs-display-xl)) * 4.31);
   /*
-   * The trio stands right of the headline, never under it: B keeps 24px clear of "unnamed."
+   * The trio stands right of the headline, never under it: B keeps 24px clear of "Unmasked."
    * on every desktop size (the headline scales with width, the figures with height), and C
    * never leaves the frame. 60% is the resting position when there is room to spare.
    */

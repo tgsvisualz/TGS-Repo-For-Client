@@ -374,8 +374,8 @@ export const COPY = {
   brand: 'Velato',
   hero: {
     titleLead: 'Luxury,',
-    titleAccent: 'unnamed.',
-    lede: 'European-cut womenswear in small weekly drops. No faces, no logos, no house markup.',
+    titleAccent: 'Unmasked.',
+    lede: 'European-cut womenswear in small weekly drops. No faces, no house markup.',
     primaryCta: 'Preview Drop 014',
     secondaryCta: 'Join the list',
     scroll: 'scroll',
@@ -386,7 +386,7 @@ export const COPY = {
     word: 'velato',
     syllables: 've·là·to',
     meaning: 'veiled',
-    body: 'Velato is a house without a face. The models wear veils. The owner keeps no name. The pieces carry no logo. What is left is the cut, the cloth and a price that makes sense.',
+    body: 'Velato is a house without a face. The models wear veils. The owner keeps no name. What is left is the cut, the cloth and a price that makes sense.',
   },
   drop: {
     eyebrow: 'The next drop',

@@ -9,7 +9,7 @@ Tokens live in `src/styles/tokens.css`. Components use the **role** tokens (`--b
 2. **Light is the hierarchy.** Dark ground, one pool of light per composition. Emphasis comes from brightness, size and weight, not from boxes.
 3. **Restraint.** One accent (garnet), used rarely. No decoration that does not carry meaning.
 4. **Editorial, not template.** The layout is asymmetric. Imagery has sharp corners. Rhythm comes from generous space, with no identical card grids.
-5. **Anonymous by design.** No faces, no logos, no names of real houses. Italian piece names carry the mystery, always shown with their gloss (*ombra: shadow*).
+5. **Anonymous by design.** No faces and no names of real houses. Italian piece names carry the mystery, always shown with their gloss (*ombra: shadow*).
 
 ## 2. Colour
 | Role | Token | Value | Use |
@@ -38,7 +38,7 @@ Tokens live in `src/styles/tokens.css`. Components use the **role** tokens (`--b
 ## 3. Typography
 - **Display:** *Cormorant Garamond*, weights 300, 400 and 500, with italic 300 and 400.
   - Use it for headlines, big numerals (N° 014), manifesto text, category names in the Index and the mobile menu, and piece names.
-  - Italic carries the seductive accent ("Luxury, *unnamed.*"), at most once per heading.
+  - Italic carries the seductive accent ("Luxury, *Unmasked.*"), at most once per heading.
 - **Text/UI:** *Jost* (variable), for navigation, body, labels, buttons and meta.
 - **Tracking scales with size:**
   - display `-0.02em`;
