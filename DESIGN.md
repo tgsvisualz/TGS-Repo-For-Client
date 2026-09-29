@@ -9,7 +9,7 @@ Tokens live in `src/styles/tokens.css`. Components use the **role** tokens (`--b
 2. **Light is the hierarchy.** Dark ground, one pool of light per composition. Emphasis comes from brightness, size and weight, not from boxes.
 3. **Restraint.** One accent (garnet), used rarely. No decoration that does not carry meaning.
 4. **Editorial, not template.** The layout is asymmetric. Imagery has sharp corners. Rhythm comes from generous space, with no identical card grids.
-5. **Anonymous by design.** No faces, no logos, no names of real houses. Italian piece names carry the mystery, always shown with their gloss (*ombra: shadow*).
+5. **Masked, never named.** Faces appear only behind a mask; no names of real houses. Italian piece and look names carry the mystery, always shown with their gloss (*ombra: shadow*).
 
 ## 2. Colour
 | Role | Token | Value | Use |
@@ -38,7 +38,7 @@ Tokens live in `src/styles/tokens.css`. Components use the **role** tokens (`--b
 ## 3. Typography
 - **Display:** *Cormorant Garamond*, weights 300, 400 and 500, with italic 300 and 400.
   - Use it for headlines, big numerals (N° 014), manifesto text, category names in the Index and the mobile menu, and piece names.
-  - Italic carries the seductive accent ("Luxury, *unnamed.*"), at most once per heading.
+  - Italic carries the seductive accent ("Luxury, *Unmasked.*"), at most once per heading.
 - **Text/UI:** *Jost* (variable), for navigation, body, labels, buttons and meta.
 - **Tracking scales with size:**
   - display `-0.02em`;
@@ -116,7 +116,7 @@ The frequency test comes first:
   - Gate hover effects behind `@media (hover: hover) and (pointer: fine)`.
 - **Reduced motion:**
   - `prefers-reduced-motion: reduce` swaps movement for short cross-fades.
-  - The tokens already shorten durations under reduced motion. Components also drop transforms and parallax, and turn off idle 3D drift and sway.
+  - The tokens already shorten durations under reduced motion. Components also drop transforms and parallax, and turn off the hero's idle light walk.
 
 ## 6. Signature interactions
 - **Custom cursor:** a bone dot plus a lagging ring with `mix-blend-mode: difference`.
@@ -127,8 +127,16 @@ The frequency test comes first:
   - Rows highlight with `--fill-hover` at `--r-2`, exactly like the reference's hovered "Forests" row.
 - **Veil reveal:** placeholders in the Drop teaser sit under a veil layer that lifts partly on hover ("Peek"), using opacity and translate only.
 - **Lantern:** in the hero, a soft light follows the cursor and lifts the dark.
+- **Into the light:** in the hero, the model nearest the cursor (or chosen in the look index) comes up to full light while the others fall back to 40%, as an opacity cross-fade (900ms). The eye strip above the headline follows her.
 
-## 7. Placeholder art direction
+## 7. Art direction
+**Hero photography (the masked cast):**
+- Three-quarter length, 2:3, low-key studio on a dark mottled backdrop, one hard side key light and deep chiaroscuro.
+- Black evening wear; lace or filigree masquerade masks over the eyes; red or wine lips; fine gold jewellery.
+- Every photograph is feathered into the page ground with a radial mask, so the three read as one room. No hard image edges in the hero.
+- The current images are original AI-generated models, not real people or real campaigns. Replace them with the client's own shoot when it exists.
+
+**Placeholder art (everywhere else):**
 - Every image slot renders parametric SVG art (`src/art`) until the client's photography arrives. Each slot has an asset ID (see `ASSETS.md`), and a real image replaces the art by setting `src` in `src/data/catalog.ts`.
 - **Look:** abstract, lit, low-key.
   - Figures are silhouettes shaped by light: one key light, a rim, and deep shadow. Gradients and grain carry the detail; there are no outlines and no cartoon edges.
@@ -163,6 +171,6 @@ The frequency test comes first:
 - Don't name real fashion houses anywhere.
 - Don't use pure black (`#000`) or pure white (`#FFF`).
 - Don't use more than one italic accent per heading.
-- Don't show a face, even in placeholder art.
+- Don't show an unmasked face. Placeholder art still draws no faces at all.
 - Don't key themes off `[data-theme]` on `<html>`, because the claude.ai preview frame sets it.
 - Don't use `localStorage` without try/catch; the helper is in `src/lib/storage.ts`.

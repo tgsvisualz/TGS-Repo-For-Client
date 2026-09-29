@@ -5,6 +5,9 @@
  * To swap in client photography: set `src` on the matching entry in ASSETS below
  * (see ASSETS.md for every slot and the brief for its replacement).
  */
+import notturno2560 from '../assets/models/look-01-notturno-2560.webp'
+import sera2560 from '../assets/models/look-02-sera-2560.webp'
+import velluto2560 from '../assets/models/look-03-velluto-2560.webp'
 import { CURRENCY, DATE_LOCALE, DROP_SCHEDULE } from '../config'
 import type {
   ArtSpec,
@@ -50,27 +53,30 @@ const product = (shape: BagShape, fabric: Fabric, light?: Light): ArtSpec => ({ 
 // ── Asset registry (every placeholder slot on the page) ────────────────────
 
 const entries: AssetEntry[] = [
-  // Hero still stage (2D fallback under the 3D showroom)
+  // Hero cast: the three masked models (photographs, see src/sections/hero/cast.ts)
   {
     id: 'HERO-FIG-A',
     art: figure('A', 'ivory', dress('column', 'noir'), 'full', { light: 'top' }),
-    alt: 'Veiled model in a black silk column gown under an ivory veil',
-    usage: 'Hero still stage, centre figure (src/sections/hero)',
-    brief: 'Full-length studio cut-out, model veiled, black column gown, transparent PNG or WebP, min 1200×3000',
+    src: sera2560,
+    alt: 'Masked model in a black one-shoulder satin gown, holding a black lace mask on a stick to her eyes',
+    usage: 'Hero cast, centre model, look 02 Sera (src/sections/hero)',
+    brief: 'Three-quarter length, masked, black gown, low-key studio on a dark mottled backdrop, 2:3, min 2560×3840',
   },
   {
     id: 'HERO-FIG-B',
     art: figure('B', 'tulle', separates('draped', 'noir', 'wide-leg', 'bone'), 'full', { light: 'left' }),
-    alt: 'Veiled model in bone wide-leg trousers and a black draped top under a black tulle veil',
-    usage: 'Hero still stage, left figure (src/sections/hero)',
-    brief: 'Full-length studio cut-out, model veiled, wide-leg trousers, transparent PNG or WebP, min 1200×3000',
+    src: notturno2560,
+    alt: 'Masked model with a platinum bob in a black strapless gown and long black opera gloves',
+    usage: 'Hero cast, left model, look 01 Notturno (src/sections/hero)',
+    brief: 'Three-quarter length, masked, black gown, low-key studio on a dark mottled backdrop, 2:3, min 2560×3840',
   },
   {
     id: 'HERO-FIG-C',
     art: figure('C', 'smoke', dress('slip', 'garnet'), 'full', { light: 'right', carry: { shape: 'top-handle', fabric: 'noir' } }),
-    alt: 'Veiled model in a garnet slip dress carrying a black top-handle bag under a smoke veil',
-    usage: 'Hero still stage, right figure (src/sections/hero)',
-    brief: 'Full-length studio cut-out, model veiled, slip dress with top-handle bag, transparent PNG or WebP, min 1200×3000',
+    src: velluto2560,
+    alt: 'Masked model with long honey-blonde waves in a black off-the-shoulder velvet gown, glancing back over her shoulder',
+    usage: 'Hero cast, right model, look 03 Velluto (src/sections/hero)',
+    brief: 'Three-quarter length, masked, black gown, low-key studio on a dark mottled backdrop, 2:3, min 2560×3840',
   },
 
   // Nav: The Drop cards
@@ -116,26 +122,26 @@ const entries: AssetEntry[] = [
   { id: 'NAV-DRESSES-4', art: figure('A', 'ivory', dress('evening', 'noir'), 'back', { light: 'right' }), alt: 'Back view of a floor-length black evening gown, veil trailing', usage: 'Nav › Dresses › Evening (src/nav)', brief: 'Back view, evening gown with veil, 5:4, min 1260×1008' },
 
   // Pieces (drop teaser, rotation, archive)
-  { id: 'PIECE-OMBRA', art: product('top-handle', 'noir', 'left'), alt: 'Ombra top-handle bag in black leather', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Product still life, 4:5, min 1200×1500' },
-  { id: 'PIECE-SETA', art: figure('B', 'tulle', separates('draped', 'bone', 'tailored', 'noir'), 'waist-up', { light: 'right' }), alt: 'Seta draped silk top in bone', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Veiled model, waist-up, 4:5, min 1200×1500' },
-  { id: 'PIECE-NOTTE', art: figure('A', 'ivory', separates('bodysuit', 'noir', 'wide-leg', 'noir'), 'full', { light: 'left' }), alt: 'Notte wide-leg trousers in black', usage: 'Drop 014 teaser, feature card (src/sections/DropTeaser)', brief: 'Veiled model, full length, 3:4, min 1200×1600' },
-  { id: 'PIECE-SUSSURRO', art: product('clutch', 'garnet', 'top'), alt: 'Sussurro evening clutch in garnet velvet', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Product still life, 4:5, min 1200×1500' },
-  { id: 'PIECE-VELLUTO', art: figure('C', 'smoke', dress('column', 'garnet'), 'full', { light: 'right' }), alt: 'Velluto column dress in garnet velvet', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Veiled model, full length, 4:5, min 1200×1500' },
-  { id: 'PIECE-BRINA', art: product('mini', 'bone', 'right'), alt: 'Brina mini bag in bone leather', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Product still life, 4:5, min 1200×1500' },
-  { id: 'PIECE-LUME', art: figure('B', 'tulle', dress('slip', 'champagne'), 'full', { light: 'left' }), alt: 'Lume slip dress in champagne satin', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Veiled model, full length, 4:5, min 1200×1500' },
-  { id: 'PIECE-CENERE', art: figure('C', 'smoke', separates('knit', 'ash', 'pleated', 'ash'), 'lower', { light: 'top' }), alt: 'Cenere pleated trousers in ash', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Lower-body crop, 4:5, min 1200×1500' },
-  { id: 'PIECE-FUMO', art: figure('A', 'ivory', separates('knit', 'smoke', 'wide-leg', 'noir'), 'waist-up', { light: 'right' }), alt: 'Fumo fine-knit top in smoke', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Veiled model, waist-up, 4:5, min 1200×1500' },
-  { id: 'PIECE-ONICE', art: product('tote', 'noir', 'left'), alt: 'Onice tote in black leather', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Product still life, 4:5, min 1200×1500' },
-  { id: 'PIECE-PERLA', art: product('pouch', 'bone', 'top'), alt: 'Perla gathered pouch in bone leather', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Product still life, 4:5, min 1200×1500' },
-  { id: 'PIECE-NEBBIA', art: figure('A', 'ivory', dress('wrap', 'smoke'), 'full', { light: 'left' }), alt: 'Nebbia wrap dress in smoke', usage: 'This week, Drop 012 archive (src/sections/Rotation)', brief: 'Veiled model, full length, 4:5, min 1200×1500' },
-  { id: 'PIECE-AMBRA', art: product('crossbody', 'oxblood', 'right'), alt: 'Ambra crossbody bag in oxblood leather', usage: 'This week, Drop 012 archive (src/sections/Rotation)', brief: 'Product still life, 4:5, min 1200×1500' },
+  { id: 'PIECE-OMBRA', art: product('top-handle', 'noir', 'left'), alt: 'Ombra top-handle bag in black leather', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Product still life, 4:5, min 1280×1500' },
+  { id: 'PIECE-SETA', art: figure('B', 'tulle', separates('draped', 'bone', 'tailored', 'noir'), 'waist-up', { light: 'right' }), alt: 'Seta draped silk top in bone', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Veiled model, waist-up, 4:5, min 1280×1500' },
+  { id: 'PIECE-NOTTE', art: figure('A', 'ivory', separates('bodysuit', 'noir', 'wide-leg', 'noir'), 'full', { light: 'left' }), alt: 'Notte wide-leg trousers in black', usage: 'Drop 014 teaser, feature card (src/sections/DropTeaser)', brief: 'Veiled model, full length, 3:4, min 1280×1600' },
+  { id: 'PIECE-SUSSURRO', art: product('clutch', 'garnet', 'top'), alt: 'Sussurro evening clutch in garnet velvet', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Product still life, 4:5, min 1280×1500' },
+  { id: 'PIECE-VELLUTO', art: figure('C', 'smoke', dress('column', 'garnet'), 'full', { light: 'right' }), alt: 'Velluto column dress in garnet velvet', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Veiled model, full length, 4:5, min 1280×1500' },
+  { id: 'PIECE-BRINA', art: product('mini', 'bone', 'right'), alt: 'Brina mini bag in bone leather', usage: 'Drop 014 teaser (src/sections/DropTeaser)', brief: 'Product still life, 4:5, min 1280×1500' },
+  { id: 'PIECE-LUME', art: figure('B', 'tulle', dress('slip', 'champagne'), 'full', { light: 'left' }), alt: 'Lume slip dress in champagne satin', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Veiled model, full length, 4:5, min 1280×1500' },
+  { id: 'PIECE-CENERE', art: figure('C', 'smoke', separates('knit', 'ash', 'pleated', 'ash'), 'lower', { light: 'top' }), alt: 'Cenere pleated trousers in ash', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Lower-body crop, 4:5, min 1280×1500' },
+  { id: 'PIECE-FUMO', art: figure('A', 'ivory', separates('knit', 'smoke', 'wide-leg', 'noir'), 'waist-up', { light: 'right' }), alt: 'Fumo fine-knit top in smoke', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Veiled model, waist-up, 4:5, min 1280×1500' },
+  { id: 'PIECE-ONICE', art: product('tote', 'noir', 'left'), alt: 'Onice tote in black leather', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Product still life, 4:5, min 1280×1500' },
+  { id: 'PIECE-PERLA', art: product('pouch', 'bone', 'top'), alt: 'Perla gathered pouch in bone leather', usage: 'This week, Drop 013 (src/sections/Rotation)', brief: 'Product still life, 4:5, min 1280×1500' },
+  { id: 'PIECE-NEBBIA', art: figure('A', 'ivory', dress('wrap', 'smoke'), 'full', { light: 'left' }), alt: 'Nebbia wrap dress in smoke', usage: 'This week, Drop 012 archive (src/sections/Rotation)', brief: 'Veiled model, full length, 4:5, min 1280×1500' },
+  { id: 'PIECE-AMBRA', art: product('crossbody', 'oxblood', 'right'), alt: 'Ambra crossbody bag in oxblood leather', usage: 'This week, Drop 012 archive (src/sections/Rotation)', brief: 'Product still life, 4:5, min 1280×1500' },
 
   // The Index (cursor-follow previews, 3:4)
-  { id: 'IDX-BAGS', art: product('shoulder', 'noir', 'left'), alt: 'Black shoulder bag in a pool of light', usage: 'The Index › Bags (src/sections/CategoryIndex)', brief: 'Still life, 3:4, min 900×1200' },
-  { id: 'IDX-PURSES', art: product('evening', 'garnet', 'top'), alt: 'Garnet chain-strap evening purse', usage: 'The Index › Purses (src/sections/CategoryIndex)', brief: 'Still life, 3:4, min 900×1200' },
-  { id: 'IDX-TOPS', art: figure('C', 'smoke', separates('blouse', 'bone', 'tailored', 'noir'), 'waist-up', { light: 'right' }), alt: 'Veiled model in a bone blouse', usage: 'The Index › Tops (src/sections/CategoryIndex)', brief: 'Veiled model, waist-up, 3:4, min 900×1200' },
-  { id: 'IDX-PANTS', art: figure('B', 'tulle', separates('bodysuit', 'noir', 'wide-leg', 'bone'), 'full', { light: 'left' }), alt: 'Veiled model in bone wide-leg trousers', usage: 'The Index › Pants (src/sections/CategoryIndex)', brief: 'Veiled model, full length, 3:4, min 900×1200' },
-  { id: 'IDX-DRESSES', art: figure('A', 'ivory', dress('evening', 'noir'), 'back', { light: 'top' }), alt: 'Back of a black evening gown under a trailing ivory veil', usage: 'The Index › Dresses (src/sections/CategoryIndex)', brief: 'Veiled model, back view, 3:4, min 900×1200' },
+  { id: 'IDX-BAGS', art: product('shoulder', 'noir', 'left'), alt: 'Black shoulder bag in a pool of light', usage: 'The Index › Bags (src/sections/CategoryIndex)', brief: 'Still life, 3:4, min 900×1280' },
+  { id: 'IDX-PURSES', art: product('evening', 'garnet', 'top'), alt: 'Garnet chain-strap evening purse', usage: 'The Index › Purses (src/sections/CategoryIndex)', brief: 'Still life, 3:4, min 900×1280' },
+  { id: 'IDX-TOPS', art: figure('C', 'smoke', separates('blouse', 'bone', 'tailored', 'noir'), 'waist-up', { light: 'right' }), alt: 'Veiled model in a bone blouse', usage: 'The Index › Tops (src/sections/CategoryIndex)', brief: 'Veiled model, waist-up, 3:4, min 900×1280' },
+  { id: 'IDX-PANTS', art: figure('B', 'tulle', separates('bodysuit', 'noir', 'wide-leg', 'bone'), 'full', { light: 'left' }), alt: 'Veiled model in bone wide-leg trousers', usage: 'The Index › Pants (src/sections/CategoryIndex)', brief: 'Veiled model, full length, 3:4, min 900×1280' },
+  { id: 'IDX-DRESSES', art: figure('A', 'ivory', dress('evening', 'noir'), 'back', { light: 'top' }), alt: 'Back of a black evening gown under a trailing ivory veil', usage: 'The Index › Dresses (src/sections/CategoryIndex)', brief: 'Veiled model, back view, 3:4, min 900×1280' },
 ]
 
 export const ASSETS: Record<string, AssetEntry> = Object.fromEntries(entries.map((entry) => [entry.id, entry]))
@@ -374,19 +380,17 @@ export const COPY = {
   brand: 'Velato',
   hero: {
     titleLead: 'Luxury,',
-    titleAccent: 'unnamed.',
-    lede: 'European-cut womenswear in small weekly drops. No faces, no logos, no house markup.',
+    titleAccent: 'Unmasked.',
+    lede: 'European-cut womenswear in small weekly drops. The look of the great houses, without the house markup.',
     primaryCta: 'Preview Drop 014',
     secondaryCta: 'Join the list',
     scroll: 'scroll',
-    orbitHint: 'Move to orbit',
-    orbitHintTouch: 'Drag to orbit',
   },
   veil: {
     word: 'velato',
     syllables: 've·là·to',
     meaning: 'veiled',
-    body: 'Velato is a house without a face. The models wear veils. The owner keeps no name. The pieces carry no logo. What is left is the cut, the cloth and a price that makes sense.',
+    body: 'Velato is a house behind a mask. The models keep theirs on. The owner keeps no name. What is left is the cut, the cloth and a price that makes sense.',
   },
   drop: {
     eyebrow: 'The next drop',
@@ -410,11 +414,11 @@ export const COPY = {
     eyebrow: 'The Index',
   },
   footer: {
-    line: 'A house without a face.',
+    line: 'A house behind a mask.',
     care: ['Returns within 14 days', 'Ships in 2 to 4 working days', 'Sizes IT 36 to 48', 'Concierge by email, answered within a day'],
     socials: ['Instagram', 'TikTok', 'Pinterest'],
     socialsNote: 'Handles announced at launch.',
     legal: '© 2026 Velato. Owner unnamed.',
-    prototype: 'Stage-one prototype · placeholder imagery',
+    prototype: 'Stage-one prototype · AI-generated models, placeholder product art',
   },
 } as const

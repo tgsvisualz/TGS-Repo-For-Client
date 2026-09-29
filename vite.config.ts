@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 
 // `vite build --mode artifact` emits one self-contained HTML file (fonts, CSS, JS and the
-// lazy 3D chunk all inlined) for the private claude.ai preview link. Regular builds stay
-// code-split, with the 3D showroom in its own chunk.
+// hero photographs all inlined) for the private claude.ai preview link. Regular builds emit
+// the photographs as separate hashed files.
 export default defineConfig(({ mode }) => {
   const artifact = mode === 'artifact'
   return {

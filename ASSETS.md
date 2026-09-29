@@ -1,28 +1,28 @@
 # Velato: Asset Swap Manifest
 
-Stage one uses **placeholder art drawn in code**, because no real images were available for the pitch. This file lists every slot that needs the client's real imagery or files before launch.
+Stage one uses **placeholder art drawn in code** everywhere except the hero, which uses three masked model photographs (original, AI-generated for the pitch). This file lists every slot that needs the client's real imagery or files before launch.
 
 ## How to swap an image
 1. **Find the slot's ID** in the tables below. There are two faster ways:
    - Open the site with `#assets` in the URL, or press **Shift + A**, and every placeholder shows its ID.
    - Open `?view=art` to see every placeholder on one sheet with its brief.
-2. **Add the photograph** to `public/assets/`, as WebP or AVIF if possible (JPEG also works). Match the ratio in the brief, and use a transparent PNG or WebP for the hero cut-outs.
+2. **Add the photograph** to `public/assets/`, as WebP or AVIF if possible (JPEG also works). Match the ratio in the brief.
 3. **Point the slot at it.** In `src/data/catalog.ts`, add `src: './assets/<file>'` to the entry with that ID. The photo replaces the art everywhere that ID is used. The entry's `alt` text already describes the intended photograph, so update it if the shot differs.
 4. **Refresh this manifest** by running `npm run assets`. The Status column then shows "Swapped".
 
-**Faces:** the brand shows no faces. Every photograph of a model must keep her veiled.
+**Faces:** the brand shows faces only behind a mask. Every photograph of a model must keep her masked.
 
 ## Image slots
 <!-- slots:start -->
 _43 slots, generated from `src/data/catalog.ts` by `npm run assets`._
 
-### Hero still stage
+### Hero cast (photographs)
 
 | ID | Where | Placeholder now | Replace with | Status |
 |---|---|---|---|---|
-| `HERO-FIG-A` | Hero still stage, centre figure (src/sections/hero) | Model A, ivory veil, noir column dress (full crop) | Full-length studio cut-out, model veiled, black column gown, transparent PNG or WebP, min 1200×3000 | Placeholder |
-| `HERO-FIG-B` | Hero still stage, left figure (src/sections/hero) | Model B, tulle veil, noir draped top, bone wide-leg trousers (full crop) | Full-length studio cut-out, model veiled, wide-leg trousers, transparent PNG or WebP, min 1200×3000 | Placeholder |
-| `HERO-FIG-C` | Hero still stage, right figure (src/sections/hero) | Model C, smoke veil, garnet slip dress, carrying a noir top-handle bag (full crop) | Full-length studio cut-out, model veiled, slip dress with top-handle bag, transparent PNG or WebP, min 1200×3000 | Placeholder |
+| `HERO-FIG-A` | Hero cast, centre model, look 02 Sera (src/sections/hero) | Model A, ivory veil, noir column dress (full crop) | Three-quarter length, masked, black gown, low-key studio on a dark mottled backdrop, 2:3, min 2560×3840 | Swapped |
+| `HERO-FIG-B` | Hero cast, left model, look 01 Notturno (src/sections/hero) | Model B, tulle veil, noir draped top, bone wide-leg trousers (full crop) | Three-quarter length, masked, black gown, low-key studio on a dark mottled backdrop, 2:3, min 2560×3840 | Swapped |
+| `HERO-FIG-C` | Hero cast, right model, look 03 Velluto (src/sections/hero) | Model C, smoke veil, garnet slip dress, carrying a noir top-handle bag (full crop) | Three-quarter length, masked, black gown, low-key studio on a dark mottled backdrop, 2:3, min 2560×3840 | Swapped |
 
 ### Navigation: The Drop cards
 
@@ -60,43 +60,34 @@ _43 slots, generated from `src/data/catalog.ts` by `npm run assets`._
 
 | ID | Where | Placeholder now | Replace with | Status |
 |---|---|---|---|---|
-| `PIECE-OMBRA` | Drop 014 teaser (src/sections/DropTeaser) | Still life: noir top-handle bag on a plinth | Product still life, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-SETA` | Drop 014 teaser (src/sections/DropTeaser) | Model B, tulle veil, bone draped top, noir tailored trousers (waist-up crop) | Veiled model, waist-up, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-NOTTE` | Drop 014 teaser, feature card (src/sections/DropTeaser) | Model A, ivory veil, noir bodysuit top, noir wide-leg trousers (full crop) | Veiled model, full length, 3:4, min 1200×1600 | Placeholder |
-| `PIECE-SUSSURRO` | Drop 014 teaser (src/sections/DropTeaser) | Still life: garnet clutch bag on a plinth | Product still life, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-VELLUTO` | Drop 014 teaser (src/sections/DropTeaser) | Model C, smoke veil, garnet column dress (full crop) | Veiled model, full length, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-BRINA` | Drop 014 teaser (src/sections/DropTeaser) | Still life: bone mini bag on a plinth | Product still life, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-LUME` | This week, Drop 013 (src/sections/Rotation) | Model B, tulle veil, champagne slip dress (full crop) | Veiled model, full length, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-CENERE` | This week, Drop 013 (src/sections/Rotation) | Model C, smoke veil, ash knit top, ash pleated trousers (lower crop) | Lower-body crop, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-FUMO` | This week, Drop 013 (src/sections/Rotation) | Model A, ivory veil, smoke knit top, noir wide-leg trousers (waist-up crop) | Veiled model, waist-up, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-ONICE` | This week, Drop 013 (src/sections/Rotation) | Still life: noir tote bag on a plinth | Product still life, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-PERLA` | This week, Drop 013 (src/sections/Rotation) | Still life: bone pouch bag on a plinth | Product still life, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-NEBBIA` | This week, Drop 012 archive (src/sections/Rotation) | Model A, ivory veil, smoke wrap dress (full crop) | Veiled model, full length, 4:5, min 1200×1500 | Placeholder |
-| `PIECE-AMBRA` | This week, Drop 012 archive (src/sections/Rotation) | Still life: oxblood crossbody bag on a plinth | Product still life, 4:5, min 1200×1500 | Placeholder |
+| `PIECE-OMBRA` | Drop 014 teaser (src/sections/DropTeaser) | Still life: noir top-handle bag on a plinth | Product still life, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-SETA` | Drop 014 teaser (src/sections/DropTeaser) | Model B, tulle veil, bone draped top, noir tailored trousers (waist-up crop) | Veiled model, waist-up, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-NOTTE` | Drop 014 teaser, feature card (src/sections/DropTeaser) | Model A, ivory veil, noir bodysuit top, noir wide-leg trousers (full crop) | Veiled model, full length, 3:4, min 1280×1600 | Placeholder |
+| `PIECE-SUSSURRO` | Drop 014 teaser (src/sections/DropTeaser) | Still life: garnet clutch bag on a plinth | Product still life, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-VELLUTO` | Drop 014 teaser (src/sections/DropTeaser) | Model C, smoke veil, garnet column dress (full crop) | Veiled model, full length, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-BRINA` | Drop 014 teaser (src/sections/DropTeaser) | Still life: bone mini bag on a plinth | Product still life, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-LUME` | This week, Drop 013 (src/sections/Rotation) | Model B, tulle veil, champagne slip dress (full crop) | Veiled model, full length, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-CENERE` | This week, Drop 013 (src/sections/Rotation) | Model C, smoke veil, ash knit top, ash pleated trousers (lower crop) | Lower-body crop, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-FUMO` | This week, Drop 013 (src/sections/Rotation) | Model A, ivory veil, smoke knit top, noir wide-leg trousers (waist-up crop) | Veiled model, waist-up, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-ONICE` | This week, Drop 013 (src/sections/Rotation) | Still life: noir tote bag on a plinth | Product still life, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-PERLA` | This week, Drop 013 (src/sections/Rotation) | Still life: bone pouch bag on a plinth | Product still life, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-NEBBIA` | This week, Drop 012 archive (src/sections/Rotation) | Model A, ivory veil, smoke wrap dress (full crop) | Veiled model, full length, 4:5, min 1280×1500 | Placeholder |
+| `PIECE-AMBRA` | This week, Drop 012 archive (src/sections/Rotation) | Still life: oxblood crossbody bag on a plinth | Product still life, 4:5, min 1280×1500 | Placeholder |
 
 ### The Index
 
 | ID | Where | Placeholder now | Replace with | Status |
 |---|---|---|---|---|
-| `IDX-BAGS` | The Index › Bags (src/sections/CategoryIndex) | Still life: noir shoulder bag on a plinth | Still life, 3:4, min 900×1200 | Placeholder |
-| `IDX-PURSES` | The Index › Purses (src/sections/CategoryIndex) | Still life: garnet evening bag on a plinth | Still life, 3:4, min 900×1200 | Placeholder |
-| `IDX-TOPS` | The Index › Tops (src/sections/CategoryIndex) | Model C, smoke veil, bone blouse top, noir tailored trousers (waist-up crop) | Veiled model, waist-up, 3:4, min 900×1200 | Placeholder |
-| `IDX-PANTS` | The Index › Pants (src/sections/CategoryIndex) | Model B, tulle veil, noir bodysuit top, bone wide-leg trousers (full crop) | Veiled model, full length, 3:4, min 900×1200 | Placeholder |
-| `IDX-DRESSES` | The Index › Dresses (src/sections/CategoryIndex) | Model A, ivory veil, noir evening dress (back crop) | Veiled model, back view, 3:4, min 900×1200 | Placeholder |
+| `IDX-BAGS` | The Index › Bags (src/sections/CategoryIndex) | Still life: noir shoulder bag on a plinth | Still life, 3:4, min 900×1280 | Placeholder |
+| `IDX-PURSES` | The Index › Purses (src/sections/CategoryIndex) | Still life: garnet evening bag on a plinth | Still life, 3:4, min 900×1280 | Placeholder |
+| `IDX-TOPS` | The Index › Tops (src/sections/CategoryIndex) | Model C, smoke veil, bone blouse top, noir tailored trousers (waist-up crop) | Veiled model, waist-up, 3:4, min 900×1280 | Placeholder |
+| `IDX-PANTS` | The Index › Pants (src/sections/CategoryIndex) | Model B, tulle veil, noir bodysuit top, bone wide-leg trousers (full crop) | Veiled model, full length, 3:4, min 900×1280 | Placeholder |
+| `IDX-DRESSES` | The Index › Dresses (src/sections/CategoryIndex) | Model A, ivory veil, noir evening dress (back crop) | Veiled model, back view, 3:4, min 900×1280 | Placeholder |
 
 <!-- slots:end -->
 
-## 3D showroom (hero)
-The hero's React Three Fiber showroom is built from placeholder geometry in `src/hero3d/`:
-
-| ID | Where | Placeholder now | Replace with |
-|---|---|---|---|
-| `HERO-3D-FIG-A` | `src/hero3d/VeiledFigure3D.tsx` + `figure.ts` / `profiles.ts`, centre figure | Lathe-geometry figure in a slight contrapposto: deep skin tone, two-tier ivory sheer veil, black silk column gown | GLB model of the veiled model (scanned or produced), ≤ 3 MB with Draco, real-world scale in metres, feet at y 0, facing +z, shipped with the site. The `modelUrl` prop on `VeiledFigure3D` is reserved for it: its doc comment gives the steps to load it with drei `useGLTF`. It is not wired yet. |
-| `HERO-3D-FIG-B` | same, left figure | Warm golden skin tone, black tulle veil, bone wide-leg trousers, black draped top | Same as A |
-| `HERO-3D-FIG-C` | same, right figure | Light skin tone, smoke veil, garnet slip dress, black top-handle bag | Same as A |
-| `HERO-3D-ROOM` | `src/hero3d/Scene.tsx` (floor, stage, runway, light bars, lights) | Procedural showroom: satin floor, glossy stage with a mirrored top (high tier) and a glowing edge ring, 2×18 runway lights, soft light shafts, dust | Optional: a baked GLB of the real showroom or set design |
-
-The figures are told apart **only** by skin tone and the hair silhouette under the veil. The final representation of the three models (Asian, Black, white) comes from real casting and photography.
+## Hero photographs
+The three hero models are photographs in `src/assets/models` (imported by `src/sections/hero/cast.ts`), each at 1280×1920 and 2560×3840 WebP. They are original AI-generated models made for the pitch. To replace them with the client's shoot: keep the 2:3 three-quarter framing on a dark backdrop, overwrite the six files, and re-aim the eye strip (`eyes: cx, cy, bw` in `cast.ts`).
 
 ## Brand files
 | ID | Where | Placeholder now | Replace with |

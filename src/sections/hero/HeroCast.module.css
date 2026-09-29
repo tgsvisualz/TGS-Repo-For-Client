@@ -1,0 +1,174 @@
+/*
+ * The cast. Sized in container units of the stage (cqh/cqw), so the room scales with the
+ * hero's real height. Local custom properties (no new global tokens):
+ *   --key          warm key-light colour (the lantern), as "r g b" for alpha mixing
+ *   --text-right   right edge of the headline ("Unmasked." is ~4.05em wide with its indent);
+ *                  --title-size is set on the hero section (Hero.module.css)
+ *   --xa/--xb/--xc each model's centre line; --x/--top/--h one model's box
+ */
+.stage {
+  --key: 255 231 207;
+  --text-right: calc(
+    max(0px, (100cqw - var(--content-max)) / 2) + var(--gutter) + var(--title-size, var(--fs-display-xl)) * 4.05
+  );
+  /*
+   * B (left) stands just right of the headline, A in front of the room's centre line and C at
+   * the right edge. On wide screens the trio spreads; on narrow landscape ones it tightens.
+   */
+  --xb: max(44cqw, calc(var(--text-right) - 2cqw));
+  --xa: calc(var(--xb) + (100cqw - var(--xb)) * 0.4);
+  --xc: calc(var(--xb) + (100cqw - var(--xb)) * 0.8);
+
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-stage);
+  overflow: hidden;
+  container-type: size;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+/* ── Models ───────────────────────────────────────────────── */
+
+.fig {
+  position: absolute;
+  top: var(--top);
+  left: var(--x);
+  height: var(--h);
+  aspect-ratio: 2 / 3;
+  translate: -50% 0;
+  animation: rise 1600ms var(--ease-out) calc(250ms + var(--i, 0) * 220ms) both;
+}
+
+/* A stands in front; B and C a step back, smaller and higher in the frame. */
+.slotA {
+  --x: var(--xa);
+  --top: 3cqh;
+  --h: 110cqh;
+  --mask: radial-gradient(ellipse 48% 60% at 50% 42%, #000 60%, transparent 100%);
+
+  z-index: 3;
+}
+
+.slotB {
+  --x: var(--xb);
+  --top: 12cqh;
+  --h: 86cqh;
+  --mask: radial-gradient(ellipse 46% 54% at 50% 38%, #000 52%, transparent 100%);
+
+  z-index: 1;
+}
+
+.slotC {
+  --x: var(--xc);
+  --top: 9cqh;
+  --h: 92cqh;
+  --mask: radial-gradient(ellipse 46% 56% at 50% 40%, #000 52%, transparent 100%);
+
+  z-index: 2;
+}
+
+.depth {
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  user-select: none;
+  /* Out of the light: the model falls back into the room. */
+  opacity: 0.4;
+  scale: 0.985;
+  transition:
+    opacity 900ms var(--ease),
+    scale 1200ms var(--ease-out);
+}
+
+.fig[data-active] .img {
+  opacity: 1;
+  scale: 1;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: -50% 2.5%;
+  }
+}
+
+/* ── Lantern: a soft warm light that follows the cursor ─────── */
+
+.lantern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 620px;
+  height: 620px;
+  margin: -310px 0 0 -310px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--key) / 0.09), rgb(var(--key) / 0.035) 45%, transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 700ms var(--ease);
+}
+
+.stage[data-lantern] .lantern {
+  opacity: 1;
+}
+
+/*
+ * ── Stacked (phones, portrait and near-square screens): the trio above, the text below.
+ * Keep this query in sync with Hero.module.css.
+ */
+@media (max-width: 767px), (max-aspect-ratio: 6/5) {
+  .slotA {
+    --x: 50cqw;
+    --top: 7cqh;
+    --h: min(70cqh, 150cqw);
+  }
+
+  .slotB {
+    --x: 13cqw;
+    --top: 12cqh;
+    --h: min(54cqh, 116cqw);
+  }
+
+  .slotC {
+    --x: 87cqw;
+    --top: 10cqh;
+    --h: min(58cqh, 124cqw);
+  }
+
+  .img {
+    opacity: 0.5;
+  }
+}
+
+/* ── Reduced motion: short cross-fades, nothing moves ─────────── */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fig {
+    animation-name: fade-in;
+    animation-duration: 600ms;
+  }
+
+  .img {
+    scale: 1;
+    transition: opacity 400ms var(--ease);
+  }
+}

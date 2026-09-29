@@ -26,7 +26,7 @@ try {
   const cell = (s) => String(s).replace(/\|/g, '\\|')
 
   const groups = [
-    ['Hero still stage', (e) => e.id.startsWith('HERO-')],
+    ['Hero cast (photographs)', (e) => e.id.startsWith('HERO-')],
     ['Navigation: The Drop cards', (e) => e.id.startsWith('NAV-DROP-')],
     ['Navigation: category previews', (e) => e.id.startsWith('NAV-') && !e.id.startsWith('NAV-DROP-')],
     ['Pieces: Drop 014 teaser and This week', (e) => e.id.startsWith('PIECE-')],

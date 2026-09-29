@@ -5,7 +5,7 @@ import styles from './SectionHeading.module.css'
 export interface SectionHeadingProps {
   /** Small uppercase line above the title ("The next drop"). */
   eyebrow?: ReactNode
-  /** The heading. One italic accent at most: <>Luxury, <em>unnamed.</em></> */
+  /** The heading. One italic accent at most: <>Luxury, <em>Unmasked.</em></> */
   title: ReactNode
   /** Lede paragraph under the title, capped at the reading measure. */
   lede?: ReactNode

@@ -1,15 +1,15 @@
 # Velato: stage-one landing prototype
 
-A high-fidelity **static** landing prototype for **Velato** (Italian for "veiled"), an anonymous, luxury-adjacent womenswear label with weekly drops. It was built for the client pitch.
+A high-fidelity **static** landing prototype for **Velato** (Italian for "veiled"), a masked, luxury-adjacent womenswear label with weekly drops. It was built for the client pitch.
 
-- **No backend, no payments, no real images.** Every image slot draws placeholder art in code, and `ASSETS.md` lists what to swap.
+- **No backend and no payments.** The hero uses photographs; every other image slot draws placeholder art in code, and `ASSETS.md` lists what to swap.
 - **Polished 2D landing:**
   - a mega-dropdown nav modelled on the client's reference;
   - a custom cursor;
   - a weekly-drop teaser with a live countdown;
   - the drop rotation;
   - a typographic category index.
-- **3D showroom hero:** a React Three Fiber runway with three veiled figures and a cursor-driven 360° orbit. It is layered on top of a 2D still stage, so it can always be switched off without breaking the page.
+- **Masked hero:** three masked models (original, AI-generated, upscaled to 4K) in one dark room. The model nearest the cursor steps into the light, with parallax, a lantern and an eye strip that follows her.
 
 The brief is in `BRIEF.md`, the design system in `DESIGN.md`, and the image swap list in `ASSETS.md`.
 
@@ -24,45 +24,32 @@ npm run dev          # http://localhost:5173
 | Command | What it does |
 |---|---|
 | `npm run dev` | Dev server with hot reload |
-| `npm run build` | Production build into `dist/` (the 3D showroom is a separate lazy chunk) |
+| `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the production build on http://localhost:4173 |
 | `npm run typecheck` | TypeScript check |
 | `npm run assets` | Regenerate the slot table in `ASSETS.md` from `src/data/catalog.ts` |
 | `npm run build:artifact` | Single-file build (`dist-artifact/velato.html`) used for the private claude.ai preview link |
 
-**For the pitch:** run `npm run build && npm run preview` on the presenting laptop. Nothing is fetched from the network at runtime: fonts are self-hosted and the 3D lighting is procedural. That means it works offline.
+**For the pitch:** run `npm run build && npm run preview` on the presenting laptop. Nothing is fetched from the network at runtime: fonts and photographs are bundled. That means it works offline.
 
 ## Deploy (optional)
 `dist/` is a static site that works from any host or sub-path (`base: './'`).
 - **Vercel:** import the repo, framework "Vite", build command `npm run build`, output `dist`.
 - **Netlify:** build command `npm run build`, publish directory `dist`.
 
-## The 3D layer and how to switch it off
-The 2D still stage always renders underneath the 3D canvas, which fades in only once it is ready.
+## The hero cast
+The hero is three masked models standing in one dark room: look 01 *Notturno* (platinum bob, opera gloves) on the left, look 02 *Sera* (brunette, lace mask on a stick) in front, and look 03 *Velluto* (honey blonde, velvet off-the-shoulder) on the right. Each photograph is feathered into the page ground, so the three backdrops read as one wall.
 
-| Control | Effect |
-|---|---|
-| **3D / Still toggle** (bottom-right of the hero) | Switches for this visitor; the choice is remembered in the browser |
-| `?3d=off` / `?3d=on` in the URL | Forces it off or on for one visit |
-| `?3d=high` in the URL | Forces it on at full quality, even on weak or software graphics (for demos) |
-| `FEATURES.hero3d` in `src/config.ts` | Turns the layer off for everyone |
-| `VITE_HERO_3D=off npm run build` | Strips the 3D code from the bundle entirely |
+- **The light:** one model stands in the light at a time; the others fall back into shadow. On a mouse or trackpad the model nearest the cursor takes the light, the room drifts with a little parallax and a soft lantern follows the pointer. The look index (bottom right) does the same on hover, focus or press. Left alone for six seconds, the light walks from model to model by itself, which is also how it moves on phones.
+- **The eye strip:** above the headline, a 5.24:1 letterbox frames the masked eyes of whoever is in the light, captioned like a contact sheet (`VLT·014 — Look 02 / 03`). It shows only where there is height to spare (780px and up) and not on phones.
+- **Click anywhere on the room** to jump to the Drop 014 preview; the cursor shows "View".
+- **Reduced motion:** no parallax, drift or idle walk; the entrance is a plain fade.
 
-**Automatic fallbacks:**
-- no WebGL;
-- "reduce motion" turned on in the OS (the default switches to Still, but the toggle can turn 3D back on);
-- software-only graphics, such as virtual machines, some remote desktops and blocklisted GPUs (the default is Still; use the toggle or `?3d=on` / `?3d=high` to force 3D);
-- data-saver mode;
-- a WebGL error or context loss mid-session.
+**The photographs** are original AI-generated models (made in Canva for the pitch, not real people or real campaigns), upscaled 4× with Real-ESRGAN, lightly blended with a plain resize so skin keeps its texture, and given fine film grain. The site uses 2560×3840 WebP on retina screens and 1280×1920 elsewhere (`src/assets/models`). The 4096×6144 JPEG masters are delivered separately for print and the pitch deck. To replace them with the client's own shoot, keep the 2:3 three-quarter framing on a dark backdrop, swap the files, and re-aim the eye strip in `src/sections/hero/cast.ts` (`eyes: cx, cy, bw`).
 
-**Quality:**
-- Desktops get the full showroom: mirrored stage, bloom, film grain and vignette.
-- Phones, narrow windows and low-memory devices get a lighter version with no mirror and no post-processing.
-- On desktop, if the frame rate drops, the scene lowers its resolution in steps and falls back to the lighter version if needed.
+**For the pitch:** open the site on the presenting laptop, rest for a few seconds to let the light walk across the three models, then move the cursor slowly across the room.
 
-**The camera:** moving the cursor across the hero turns the camera a full 360° around the stage. The centre shows the fronts and the edges show the backs. On touch, drag sideways to turn.
-
-**For the pitch:** open the site on a laptop with a real GPU and move the cursor slowly across the hero. If the laptop's GPU is blocklisted or you present from a VM, add `?3d=on`.
+The earlier 3D showroom (React Three Fiber, veiled figures, 360° orbit) is retired from this build. It lives in the git history at commit `44d6117` if it is ever wanted back.
 
 ## Swapping in the client's imagery
 1. Open the site with `#assets` in the URL, or press **Shift + A**, to see every placeholder's ID. `?view=art` shows them all on one sheet with briefs.
@@ -79,12 +66,12 @@ src/
   data/                typed placeholder catalogue, copy and asset registry
   styles/              tokens.css (design tokens), fonts.css, base.css
   components/          Wordmark, Button, Placeholder, Countdown, StatusChip, Reveal…
-  lib/                 hooks: media queries, reduced motion, storage, WebGL, countdown
+  lib/                 hooks: media queries, reduced motion, storage, countdown
   art/                 parametric SVG placeholder art + the ?view=art sheet
   nav/                 header, mega-dropdown (scales from trigger, glides between), mobile menu
   cursor/              custom cursor
-  sections/            hero (still stage + 3D mount), manifesto, drop teaser, rotation, index, footer
-  hero3d/              React Three Fiber showroom (lazy chunk)
+  sections/            hero (masked cast, eye strip, look index), manifesto, drop teaser, rotation, index, footer
+  assets/models/       the hero photographs (1280 and 2560 wide WebP)
 ```
 
 ## Stage two (not in this repo)

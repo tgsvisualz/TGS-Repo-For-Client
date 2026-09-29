@@ -1,12 +1,12 @@
 /*
  * Hero layers, bottom to top (all inside the section's own stacking context):
- *   still stage (--z-stage) → 3D layer (--z-canvas) → shade + fog (--z-canvas, later in DOM)
- *   → text overlay (--z-overlay). The fixed header (72px) floats above all of it.
+ *   the cast (--z-stage) → shade + fog (--z-canvas) → vertical caption and text overlay
+ *   (--z-overlay). The fixed header (72px) floats above all of it.
  */
 /*
  * Local: --title-size, the headline size. The display token, capped by height so the text
- * block never slides under the header on short, wide windows. HeroStill reads it too (the
- * trio keeps clear of the headline).
+ * block never slides under the header on short, wide windows. HeroCast reads it too (the
+ * trio stands just right of the headline).
  */
 .hero {
   --title-size: min(var(--fs-display-xl), 16.5svh);
@@ -19,22 +19,7 @@
   background: var(--bg);
 }
 
-/* ── 3D slot ──────────────────────────────────────────────── */
-
-.layer3d {
-  position: absolute;
-  inset: 0;
-  z-index: var(--z-canvas);
-  opacity: 0;
-  will-change: opacity;
-  transition: opacity var(--dur-hero) var(--ease-out);
-}
-
-.hero[data-hero3d='ready'] .layer3d {
-  opacity: 1;
-}
-
-/* ── Shade: legibility and edges, above the 3D layer so both stages melt the same way ── */
+/* ── Shade: legibility and edges, above the cast ── */
 
 .shade {
   position: absolute;
@@ -102,7 +87,7 @@
 
 /* ── Overlay ──────────────────────────────────────────────── */
 
-/* Empty areas pass the pointer through (the 3D showroom takes drags on touch). */
+/* Empty areas pass the pointer through to the cast (parallax, light, click to the drop). */
 .overlay {
   position: absolute;
   inset: 0;
@@ -188,7 +173,7 @@
 
 .countdownLabel,
 .scroll,
-.hint {
+.vertical {
   font-family: var(--font-sans);
   font-size: var(--fs-label);
   font-weight: var(--fw-medium);
@@ -235,20 +220,35 @@
   animation-play-state: paused;
 }
 
-.controls {
+.looks {
   justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-5);
+  margin-right: calc(var(--space-3) * -1);
 }
 
-.hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  color: var(--fg-2);
+/* ── Eye strip (above the eyebrow) ────────────────────────── */
+
+/* Only where there is height to spare above the headline. */
+@media (max-height: 779px) {
+  .content .strip {
+    display: none;
+  }
+}
+
+/* ── Vertical caption on the right edge, like a campaign credit ── */
+
+.vertical {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--gutter) * 0.5);
+  z-index: var(--z-overlay);
+  margin: 0;
+  color: var(--fg-3);
   text-transform: uppercase;
-  animation: fade-in var(--dur-hero) var(--ease-out) both;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  /* transform, not translate/rotate: the entrance animates the translate property. */
+  transform: translateY(-50%) rotate(180deg);
+  pointer-events: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -263,7 +263,7 @@
 
 /*
  * ── Stacked (phones, portrait and near-square screens): the trio above, the text below.
- * Keep this query in sync with HeroStill.module.css.
+ * Keep this query in sync with HeroCast.module.css.
  * Local: --title-size (the headline), --text-top (the text block's height from the bottom,
  * ≈ 275px + two headline lines), so the scrim darkens exactly where the text sits.
  */
@@ -322,20 +322,11 @@
     padding-inline: var(--space-2) 0;
   }
 
-  /* The row keeps only the countdown and the scroll cue. */
-  .controls {
-    display: contents;
-  }
-
-  .hint {
+  /* The row keeps only the countdown and the scroll cue; the light walks on its own. */
+  .bottom .looks,
+  .content .strip,
+  .vertical {
     display: none;
-  }
-
-  /* Compact toggle, top right under the header. */
-  .toggle {
-    position: absolute;
-    top: calc(var(--header-h) + var(--space-3));
-    right: var(--gutter);
   }
 }
 
