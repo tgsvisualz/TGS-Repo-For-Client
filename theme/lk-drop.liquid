@@ -1,0 +1,235 @@
+{%- comment -%}
+  Campaign page for one drop (three-letter concept). Default: S.Y.S. = Show Your Smile.
+  Hero (wide) with a 45° reveal of the full look, the concept, the look (one full-screen image), the shoppable pieces grid (quick add), the close.
+  Used by S.Y.S., B.T.R. and L.D.K.: each page template sets its letters, copy set, tone, images and grid blocks.
+{%- endcomment -%}
+{%- liquid
+  assign hero = section.settings.hero
+  if hero == blank
+    assign hero = images['lk-sys-3.jpg']
+  endif
+  assign look = section.settings.look
+  if look == blank
+    assign look = images['lk-sys-2.jpg']
+  endif
+  assign full = section.settings.full
+  if full == blank
+    assign full = images['lk-sys-5.jpg']
+  endif
+  assign full_m = section.settings.full_m
+  if full_m == blank
+    assign full_m = images['lk-sys-6.jpg']
+  endif
+  assign third = section.settings.third
+  if third == blank
+    assign third = images['lk-sys-4.jpg']
+  endif
+  assign third_m = section.settings.third_m
+  assign link = section.settings.link
+  if link == blank
+    assign link = routes.collections_url | append: '/new-drop'
+  endif
+  assign p = section.settings.copy | default: 'dp'
+  assign k_kicker = p | append: '_kicker'
+  assign k_sub = p | append: '_sub'
+  assign k_lede = p | append: '_lede'
+  assign k_body = p | append: '_body'
+  assign k_cap = p | append: '_cap3'
+  assign k_end = p | append: '_end'
+  assign k_grid = p | append: '_grid'
+  assign k_gsub = p | append: '_gridsub'
+  assign fr = false
+  if request.locale.iso_code == 'fr'
+    assign fr = true
+  endif
+  assign code = section.settings.letter_1 | append: '.' | append: section.settings.letter_2 | append: '.' | append: section.settings.letter_3 | append: '.'
+  assign words = section.settings.word_1 | append: ' ' | append: section.settings.word_2 | append: ' ' | append: section.settings.word_3
+-%}
+<article class="dp{% if section.settings.tone == 'light' %} dp--light{% endif %}" aria-labelledby="dp-h-{{ section.id }}">
+  <header class="dp__hero" id="dp-hero-{{ section.id }}">
+    <figure class="dp__media">
+      {%- if hero -%}
+        {%- assign alt = hero.alt | default: '' -%}
+        <picture>
+          {%- if look -%}<source media="(max-width: 749px)" srcset="{{ look | image_url: width: 750 }} 750w, {{ look | image_url: width: 1100 }} 1100w, {{ look | image_url: width: 1400 }} 1400w, {{ look | image_url: width: 1600 }} 1600w" sizes="180vw">{%- endif -%}
+          {{ hero | image_url: width: 3840 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '1100,1500,1920,2400,3000,3840', sizes: '100vw', alt: alt, class: 'dp__hero-img', data-parallax: '' }}
+        </picture>
+      {%- endif -%}
+      {%- if full -%}
+        <picture class="dp__alt">
+          {%- if full_m -%}<source media="(max-width: 749px)" srcset="{{ full_m | image_url: width: 750 }} 750w, {{ full_m | image_url: width: 1100 }} 1100w, {{ full_m | image_url: width: 1400 }} 1400w" sizes="180vw">{%- endif -%}
+          {{ full | image_url: width: 2400 | image_tag: loading: 'lazy', widths: '1100,1500,1920,2400', sizes: '100vw', alt: full.alt, class: 'dp__alt-img' }}
+        </picture>
+      {%- endif -%}
+    </figure>
+    <p class="mono dp__tl">{% if section.settings.kicker != blank %}{{ section.settings.kicker }}{% else %}{% render 'lk-t2', k: k_kicker %}{% endif %}</p>
+    <p class="mono dp__tr">LK Fashion<br>{{ 'now' | date: '%Y' }}{% if full %}<span class="dp__hint" aria-hidden="true"><span class="on-fine">{% render 'lk-t2', k: 'dp_hint' %}</span><span class="on-touch">{% render 'lk-t2', k: 'dp_tap' %}</span></span>{% endif %}</p>
+    <h1 class="dp__title" id="dp-h-{{ section.id }}">
+      {%- for i in (1..3) -%}
+        {%- assign kl = 'letter_' | append: i -%}
+        <span class="dp__l" style="--d:{{ forloop.index0 }}" aria-hidden="true">{{ section.settings[kl] }}</span>
+      {%- endfor -%}
+      <span class="visually-hidden">{{ code }} {{ words }}</span>
+    </h1>
+    <p class="dp__sub"><span class="mono dp__k">{{ code }}</span>{% if section.settings.subtitle != blank %}{{ section.settings.subtitle }}{% else %}{% render 'lk-t2', k: k_sub %}{% endif %}</p>
+    <a class="bracket dp__hcta" href="{{ link }}"><span>[</span> {% render 'lk-t', k: 'hero_cta' %} <span>]</span></a>
+  </header>
+  {%- if full -%}
+  <script>
+    (() => {
+      const h = document.getElementById('dp-hero-{{ section.id }}');
+      if (!h) return;
+      const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+      let x = -9999, y = -9999, cx = x, cy = y, raf = 0, wait = 0, hide = 0;
+      const set = () => { h.style.setProperty('--mx', cx.toFixed(1) + 'px'); h.style.setProperty('--my', cy.toFixed(1) + 'px'); };
+      const loop = () => { cx += (x - cx) * 0.22; cy += (y - cy) * 0.22; set(); raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.3 ? requestAnimationFrame(loop) : 0; };
+      const pos = (e) => { const r = h.getBoundingClientRect(); x = e.clientX - r.left; y = e.clientY - r.top; };
+      const jump = (e) => { h.style.setProperty('--hh', h.clientHeight + 'px'); pos(e); cx = x; cy = y; set(); };
+      h.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'mouse') return; jump(e); clearTimeout(wait); wait = setTimeout(() => h.classList.add('is-on'), 1500); });
+      h.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; pos(e); if (!raf) raf = requestAnimationFrame(loop); });
+      h.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'mouse') return; clearTimeout(wait); h.classList.remove('is-on'); });
+      h.addEventListener('click', (e) => { if (fine || e.target.closest('a')) return; jump(e); h.classList.add('is-on'); clearTimeout(hide); hide = setTimeout(() => h.classList.remove('is-on'), 3500); });
+    })();
+  </script>
+  {%- endif -%}
+
+  <section class="stmt dp__intro">
+    <p class="mono stmt__no">({% render 'lk-t2', k: 'dp_s1' %})</p>
+    <div class="stmt__h" data-reveal><p>{% if section.settings.lede != blank %}{{ section.settings.lede }}{% else %}{% render 'lk-t2', k: k_lede %}{% endif %}</p></div>
+    <p class="stmt__sub mono" data-reveal>{% if section.settings.body != blank %}{{ section.settings.body }}{% else %}{% render 'lk-t2', k: k_body %}{% endif %}</p>
+    <span class="stmt__scroll mono" aria-hidden="true">{% render 'lk-t', k: 'scroll' %} ↓</span>
+  </section>
+
+  <div class="dp__band" aria-hidden="true">
+    <div class="dp__track">
+      {%- for i in (1..2) -%}
+        <span class="dp__run">{%- for j in (1..4) -%}<b>{{ code }}</b><em>{{ words }}</em><i>✶</i>{%- endfor -%}</span>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- if third -%}
+  <section class="dp__look" aria-labelledby="dp-l-{{ section.id }}">
+    <figure class="dp__full">
+      <picture>
+        {%- if third_m -%}<source media="(max-width: 749px)" srcset="{{ third_m | image_url: width: 750 }} 750w, {{ third_m | image_url: width: 1100 }} 1100w, {{ third_m | image_url: width: 1500 }} 1500w, {{ third_m | image_url: width: 2000 }} 2000w" sizes="170vw">{%- endif -%}
+        {{ third | image_url: width: 2880 | image_tag: loading: 'lazy', widths: '750,1100,1500,1920,2400,2880', sizes: '100vw', alt: third.alt, class: 'dp__full-img', data-parallax: '' }}
+      </picture>
+      <header class="shead dp__full-h"><h2 class="shead__h" id="dp-l-{{ section.id }}"><span class="shead__no">02.</span> {% render 'lk-t2', k: 'dp_s3' %}</h2></header>
+      <figcaption class="mono dp__full-cap"><span>{{ code }} — 02</span><span>{% render 'lk-t2', k: k_cap %}</span></figcaption>
+    </figure>
+  </section>
+  {%- endif -%}
+
+  {%- if section.blocks.size > 0 -%}
+  <section class="dp__grid" aria-labelledby="dp-g-{{ section.id }}">
+    <header class="shead"><h2 class="shead__h" id="dp-g-{{ section.id }}"><span class="shead__no">03.</span> {% render 'lk-t2', k: k_grid %}</h2></header>
+    <p class="mono dp__gsub">{% render 'lk-t2', k: k_gsub %}</p>
+    <ul class="dp__cards" role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign pr = block.settings.product
+          assign t = block.settings.title
+          assign n = block.settings.note
+          if fr
+            if block.settings.title_fr != blank
+              assign t = block.settings.title_fr
+            endif
+            if block.settings.note_fr != blank
+              assign n = block.settings.note_fr
+            endif
+          endif
+          assign url = block.settings.link
+          if pr != blank
+            assign t = pr.title
+            if pr.metafields.custom.note.value != blank
+              assign n = pr.metafields.custom.note.value
+            endif
+            assign url = pr.url
+          endif
+          assign img = block.settings.image | default: pr.featured_image
+        -%}
+        <li class="dp__card{% if pr != blank %} dp__card--shop{% endif %}" data-reveal {{ block.shopify_attributes }}>
+          {%- if url != blank -%}<a href="{{ url }}" class="dp__card-in" data-mcur-zone>{%- else -%}<div class="dp__card-in">{%- endif -%}
+            <span class="dp__frame">
+              {%- if img -%}{{ img | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '480,720,960,1200', sizes: '(min-width: 750px) 31vw, 50vw', alt: t }}{%- endif -%}
+              {%- if pr != blank and pr.available == false -%}<span class="dp__out mono">({% render 'lk-t', k: 'sold_out' %})</span>{%- endif -%}
+            </span>
+            <span class="dp__cap">
+              <span class="mono dp__cno">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+              <span class="dp__ct">{{ t }}</span>
+              {%- if pr != blank -%}<span class="mono dp__cp">{{ pr.price | money }}</span>{%- endif -%}
+              <span class="mono dp__cn">{{ n }}</span>
+            </span>
+          {%- if url != blank -%}</a>{%- else -%}</div>{%- endif -%}
+          {%- if pr != blank and pr.available -%}
+            {%- assign one = false -%}
+            {%- if pr.has_only_default_variant or pr.variants.size == 1 -%}{%- assign one = true -%}{%- endif -%}
+            <div class="dp__qa mono{% if one %} dp__qa--one{% endif %}" role="group" aria-label="{% render 'lk-t', k: 'quick_add' %} — {{ pr.title | escape }}">
+              {%- if one -%}
+                <button type="button" data-qa="{{ pr.variants.first.id }}">+ {% render 'lk-t', k: 'add_to_bag' %}</button>
+              {%- else -%}
+                <span class="dp__qlbl">+ {% render 'lk-t', k: 'bag' %}</span>
+                {%- for v in pr.variants -%}
+                  <button type="button" data-qa="{{ v.id }}"{% unless v.available %} disabled{% endunless %} aria-label="{% render 'lk-t', k: 'add_to_bag' %} — {{ pr.title | escape }} — {{ v.title | escape }}">{{ v.title }}</button>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+  {%- endif -%}
+
+  <footer class="dp__end">
+    <p class="dp__close" data-reveal>{% render 'lk-t2', k: k_end %}</p>
+    <a class="bracket bracket--light dp__cta" href="{{ link }}"><span>[</span> {% render 'lk-t', k: 'hero_cta' %} <span>]</span></a>
+    <p class="mono dp__note">{% render 'lk-t', k: 'hero_side' %}</p>
+  </footer>
+</article>
+
+{% schema %}
+{
+  "name": "LK drop campaign",
+  "settings": [
+    { "type": "paragraph", "content": "Campaign page for a three-letter drop (S.Y.S., B.T.R., L.D.K.). The copy set picks the bilingual text; leave text fields blank to use it." },
+    { "type": "select", "id": "copy", "label": "Copy set", "default": "dp", "options": [{ "value": "dp", "label": "S.Y.S. — Show Your Smile" }, { "value": "btr", "label": "B.T.R. — Bags To Riches" }, { "value": "ldk", "label": "L.D.K. — Looks Do Kill" }] },
+    { "type": "text", "id": "letter_1", "label": "Letter 1", "default": "S" },
+    { "type": "text", "id": "word_1", "label": "Word 1", "default": "Show" },
+    { "type": "text", "id": "letter_2", "label": "Letter 2", "default": "Y" },
+    { "type": "text", "id": "word_2", "label": "Word 2", "default": "Your" },
+    { "type": "text", "id": "letter_3", "label": "Letter 3", "default": "S" },
+    { "type": "text", "id": "word_3", "label": "Word 3", "default": "Smile" },
+    { "type": "text", "id": "kicker", "label": "Kicker", "info": "Blank = copy set." },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "info": "Blank = copy set." },
+    { "type": "textarea", "id": "lede", "label": "Lede", "info": "Blank = copy set." },
+    { "type": "textarea", "id": "body", "label": "Body", "info": "Blank = copy set." },
+    { "type": "select", "id": "tone", "label": "Page tone", "default": "light", "options": [{ "value": "light", "label": "Light (white-background photos)" }, { "value": "dark", "label": "Dark (black-background photos)" }] },
+    { "type": "image_picker", "id": "hero", "label": "Hero (wide)", "info": "Blank = lk-sys-3.jpg from Files." },
+    { "type": "image_picker", "id": "full", "label": "Hover reveal: full look (wide)", "info": "Shown in a 45° band that follows the cursor after 1.5 s of hovering (a tap on phones). Blank = lk-sys-5.jpg." },
+    { "type": "image_picker", "id": "full_m", "label": "Hover reveal: full look (phones, 3:4)", "info": "Blank = lk-sys-6.jpg." },
+    { "type": "image_picker", "id": "look", "label": "Phone hero", "info": "Blank = lk-sys-2.jpg. Shown instead of the wide hero on phones (3:4)." },
+    { "type": "image_picker", "id": "third", "label": "The look (full screen)", "info": "Blank = lk-sys-4.jpg. Wide (16:9) works best on desktop." },
+    { "type": "image_picker", "id": "third_m", "label": "The look (phones, 3:4)", "info": "Optional. Shown instead of the wide image on phones." },
+    { "type": "url", "id": "link", "label": "Button link", "info": "Blank = New Drop collection. Set to the drop's collection." }
+  ],
+  "blocks": [
+    {
+      "type": "piece",
+      "name": "Grid piece",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product", "info": "Makes the piece shoppable: name, note, price and quick add come from the product (translated). The note is the product's Grid note field." },
+        { "type": "image_picker", "id": "image", "label": "Image (3:4)", "info": "Blank = the product's photo." },
+        { "type": "text", "id": "title", "label": "Name", "info": "Used when no product is set." },
+        { "type": "text", "id": "title_fr", "label": "Name (French)" },
+        { "type": "text", "id": "note", "label": "Note", "info": "e.g. colour or cut." },
+        { "type": "text", "id": "note_fr", "label": "Note (French)" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Used when no product is set." }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [{ "name": "LK drop campaign" }]
+}
+{% endschema %}

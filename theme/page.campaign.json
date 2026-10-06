@@ -1,0 +1,102 @@
+{
+  "layout": "lk",
+  "sections": {
+    "main": {
+      "type": "lk-drop",
+      "blocks": {
+        "piece_1": {
+          "type": "piece",
+          "settings": {
+            "product": "sys-wool-coat-burnt-orange",
+            "image": "shopify://shop_images/lk-sys-v3-burnt-orange.jpg",
+            "title": "Burnt orange",
+            "title_fr": "Orange brûlé",
+            "note": "Wool, oversized",
+            "note_fr": "Laine, coupe ample"
+          }
+        },
+        "piece_2": {
+          "type": "piece",
+          "settings": {
+            "product": "sys-wool-coat-ivory",
+            "image": "shopify://shop_images/lk-sys-v3-ivory.jpg",
+            "title": "Ivory",
+            "title_fr": "Ivoire",
+            "note": "Wool, oversized",
+            "note_fr": "Laine, coupe ample"
+          }
+        },
+        "piece_3": {
+          "type": "piece",
+          "settings": {
+            "product": "sys-wool-coat-black",
+            "image": "shopify://shop_images/lk-sys-v3-black.jpg",
+            "title": "Black",
+            "title_fr": "Noir",
+            "note": "Wool, oversized",
+            "note_fr": "Laine, coupe ample"
+          }
+        },
+        "piece_4": {
+          "type": "piece",
+          "settings": {
+            "product": "sys-wool-coat-bordeaux",
+            "image": "shopify://shop_images/lk-sys-v3-bordeaux.jpg",
+            "title": "Bordeaux",
+            "title_fr": "Bordeaux",
+            "note": "Wool, oversized",
+            "note_fr": "Laine, coupe ample"
+          }
+        },
+        "piece_5": {
+          "type": "piece",
+          "settings": {
+            "product": "sys-wool-coat-forest-green",
+            "image": "shopify://shop_images/lk-sys-v3-forest-green.jpg",
+            "title": "Forest green",
+            "title_fr": "Vert forêt",
+            "note": "Wool, oversized",
+            "note_fr": "Laine, coupe ample"
+          }
+        },
+        "piece_6": {
+          "type": "piece",
+          "settings": {
+            "product": "sys-wool-coat-cobalt",
+            "image": "shopify://shop_images/lk-sys-v3-cobalt.jpg",
+            "title": "Cobalt",
+            "title_fr": "Bleu cobalt",
+            "note": "Wool, oversized",
+            "note_fr": "Laine, coupe ample"
+          }
+        }
+      },
+      "block_order": [
+        "piece_1",
+        "piece_2",
+        "piece_3",
+        "piece_4",
+        "piece_5",
+        "piece_6"
+      ],
+      "settings": {
+        "copy": "dp",
+        "link": "shopify://collections/sys",
+        "hero": "shopify://shop_images/lk-sys-hero-4k.jpg",
+        "full": "shopify://shop_images/lk-sys-full-v5.jpg",
+        "full_m": "shopify://shop_images/lk-sys-full-m-v4.jpg",
+        "look": "shopify://shop_images/lk-sys-hero-m-4k.jpg",
+        "third": "shopify://shop_images/lk-sys-look-hd.jpg",
+        "third_m": "shopify://shop_images/lk-sys-look-hd.jpg"
+      }
+    },
+    "newsletter": {
+      "type": "lk-newsletter",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "newsletter"
+  ]
+}
