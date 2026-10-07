@@ -1,0 +1,136 @@
+{%- comment -%}
+  Landing hero: the drop's three-letter concept (L.K.F. by default; e.g. S.Y.S. = Show Your Smile, L.D.K. = Looks Do Kill).
+  At rest: one composite face — the left third of face 1, the middle third of face 2, the right third of face 3 —
+  with one giant letter on each slice. Hovering a slice (desktop) or tapping it (phones) widens it and reveals
+  that woman in her look, in colour, from the point you touched.
+  For each new drop: change the three letters (and optional words), the three faces and the three looks.
+{%- endcomment -%}
+{%- liquid
+  assign c = section.settings.collection
+  assign link = section.settings.link
+  if link == blank
+    assign link = routes.collections_url | append: '/new-drop'
+  endif
+  assign letters = ''
+-%}
+<section class="hero" data-hero aria-labelledby="hero-h-{{ section.id }}">
+  <div class="hero__panels" data-mcur-zone>
+    {%- for i in (1..3) -%}
+      {%- liquid
+        assign k_letter = 'letter_' | append: i
+        assign k_word = 'word_' | append: i
+        assign k_face = 'face_' | append: i
+        assign k_prod = 'product_' | append: i
+        assign k_look = 'look_' | append: i
+        assign k_fz = 'zoom_' | append: i
+        assign k_dx = 'dx_' | append: i
+        assign k_dy = 'dy_' | append: i
+        assign k_fw = 'width_' | append: i
+        assign fz = section.settings[k_fz] | default: 100 | divided_by: 100.0
+        assign fw = section.settings[k_fw] | default: 100 | divided_by: 100.0
+        assign letter = section.settings[k_letter] | default: '·'
+        assign word = section.settings[k_word]
+        assign p = section.settings[k_prod]
+        if p == blank
+          assign p = c.products[forloop.index0]
+        endif
+        assign face_file = 'lk-drop-face-' | append: i | append: '.jpg'
+        assign face = section.settings[k_face]
+        if face == blank
+          assign face = images[face_file]
+        endif
+        assign look = section.settings[k_look]
+        if look == blank
+          assign look = p.featured_media.preview_image
+        endif
+        if face == blank
+          assign face = look
+        endif
+        assign letters = letters | append: letter | append: '.'
+        assign purl = p.url | default: link
+      -%}
+      <a class="hp" href="{{ purl }}" data-hp style="--i:{{ forloop.index0 }};--fz:{{ fz }};--fw:{{ fw }};--dx:{{ section.settings[k_dx] | default: 0 }}%;--dy:{{ section.settings[k_dy] | default: 0 }}%">
+        <span class="hp__media">
+          {%- if face -%}
+            {{ face | image_url: width: 2400 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '480,720,1000,1400,1800,2400', sizes: '(min-width: 750px) 55vw, 75vw', alt: '', class: 'hp__img hp__img--face', data-hero-img: '' }}
+          {%- endif -%}
+          {%- if look -%}
+            {{ look | image_url: width: 2400 | image_tag: loading: 'lazy', decoding: 'async', widths: '480,720,1000,1400,1800,2400', sizes: '(min-width: 750px) 55vw, 75vw', alt: '', class: 'hp__img hp__img--col' }}
+          {%- endif -%}
+        </span>
+        <span class="hp__letter" aria-hidden="true">{{ letter }}</span>
+        {%- if word != blank -%}<span class="hp__word" aria-hidden="true">{{ word }}</span>{%- endif -%}
+        <span class="hp__meta">
+          {%- if p -%}
+            <span class="mono hp__no">{{ letter }} / {% render 'lk-type', t: p.type %}</span>
+            <span class="hp__name">{{ p.title }}</span>
+            <span class="mono hp__price">{% render 'lk-price', product: p %}<span class="hp__go">[ {% render 'lk-t', k: 'view' %} ]</span></span>
+          {%- endif -%}
+        </span>
+      </a>
+    {%- endfor -%}
+  </div>
+
+  <h1 class="visually-hidden" id="hero-h-{{ section.id }}">LK Fashion — {{ letters }} {{ section.settings.concept }}</h1>
+
+  <div class="hero__ui">
+    <p class="mono hero__tl">LK Fashion<br>{% render 'lk-t', k: 'drop_tag' %}</p>
+    <p class="mono hero__tr">{{ c.products_count | prepend: '0' | slice: -2, 2 }} {% render 'lk-t', k: 'pieces' %}<br>{{ 'now' | date: '%Y' }}</p>
+    <p class="hero__line"><span class="mono hero__code">{{ letters }}</span>{% if section.settings.concept != blank %}{{ section.settings.concept }}{% else %}{% render 'lk-t', k: 'hero_line' %}{% endif %}</p>
+    <p class="mono hero__hint" aria-hidden="true">{% render 'lk-mask', id: 'hint', class: 'hero__hint-ic' %}<span class="on-fine">{% render 'lk-t', k: 'hero_hint' %}</span><span class="on-touch">{% render 'lk-t', k: 'hero_tap' %}</span></p>
+    <a class="bracket hero__cta" href="{{ link }}"><span>[</span> {% render 'lk-t', k: 'hero_cta' %} <span>]</span></a>
+  </div>
+</section>
+
+{%- unless request.design_mode -%}
+  <div class="pre" data-pre aria-hidden="true">
+    <p class="mono pre__tl">LK Fashion</p>
+    <p class="mono pre__tr">{% render 'lk-t', k: 'loading' %}</p>
+    {% render 'lk-mask', id: 'pre', class: 'pre__ic' %}
+    <div class="pre__bar"><span class="pre__fill" data-pre-fill></span><span class="mono pre__pct" data-pre-pct>000%</span></div>
+    <p class="pre__mark">LK</p>
+  </div>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "LK drop hero (3 letters)",
+  "settings": [
+    { "type": "paragraph", "content": "Every drop is a three-letter concept, e.g. S.Y.S. = Show Your Smile, L.D.K. = Looks Do Kill. At rest, the three faces are cut into thirds and form one face: use each face's zoom, width and nudges so the eyes and lips of all three sit on the same lines. Hovering a face reveals that woman in her look." },
+    { "type": "text", "id": "concept", "label": "Concept (what the letters stand for)", "info": "e.g. Show Your Smile. Blank = default tagline." },
+    { "type": "collection", "id": "collection", "label": "Drop collection", "info": "Counts the pieces and fills any look left blank." },
+    { "type": "header", "content": "Face 1" },
+    { "type": "text", "id": "letter_1", "label": "Letter", "default": "L" },
+    { "type": "text", "id": "word_1", "label": "Word (optional)", "info": "Shown under the letter on hover, e.g. Show." },
+    { "type": "image_picker", "id": "face_1", "label": "Face close-up", "info": "Front-facing, centred, 3:4. Blank = lk-drop-face-1.jpg from Files." },
+    { "type": "range", "id": "zoom_1", "label": "Face zoom", "min": 80, "max": 130, "step": 1, "unit": "%", "default": 100 },
+    { "type": "range", "id": "width_1", "label": "Face width", "min": 85, "max": 115, "step": 1, "unit": "%", "default": 100, "info": "Matches eye spacing to the other faces." },
+    { "type": "range", "id": "dx_1", "label": "Nudge left / right", "min": -5, "max": 5, "step": 0.1, "unit": "%", "default": 0 },
+    { "type": "range", "id": "dy_1", "label": "Nudge up / down", "min": -5, "max": 5, "step": 0.1, "unit": "%", "default": 0 },
+    { "type": "product", "id": "product_1", "label": "Her look (product)" },
+    { "type": "image_picker", "id": "look_1", "label": "Look photo (optional)", "info": "Blank = the product's main photo." },
+    { "type": "header", "content": "Face 2" },
+    { "type": "text", "id": "letter_2", "label": "Letter", "default": "K" },
+    { "type": "text", "id": "word_2", "label": "Word (optional)" },
+    { "type": "image_picker", "id": "face_2", "label": "Face close-up", "info": "Front-facing, centred, 3:4. Blank = lk-drop-face-2.jpg from Files." },
+    { "type": "range", "id": "zoom_2", "label": "Face zoom", "min": 80, "max": 130, "step": 1, "unit": "%", "default": 100 },
+    { "type": "range", "id": "width_2", "label": "Face width", "min": 85, "max": 115, "step": 1, "unit": "%", "default": 100, "info": "Matches eye spacing to the other faces." },
+    { "type": "range", "id": "dx_2", "label": "Nudge left / right", "min": -5, "max": 5, "step": 0.1, "unit": "%", "default": 0 },
+    { "type": "range", "id": "dy_2", "label": "Nudge up / down", "min": -5, "max": 5, "step": 0.1, "unit": "%", "default": 0 },
+    { "type": "product", "id": "product_2", "label": "Her look (product)" },
+    { "type": "image_picker", "id": "look_2", "label": "Look photo (optional)" },
+    { "type": "header", "content": "Face 3" },
+    { "type": "text", "id": "letter_3", "label": "Letter", "default": "F" },
+    { "type": "text", "id": "word_3", "label": "Word (optional)" },
+    { "type": "image_picker", "id": "face_3", "label": "Face close-up", "info": "Front-facing, centred, 3:4. Blank = lk-drop-face-3.jpg from Files." },
+    { "type": "range", "id": "zoom_3", "label": "Face zoom", "min": 80, "max": 130, "step": 1, "unit": "%", "default": 100 },
+    { "type": "range", "id": "width_3", "label": "Face width", "min": 85, "max": 115, "step": 1, "unit": "%", "default": 100, "info": "Matches eye spacing to the other faces." },
+    { "type": "range", "id": "dx_3", "label": "Nudge left / right", "min": -5, "max": 5, "step": 0.1, "unit": "%", "default": 0 },
+    { "type": "range", "id": "dy_3", "label": "Nudge up / down", "min": -5, "max": 5, "step": 0.1, "unit": "%", "default": 0 },
+    { "type": "product", "id": "product_3", "label": "Her look (product)" },
+    { "type": "image_picker", "id": "look_3", "label": "Look photo (optional)" },
+    { "type": "url", "id": "link", "label": "Button link", "info": "Blank = New Drop collection." }
+  ],
+  "presets": [{ "name": "LK drop hero (3 letters)" }]
+}
+{% endschema %}
