@@ -1,0 +1,52 @@
+{%- comment -%} Product card. Params: product, sizes, loading, show_sizes (default true) {%- endcomment -%}
+{%- liquid
+  assign img = product.featured_media.preview_image
+  assign alt = img.alt | default: product.title
+  assign size_opt = product.options_with_values | where: 'name', 'Size' | first
+  if size_opt == nil
+    assign size_opt = product.options_with_values | where: 'name', 'Taille' | first
+  endif
+  assign is_new = false
+  if product.tags contains 'new-drop'
+    assign is_new = true
+  endif
+  assign is_best = false
+  if product.tags contains 'best-seller'
+    assign is_best = true
+  endif
+-%}
+<article class="card{% unless product.available %} card--out{% endunless %}">
+  <a class="card__media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if img -%}
+      {{ img | image_url: width: 1800 | image_tag: loading: loading, widths: '360,540,720,900,1100,1400,1800', sizes: sizes, alt: alt, class: 'card__img' }}
+    {%- else -%}
+      {{ 'product-apparel-1' | placeholder_svg_tag: 'card__img card__img--ph' }}
+    {%- endif -%}
+    <span class="card__tags">
+      {%- if is_new -%}<span class="tag">({% render 'lk-t', k: 'new' %})</span>{%- endif -%}
+      {%- if is_best -%}<span class="tag tag--ink">★ {% render 'lk-t', k: 'best_seller' %}</span>{%- endif -%}
+      {%- if product.compare_at_price > product.price -%}<span class="tag tag--red">({% render 'lk-t', k: 'sale' %})</span>{%- endif -%}
+      {%- unless product.available -%}<span class="tag">({% render 'lk-t', k: 'sold_out' %})</span>{%- endunless -%}
+    </span>
+    {%- if size_opt and show_sizes != false -%}
+      <span class="card__sizes">
+        {%- for value in size_opt.values -%}
+          {%- liquid
+            assign avail = false
+            for v in product.variants
+              if v.options contains value and v.available
+                assign avail = true
+                break
+              endif
+            endfor
+          -%}
+          <span class="pill{% unless avail %} pill--out{% endunless %}">({{ value | replace: 'One size', 'OS' | replace: 'Taille unique', 'TU' }})</span>
+        {%- endfor -%}
+      </span>
+    {%- endif -%}
+  </a>
+  <div class="card__meta">
+    <h3 class="card__name"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+    {% render 'lk-price', product: product, class: 'card__price' %}
+  </div>
+</article>

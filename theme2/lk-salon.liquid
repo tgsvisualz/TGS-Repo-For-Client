@@ -1,0 +1,81 @@
+{%- comment -%}
+  Best-seller showcase: a horizontal slider (swipe on phones, drag or arrows on desktop).
+  Each card uses the product's "Showcase photo" (metafield custom.showcase_image), a picture that isn't used in the catalogue,
+  and falls back to the product's main photo. Every card links to the product.
+{%- endcomment -%}
+{%- assign c = section.settings.collection -%}
+<section class="salon show" aria-labelledby="salon-h-{{ section.id }}" data-show>
+  <header class="show__head">
+    <p class="mono">({{ section.settings.number }}) {% render 'lk-t', k: 's_best' %}</p>
+    <h2 class="salon__h show__h" id="salon-h-{{ section.id }}">{% render 'lk-t', k: 'salon_title' %}</h2>
+    <div class="show__nav">
+      {%- if c -%}<a class="bracket" href="{{ c.url }}"><span>[</span> {% render 'lk-t', k: 'view_all' %} <span>]</span></a>{%- endif -%}
+      <button type="button" class="show__btn" data-show-prev aria-label="{% render 'lk-t', k: 'prev' %}"><svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M21 6H1m5-5L1 6l5 5" fill="none" stroke="currentColor"/></svg></button>
+      <button type="button" class="show__btn" data-show-next aria-label="{% render 'lk-t', k: 'next' %}"><svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6h20m-5-5 5 5-5 5" fill="none" stroke="currentColor"/></svg></button>
+    </div>
+  </header>
+  <ul class="show__track" role="list" data-show-track tabindex="0" aria-label="{% render 'lk-t', k: 's_best' %}">
+    {%- if c -%}
+      {%- for p in c.products limit: section.settings.limit -%}
+        {%- liquid
+          assign pimg = p.metafields.custom.showcase_image.value
+          if pimg == blank
+            assign pimg = p.featured_media.preview_image
+          endif
+          assign alt = pimg.alt | default: p.title
+          assign code = p.type | slice: 0, 1 | upcase
+        -%}
+        <li class="show__item">
+          <a class="show__media" href="{{ p.url }}" draggable="false" tabindex="-1" aria-hidden="true">
+            {%- if pimg -%}{{ pimg | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '360,540,720,900,1100,1400,1800', sizes: '(min-width: 990px) 30vw, 78vw', alt: alt, draggable: 'false' }}{%- endif -%}
+            <span class="show__no mono" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+          </a>
+          <div class="salon__meta">
+            <p class="mono salon__code">LK·{{ code }}·{{ forloop.index | prepend: '0' | slice: -2, 2 }} — {% render 'lk-t', k: 'best_seller' %}</p>
+            <h3 class="salon__name"><a href="{{ p.url }}" draggable="false">{{ p.title }}</a></h3>
+            <p class="salon__price">{% render 'lk-price', product: p %}</p>
+          </div>
+        </li>
+      {%- endfor -%}
+    {%- endif -%}
+  </ul>
+  <div class="show__bar" aria-hidden="true"><span data-show-bar></span></div>
+</section>
+<script>
+(() => {
+  const root = document.currentScript.previousElementSibling;
+  const t = root && root.querySelector('[data-show-track]');
+  if (!t || t.dataset.ready) return; t.dataset.ready = 1;
+  const rtl = getComputedStyle(t).direction === 'rtl';
+  const prev = root.querySelector('[data-show-prev]'), next = root.querySelector('[data-show-next]'), bar = root.querySelector('[data-show-bar]');
+  const step = () => { const i = t.querySelector('.show__item'); return i ? i.getBoundingClientRect().width + parseFloat(getComputedStyle(t).columnGap || 0) : t.clientWidth * .8; };
+  const pos = () => Math.abs(t.scrollLeft);
+  const sync = () => {
+    const max = t.scrollWidth - t.clientWidth;
+    prev.disabled = pos() < 4; next.disabled = pos() > max - 4;
+    if (bar) { const w = t.clientWidth / t.scrollWidth; bar.style.width = (w * 100) + '%'; bar.style.transform = 'translateX(' + (max > 0 ? pos() / max * (1 / w - 1) * 100 : 0) * (rtl ? -1 : 1) + '%)'; }
+  };
+  const go = d => t.scrollBy({ left: step() * d * (rtl ? -1 : 1), behavior: 'smooth' });
+  prev.addEventListener('click', () => go(-1)); next.addEventListener('click', () => go(1));
+  t.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); go(rtl ? -1 : 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); go(rtl ? 1 : -1); } });
+  t.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true }); addEventListener('resize', sync); sync();
+  /* Mouse drag on desktop (touch already swipes natively); a drag never counts as a click */
+  let down = false, x0 = 0, s0 = 0, moved = 0;
+  t.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button) return; down = true; moved = 0; x0 = e.clientX; s0 = t.scrollLeft; t.classList.add('is-drag'); });
+  addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - x0; moved = Math.max(moved, Math.abs(dx)); t.scrollLeft = s0 - dx; });
+  addEventListener('pointerup', () => { if (!down) return; down = false; t.classList.remove('is-drag'); });
+  t.addEventListener('click', e => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); moved = 0; } }, true);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "LK best-seller showcase",
+  "settings": [
+    { "type": "text", "id": "number", "label": "Number", "default": "04" },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Best sellers. Each card uses the product's Showcase photo (product metafield), or its main photo when none is set." },
+    { "type": "range", "id": "limit", "label": "Pieces", "min": 3, "max": 12, "step": 1, "default": 8 }
+  ],
+  "presets": [{ "name": "LK best-seller showcase" }]
+}
+{% endschema %}

@@ -1,0 +1,38 @@
+{%- liquid
+  assign img = section.settings.image
+  if img == blank
+    assign img = images['lk-campaign.jpg']
+  endif
+  assign link = section.settings.link
+  if link == blank
+    assign link = routes.collections_url | append: '/new-drop'
+  endif
+-%}
+<section class="sec camp" aria-labelledby="h-{{ section.id }}">
+  {%- assign hid = 'h-' | append: section.id -%}
+  {% render 'lk-shead', no: section.settings.number, k: 's_campaign', tag_k: 'campaign_tag', id: hid %}
+  <a class="camp__frame" href="{{ link }}">
+    {%- if img -%}
+      {%- assign alt = img.alt | default: '' -%}
+      {{ img | image_url: width: 3600 | image_tag: loading: 'lazy', widths: '750,1100,1500,1920,2400,3000,3600', sizes: '100vw', alt: alt, class: 'camp__img', data-parallax: '' }}
+    {%- endif -%}
+    <span class="camp__over">
+      <span class="camp__title">{% if section.settings.title != blank %}{{ section.settings.title }}{% else %}{% render 'lk-t', k: 'campaign_title' %}{% endif %}</span>
+      <span class="camp__body">{% render 'lk-t', k: 'campaign_body' %}</span>
+      <span class="bracket bracket--light"><span>[</span> {% render 'lk-t', k: 'discover' %} <span>]</span></span>
+    </span>
+  </a>
+</section>
+
+{% schema %}
+{
+  "name": "LK campaign",
+  "settings": [
+    { "type": "text", "id": "number", "label": "Number", "default": "02" },
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Defaults to lk-campaign.jpg from Files." },
+    { "type": "text", "id": "title", "label": "Title", "info": "Blank = bilingual default (The masquerade / La mascarade)." },
+    { "type": "url", "id": "link", "label": "Link", "info": "Blank = New Drop collection." }
+  ],
+  "presets": [{ "name": "LK campaign" }]
+}
+{% endschema %}

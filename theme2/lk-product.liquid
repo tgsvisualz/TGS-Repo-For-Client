@@ -1,0 +1,112 @@
+{%- liquid
+  assign current = product.selected_or_first_available_variant
+  assign size_opt = product.options_with_values | first
+  assign single = product.has_only_default_variant
+  assign coll = nil
+  for c in product.collections
+    unless c.handle == 'new-drop' or c.handle == 'best-sellers' or c.handle == 'sale' or c.handle == 'frontpage' or c.handle == 'archive'
+      assign coll = c
+      break
+    endunless
+  endfor
+  assign info_page = section.settings.info_page
+  if info_page == blank
+    assign info_page = pages['shipping-returns']
+  endif
+-%}
+<div class="pdp wrap">
+  <nav class="pdp__crumbs mono" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}">{% render 'lk-t', k: 'home' %}</a> /
+    {%- if coll %} <a href="{{ coll.url }}">{{ coll.title }}</a> /{% endif %}
+    <span aria-current="page">{{ product.title }}</span>
+  </nav>
+
+  <div class="pdp__gallery" data-gallery>
+    {%- for media in product.media -%}
+      {%- if media.media_type == 'image' -%}
+        {%- if forloop.first -%}{%- assign ld = 'eager' -%}{%- else -%}{%- assign ld = 'lazy' -%}{%- endif -%}
+        {%- assign alt = media.alt | default: product.title -%}
+        <figure class="pdp__fig">{{ media.preview_image | image_url: width: 2400 | image_tag: loading: ld, widths: '600,900,1200,1600,2000,2400', sizes: '(min-width: 990px) 55vw, 100vw', alt: alt, class: 'pdp__img' }}</figure>
+      {%- endif -%}
+    {%- else -%}
+      <figure class="pdp__fig">{{ 'product-apparel-1' | placeholder_svg_tag: 'pdp__img card__img--ph' }}</figure>
+    {%- endfor -%}
+  </div>
+
+  <div class="pdp__info">
+    <div class="pdp__sticky">
+      <p class="mono pdp__type">({% render 'lk-type', t: product.type %}){% if product.tags contains 'new-drop' %} ({% render 'lk-t', k: 'new' %}){% endif %}</p>
+      <h1 class="pdp__title">{{ product.title }}</h1>
+      {%- if product.tags contains 'best-seller' -%}<p class="mono pdp__best">★ {% render 'lk-t', k: 'best_seller' %}</p>{%- endif -%}
+      <p class="pdp__price">{% render 'lk-price', product: product, variant: current %}</p>
+
+      {%- form 'product', product, class: 'pdp__form', data-product-form: '', novalidate: 'novalidate' -%}
+        <input type="hidden" name="id" value="{{ current.id }}" data-variant-id>
+        <script type="application/json" data-variants>[{%- for v in product.variants -%}{"id":{{ v.id }},"option1":{{ v.option1 | json }},"available":{{ v.available | json }},"qty":{% if v.inventory_management == 'shopify' and v.inventory_policy == 'deny' %}{{ v.inventory_quantity | json }}{% else %}null{% endif %},"price":{{ v.price | money | json }},"compare":{% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | json }}{% else %}null{% endif %}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
+        {%- unless single -%}
+          <fieldset class="sizes">
+            <legend class="mono">{% render 'lk-t', k: 'size' %} <span class="sizes__stock" data-stock></span></legend>
+            <div class="sizes__row">
+              {%- for value in size_opt.values -%}
+                {%- assign v = product.variants | where: 'option1', value | first -%}
+                <input type="radio" class="visually-hidden" id="sz-{{ section.id }}-{{ forloop.index }}" name="lk-size" value="{{ value | escape }}"{% if v.id == current.id %} checked{% endif %}{% unless v.available %} data-out{% endunless %}>
+                <label class="pill pill--lg{% unless v.available %} pill--out{% endunless %}" for="sz-{{ section.id }}-{{ forloop.index }}">({{ value }})</label>
+              {%- endfor -%}
+            </div>
+          </fieldset>
+        {%- endunless -%}
+        <button class="btn btn--ink btn--block" type="submit" name="add" data-atc data-label="[ {% render 'lk-t', k: 'add_to_bag' %} ]"{% unless current.available %} disabled{% endunless %}>
+          {%- if current.available -%}[ {% render 'lk-t', k: 'add_to_bag' %} ]{%- else -%}[ {% render 'lk-t', k: 'sold_out' %} ]{%- endif -%}
+        </button>
+        <p class="mono pdp__err" data-form-error role="alert" hidden></p>
+        {{ form | payment_terms }}
+      {%- endform -%}
+
+      <div class="acc">
+        <details open>
+          <summary class="mono">{% render 'lk-t', k: 'details' %} <span aria-hidden="true">+</span></summary>
+          <div class="acc__body rte">{{ product.description }}</div>
+        </details>
+        <details>
+          <summary class="mono">{% render 'lk-t', k: 'shipping_returns' %} <span aria-hidden="true">+</span></summary>
+          <div class="acc__body rte">
+            {%- if info_page -%}{{ info_page.content | strip_html | truncatewords: 60 }} <a href="{{ info_page.url }}">→</a>{%- endif -%}
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dock" data-dock aria-hidden="true">
+  <div class="dock__info">
+    <span class="dock__name">{{ product.title }}</span>
+    <span class="dock__meta mono"><span data-dock-price>{{ current.price | money }}</span>{%- unless single -%}<span>{% render 'lk-t', k: 'size' %} <span data-dock-size>{{ current.option1 }}</span></span><button type="button" data-dock-change>{% render 'lk-t', k: 'change' %}</button>{%- endunless -%}</span>
+  </div>
+  <button type="button" class="btn btn--ink dock__btn" data-dock-btn tabindex="-1">[ {% render 'lk-t', k: 'add_to_bag' %} ]</button>
+</div>
+
+{%- if coll and coll.products_count > 1 -%}
+  <section class="sec" aria-labelledby="more-{{ section.id }}">
+    {%- assign hid = 'more-' | append: section.id -%}
+    {% render 'lk-shead', k: 'you_may_like', tag: coll.title, url: coll.url, id: hid %}
+    <div class="rail" data-rail data-cursor-label="[ {% render 'lk-t', k: 'drag' %} ]">
+      <ul class="rail__list" role="list">
+        {%- for p in coll.products limit: 9 -%}
+          {%- if p.id != product.id -%}
+            <li class="rail__item">{% render 'lk-card', product: p, sizes: '(min-width: 990px) 28vw, 78vw', loading: 'lazy' %}</li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "LK product",
+  "settings": [
+    { "type": "page", "id": "info_page", "label": "Shipping & returns page", "info": "Blank = the page with handle shipping-returns." }
+  ]
+}
+{% endschema %}

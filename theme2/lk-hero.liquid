@@ -1,0 +1,51 @@
+{%- liquid
+  assign img = section.settings.image
+  if img == blank
+    assign img = images['lk-hero.jpg']
+  endif
+  assign link = section.settings.link
+  if link == blank
+    assign link = routes.collections_url | append: '/new-drop'
+  endif
+-%}
+<section class="hero" aria-labelledby="hero-h-{{ section.id }}">
+  <div class="hero__media" data-hero>
+    {%- if img -%}
+      {%- assign alt = img.alt | default: '' -%}
+      <div class="hero__half hero__half--color">
+        {{ img | image_url: width: 3840 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '750,1100,1500,1920,2400,3000,3840', sizes: '100vw', alt: alt, class: 'hero__img' }}
+      </div>
+      <div class="hero__half hero__half--mono" aria-hidden="true">
+        <div class="hero__clip">
+          {{ img | image_url: width: 3840 | image_tag: loading: 'eager', widths: '750,1100,1500,1920,2400,3000,3840', sizes: '100vw', alt: '', class: 'hero__img' }}
+        </div>
+      </div>
+    {%- else -%}
+      <div class="hero__half hero__half--color hero__ph"></div>
+    {%- endif -%}
+  </div>
+
+  <div class="hero__ui wrap">
+    <p class="mono hero__tag">{% if section.settings.tag != blank %}{{ section.settings.tag }}{% else %}{% render 'lk-t', k: 'hero_tag' %}{% endif %}</p>
+    <p class="mono hero__side">{% render 'lk-t', k: 'hero_side' %}</p>
+    <h1 class="hero__h" id="hero-h-{{ section.id }}">
+      <span class="hero__l">{% if section.settings.title_left != blank %}{{ section.settings.title_left }}{% else %}{% render 'lk-t', k: 'hero_l' %}{% endif %}</span>
+      <span class="hero__r">{% if section.settings.title_right != blank %}{{ section.settings.title_right }}{% else %}{% render 'lk-t', k: 'hero_r' %}{% endif %}</span>
+    </h1>
+    <a class="bracket hero__cta" href="{{ link }}"><span>[</span> {% render 'lk-t', k: 'hero_cta' %} <span>]</span></a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "LK hero (split)",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Landscape works best. Left half shows in colour, right half in black and white. Defaults to lk-hero.jpg from Files." },
+    { "type": "text", "id": "tag", "label": "Tag", "info": "Leave blank to use the bilingual default." },
+    { "type": "text", "id": "title_left", "label": "Headline, left", "info": "Leave blank for the bilingual default (Masked / Masquée)." },
+    { "type": "text", "id": "title_right", "label": "Headline, right", "info": "Leave blank for the bilingual default (Not hidden / Pas cachée)." },
+    { "type": "url", "id": "link", "label": "Button link", "info": "Blank = New Drop collection." }
+  ],
+  "presets": [{ "name": "LK hero (split)" }]
+}
+{% endschema %}
