@@ -15,7 +15,8 @@
       </span>
       <select name="country_code" data-lk-autosubmit aria-label="{% render 'lk-t', k: 'region' %}">
         {%- comment -%} Main markets first (Canada, United States), then every other country A-Z {%- endcomment -%}
-        {%- for code in 'CA,US' | split: ',' -%}
+        {%- assign lk_main = 'CA,US' | split: ',' -%}
+        {%- for code in lk_main -%}
           {%- for c in localization.available_countries -%}
             {%- if c.iso_code == code -%}<option value="{{ c.iso_code }}"{% if c.iso_code == localization.country.iso_code %} selected{% endif %}>{{ c.name }} — {{ c.currency.iso_code }} {{ c.currency.symbol }}</option>{%- endif -%}
           {%- endfor -%}
