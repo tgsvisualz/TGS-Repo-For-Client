@@ -1,0 +1,154 @@
+/* Languages, currencies, right-to-left, shoppable campaign grids, phone polish */
+
+/* Language + currency pickers: a mono label with a native select laid over it (opens the system picker, easiest on phones) */
+.lk-lang{display:inline-flex;align-items:center;gap:.45em}
+.lk-lang__main,.lk-lang__more,.lk-cur{display:inline-flex;align-items:center;gap:.45em;margin:0}
+.lk-pick{position:relative;display:inline-flex;align-items:center}
+.lk-pick__face{display:inline-flex;align-items:center;gap:.45em;font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;opacity:.45;transition:opacity .2s}
+.lk-pick.is-on .lk-pick__face,.lk-pick:hover .lk-pick__face,.lk-pick:focus-within .lk-pick__face{opacity:1}
+.lk-pick select{position:absolute;inset:-8px -6px;width:calc(100% + 12px);height:calc(100% + 16px);opacity:0;cursor:pointer;font-size:16px;-webkit-appearance:none;appearance:none;border:0}
+.lk-pick:focus-within{outline:1px solid var(--crimson);outline-offset:4px}
+.hdr__loc{display:inline-flex;align-items:center;gap:clamp(14px,1.8vw,26px)}
+.menu__loc{display:flex;align-items:center;gap:18px}
+.ftr__h--2{margin-top:22px}
+.ftr__col .lk-pick__face{font-size:12px}
+/* "More languages": plain sans in sentence case (the mono caps were hard to read, and other scripts have no mono) */
+.lk-pick--lang .lk-pick__face{font:500 13px/1.2 var(--sans);text-transform:none;letter-spacing:0;opacity:.8}
+.lk-pick--lang.is-on .lk-pick__face{opacity:1}
+/* Open lists (language and currency): dark text on white, never the page's light text colour */
+.lk-pick select{color-scheme:light;color:#0b0b0b;background:#fff}
+.lk-pick option{color:#0b0b0b;background:#fff;font:400 15px/1.4 var(--sans);text-transform:none;letter-spacing:0}
+.lk-pick option:checked{color:#fff;background:#b3121b}
+.lk-pick__short{display:none}
+@media (max-width:1180px){.hdr__loc .lk-pick__long{display:none}.hdr__loc .lk-pick__short{display:inline}}
+.ftr__col .lk-pick--lang .lk-pick__face,.menu__loc .lk-pick--lang .lk-pick__face{font-size:14px}
+
+/* Scripts: Bodoni/Inter/Plex keep the Latin letters, a matching Noto (or Playfair for Cyrillic) carries the rest */
+html[lang=ru]{--serif:'Bodoni Moda','Playfair Display',Georgia,serif}
+html[lang=zh-CN]{--serif:'Bodoni Moda','Noto Serif SC',serif;--sans:'Inter','Noto Sans SC',sans-serif;--mono:'IBM Plex Mono','Noto Sans SC',monospace}
+html[lang=hi]{--serif:'Bodoni Moda','Noto Serif Devanagari',serif;--sans:'Inter','Noto Sans Devanagari',sans-serif;--mono:'IBM Plex Mono','Noto Sans Devanagari',monospace}
+html[lang=bn]{--serif:'Bodoni Moda','Noto Serif Bengali',serif;--sans:'Inter','Noto Sans Bengali',sans-serif;--mono:'IBM Plex Mono','Noto Sans Bengali',monospace}
+html[lang=ar],html[lang=ur]{--serif:'Bodoni Moda','Noto Naskh Arabic',serif;--sans:'Inter','Noto Sans Arabic',sans-serif;--mono:'IBM Plex Mono','Noto Sans Arabic',monospace}
+/* Joined and stacked scripts break apart with tracking: no letter-spacing, no faux uppercase, a little more line height */
+html:is([lang=ar],[lang=ur],[lang=hi],[lang=bn],[lang=zh-CN]) body *{letter-spacing:0!important}
+html:is([lang=ar],[lang=ur],[lang=hi],[lang=bn]) .mono{line-height:1.6}
+html:is([lang=ar],[lang=ur],[lang=hi],[lang=bn]) :is(.stmt__h,.dp__close,.dp__ct,.cc__name,.shead__h){line-height:1.35}
+html:is([lang=ar],[lang=ur]) :is(em,i){font-style:normal}
+
+/* Right-to-left (Arabic, Urdu): text and lists flip; the hero art, marquees and image crops keep their composition */
+html[dir=rtl] body{text-align:right}
+html[dir=rtl] :is(.hero__panels,.dp__hero,.pin__stick,.dp__band,.lk-cursor,.mcur){direction:ltr}
+html[dir=rtl] :is(.dp__sub,.dp__tl,.dp__tr,.pin__stick p){direction:rtl;unicode-bidi:isolate}
+html[dir=rtl] .dp__end,html[dir=rtl] .stmt{text-align:center}
+html[dir=rtl] input,html[dir=rtl] textarea{text-align:right}
+
+/* Campaign grid: price + quick add */
+.dp__cap{grid-template-columns:auto 1fr auto}
+.dp__cp{grid-column:3;grid-row:1;white-space:nowrap}
+.dp__cn{grid-column:2/-1}
+.dp__card--shop .dp__ct{transition:color .2s}
+.dp__card--shop .dp__card-in:hover .dp__ct{color:var(--crimson)}
+.dp__out{position:absolute;left:10px;top:10px;padding:6px 8px;background:var(--ink);color:var(--bone)}
+.dp__frame{position:relative}
+.dp__qa{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;padding-left:calc(2ch + 12px)}
+.dp__qlbl{font-size:10px;opacity:.55;margin-inline-end:4px}
+.dp__qa button{min-width:38px;min-height:34px;padding:8px 9px;border:1px solid currentColor;font:500 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;opacity:.8;transition:background .2s,color .2s,opacity .2s,border-color .2s}
+.dp__qa button:hover{opacity:1;background:var(--ink);color:var(--bone);border-color:var(--ink)}
+.dp:not(.dp--light) .dp__qa button:hover{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.dp__qa button:disabled{opacity:.25;text-decoration:line-through;cursor:not-allowed;background:none;color:inherit}
+.dp__qa button.is-busy{opacity:1;background:var(--crimson);border-color:var(--crimson);color:var(--bone)}
+.dp__qa--one button{padding-inline:14px}
+
+/* Phones */
+@media (max-width:749px){
+  .menu__loc{gap:14px}
+  .menu__loc .lk-pick__face,.menu__loc .lk-lang__opt{font-size:12px}
+  .menu__loc .lk-lang__opt{padding:12px 4px}
+  .dp__qa{padding-left:0;gap:5px}
+  .dp__qa button{flex:1 0 auto;min-height:40px;min-width:40px;padding:10px 6px}
+  .dp__qlbl{flex-basis:100%;margin-bottom:2px}
+  .dp__cap{grid-template-columns:auto 1fr;gap:3px 8px}
+  .dp__cp{grid-column:2;grid-row:auto}
+  .dp__ct{font-size:16px}
+}
+@media (hover:none){
+  .dp__qa button:hover{background:none;color:inherit;border-color:currentColor}
+}
+/* Scripts without an italic face: never fake-slant them */
+html:is([lang=ar],[lang=ur],[lang=hi],[lang=bn],[lang=zh-CN]){font-synthesis:none}
+.lk-cur .lk-pick__face{direction:ltr;unicode-bidi:isolate}
+
+/* Phone pass: bigger touch targets without moving anything, no clipped controls, shorter home catalogue */
+.cat__item.is-capped{display:none}
+.cat__more{display:flex;justify-content:center;margin-top:28px}
+.cat__more:has([hidden]){display:none}
+@media (max-width:749px){
+  .bracket,.pdp__crumbs a,.lk-lang__opt{position:relative}
+  .bracket::after,.pdp__crumbs a::after{content:"";position:absolute;inset:-15px -10px}
+  .lk-lang__opt{padding:12px 6px}
+  .lk-lang{flex-wrap:wrap;row-gap:0}
+  .ftr__col li{margin:0}
+  .ftr__col li a{display:inline-block;padding:7px 0}
+  .coll__nav .pill--lg,.cat__filters button{min-height:40px}
+  .srch__form{gap:12px}
+  .srch__form input{font-size:26px}
+  .srch__form button{flex:none;min-height:44px}
+  .news__h{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+  .news__k{vertical-align:baseline}
+  .news__form button{min-height:44px}
+  .pdp__gallery:has(> :only-child){grid-auto-columns:100%}
+  [data-dock-change]{padding:12px 4px}
+  .cc__code,.cc__no,.cc__type,.cc__stock,.tag,.dp__qlbl{font-size:11px}
+}
+
+/* Best-seller showcase: a horizontal slider (scroll-snap; arrows and drag on desktop, swipe on phones) */
+.show{padding-inline:0;overflow:hidden}
+.show__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:20px;margin:0 var(--g) clamp(40px,6vw,90px)}
+.show__h{max-width:15ch}
+.show__nav{justify-self:end;display:flex;align-items:center;gap:10px}
+.show__btn{display:grid;place-items:center;width:52px;height:52px;border:1px solid currentColor;border-radius:50%;transition:background .2s,color .2s,opacity .2s}
+.show__btn:hover:not(:disabled){background:var(--ink);color:var(--bone)}
+.show__btn:disabled{opacity:.25;cursor:default}
+html[dir=rtl] .show__btn svg{transform:scaleX(-1)}
+.show__track{display:grid;grid-auto-flow:column;grid-auto-columns:clamp(260px,28vw,460px);column-gap:clamp(16px,2vw,32px);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--g);padding:0 var(--g) 6px;scrollbar-width:none;cursor:grab;-webkit-user-select:none;user-select:none}
+.show__track::-webkit-scrollbar{display:none}
+.show__track.is-drag{scroll-snap-type:none;cursor:grabbing}
+.show__track.is-drag a{pointer-events:none}
+.show__track:focus-visible{outline:1px solid var(--crimson);outline-offset:6px}
+.show__item{scroll-snap-align:start}
+.show__media{position:relative;display:block;aspect-ratio:3/4;overflow:hidden;background:var(--bone-2)}
+.show__media img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease-out);-webkit-user-drag:none}
+.show__item:hover .show__media img{transform:scale(1.04)}
+.show__no{position:absolute;left:12px;top:10px;color:#fff;mix-blend-mode:difference;font-size:11px}
+.show__bar{position:relative;height:1px;margin:clamp(30px,4vw,50px) var(--g) 0;background:color-mix(in srgb,currentColor 18%,transparent);overflow:hidden}
+.show__bar span{position:absolute;inset-block:0;inset-inline-start:0;width:30%;background:currentColor;transition:transform .2s linear}
+@media (max-width:749px){
+  .show__head{grid-template-columns:1fr auto;grid-template-areas:"no nav" "h h"}
+  .show__head>p{grid-area:no}.show__h{grid-area:h;text-align:start;max-width:none}.show__nav{grid-area:nav}
+  .show__nav .bracket{display:none}
+  .show__btn{width:44px;height:44px}
+  .show__track{grid-auto-columns:76vw;column-gap:14px}
+}
+
+/* "Fashion that doesn't wait": three words in one line on desktop, stacked on phones; the outer words drift apart, the middle stays */
+.pin__word{font-size:clamp(40px,7.2vw,150px);gap:.24em}
+.pin__w--1{transform:translateX(calc(var(--a) * -5vw))}
+.pin__w--2{transform:translateY(calc(var(--a) * 3vh));opacity:1}
+.pin__w--3{transform:translateX(calc(var(--a) * 5vw))}
+html[dir=rtl] .pin__word{flex-direction:row-reverse}
+@media (max-width:749px){
+  .pin__word{flex-direction:column;align-items:center;gap:0;font-size:14vw;line-height:.95}
+  html[dir=rtl] .pin__word{flex-direction:column}
+  .pin__w--1{transform:translateX(calc(var(--a) * -4vw))}
+  .pin__w--3{transform:translateX(calc(var(--a) * 4vw))}
+}
+html[dir=rtl] .pin__w--1{transform:translateX(calc(var(--a) * 5vw))}
+html[dir=rtl] .pin__w--3{transform:translateX(calc(var(--a) * -5vw))}
+@media (max-width:749px){.pin__w--2{transform:none}html[dir=rtl] .pin__w--1{transform:translateX(calc(var(--a) * 4vw))}html[dir=rtl] .pin__w--3{transform:translateX(calc(var(--a) * -4vw))}}
+.hero__line{max-width:32ch}
+
+/* Smooth in-page jumps (Index link); off for reduced motion */
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+
+/* EN / FR are links now: keep the tap area of the old buttons */
+.lk-lang__opt{display:inline-block;color:inherit;text-decoration:none}

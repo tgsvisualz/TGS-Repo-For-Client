@@ -1,0 +1,58 @@
+{%- comment -%}
+  Language switch. EN and FR are the main languages and show as buttons; every other published language sits in a native "More languages" picker (easy on phones).
+  Param: compact (true in the header: the picker reads "+8" instead of "More languages").
+{%- endcomment -%}
+{%- if localization.available_languages.size > 1 -%}
+  {%- assign cur = localization.language.iso_code -%}
+  {%- assign main = false -%}
+  {%- if cur == 'en' or cur == 'fr' -%}{%- assign main = true -%}{%- endif -%}
+  {%- assign extra = localization.available_languages.size | minus: 2 -%}
+  <div class="lk-lang" data-lk-lang>
+    {%- liquid
+      assign here = request.path
+      assign pre = request.locale.root_url
+      if pre != '/'
+        assign here = here | remove_first: pre
+      endif
+      if here == blank
+        assign here = '/'
+      endif
+    -%}
+    <div class="lk-lang__main">
+      {%- for l in localization.available_languages -%}
+        {%- if l.iso_code == 'en' or l.iso_code == 'fr' -%}
+          {%- liquid
+            assign href = here
+            if l.root_url != '/'
+              if here == '/'
+                assign href = l.root_url
+              else
+                assign href = l.root_url | append: here
+              endif
+            endif
+          -%}
+          <a href="{{ href }}" hreflang="{{ l.iso_code }}" lang="{{ l.iso_code }}" data-lk-langlink class="lk-lang__opt{% if l.iso_code == cur %} is-on{% endif %}"{% if l.iso_code == cur %} aria-current="true"{% endif %} title="{{ l.endonym_name | capitalize }}">{{ l.iso_code | upcase }}</a>
+          <span class="lk-lang__sep" aria-hidden="true">/</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    {%- if extra > 0 -%}
+      {%- form 'localization', class: 'lk-lang__more' -%}
+        <span class="lk-pick lk-pick--lang{% unless main %} is-on{% endunless %}">
+          <span class="lk-pick__face" aria-hidden="true">
+            {%- if main -%}{% if compact %}<span class="lk-pick__long">{% render 'lk-t', k: 'lang_more' %}</span><span class="lk-pick__short">+{{ extra }}</span>{% else %}{% render 'lk-t', k: 'lang_more' %}{% endif %}{%- else -%}{% render 'lk-lname', t: cur %}{%- endif -%}
+            <svg width="8" height="5" viewBox="0 0 8 5" aria-hidden="true"><path d="M.5.5 4 4 7.5.5" fill="none" stroke="currentColor"/></svg>
+          </span>
+          <select name="locale_code" data-lk-autosubmit aria-label="{% render 'lk-t', k: 'lang_more' %}">
+            {%- if main -%}<option value="" selected disabled hidden>{% render 'lk-t', k: 'lang_more' %}</option>{%- endif -%}
+            {%- for l in localization.available_languages -%}
+              {%- unless l.iso_code == 'en' or l.iso_code == 'fr' -%}
+                <option value="{{ l.iso_code }}"{% if l.iso_code == cur %} selected{% endif %}>{% render 'lk-lname', t: l.iso_code %}</option>
+              {%- endunless -%}
+            {%- endfor -%}
+          </select>
+        </span>
+      {%- endform -%}
+    {%- endif -%}
+  </div>
+{%- endif -%}

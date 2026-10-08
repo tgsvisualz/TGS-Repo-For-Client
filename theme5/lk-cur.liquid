@@ -1,0 +1,32 @@
+{%- comment -%}
+  Region and currency picker. Shows the current currency (e.g. "USD $"); a native picker lists every country the store sells to with its currency.
+  On a first visit lk-i18n.js picks the visitor's country automatically. Param: full (true shows the country name as well).
+  Changing country also sends locale_code: lk-i18n.js keeps the current language if it suits that country, otherwise switches to the country's main language (e.g. France -> French, Brazil -> Portuguese).
+{%- endcomment -%}
+{%- if localization.available_countries.size > 1 -%}
+  {%- capture lk_locs -%}{%- for l in localization.available_languages -%}{{ l.iso_code }}{% unless forloop.last %},{% endunless %}{%- endfor -%}{%- endcapture -%}
+  {%- assign lk_primary = 'en' -%}{%- for l in localization.available_languages -%}{%- if l.primary -%}{%- assign lk_primary = l.iso_code -%}{%- endif -%}{%- endfor -%}
+  {%- form 'localization', class: 'lk-cur', data-lk-cur: '', data-locales: lk_locs, data-primary: lk_primary -%}
+    <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}" data-lk-locale>
+    <span class="lk-pick is-on">
+      <span class="lk-pick__face" aria-hidden="true">
+        {%- if full -%}{{ localization.country.name }} · {% endif -%}{{ localization.country.currency.iso_code }} {{ localization.country.currency.symbol }}
+        <svg width="8" height="5" viewBox="0 0 8 5" aria-hidden="true"><path d="M.5.5 4 4 7.5.5" fill="none" stroke="currentColor"/></svg>
+      </span>
+      <select name="country_code" data-lk-autosubmit aria-label="{% render 'lk-t', k: 'region' %}">
+        {%- comment -%} Main markets first (Canada, United States), then every other country A-Z {%- endcomment -%}
+        {%- for code in 'CA,US' | split: ',' -%}
+          {%- for c in localization.available_countries -%}
+            {%- if c.iso_code == code -%}<option value="{{ c.iso_code }}"{% if c.iso_code == localization.country.iso_code %} selected{% endif %}>{{ c.name }} — {{ c.currency.iso_code }} {{ c.currency.symbol }}</option>{%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+        <option disabled>──────────</option>
+        {%- for c in localization.available_countries -%}
+          {%- unless c.iso_code == 'CA' or c.iso_code == 'US' -%}
+          <option value="{{ c.iso_code }}"{% if c.iso_code == localization.country.iso_code %} selected{% endif %}>{{ c.name }} — {{ c.currency.iso_code }} {{ c.currency.symbol }}</option>
+          {%- endunless -%}
+        {%- endfor -%}
+      </select>
+    </span>
+  {%- endform -%}
+{%- endif -%}

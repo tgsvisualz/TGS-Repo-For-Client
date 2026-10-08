@@ -1,0 +1,46 @@
+{%- comment -%} LK Fashion campaign-page strings. Usage: {% render 'lk-t2', k: 'dp_lede' %}. EN/FR below; other languages in lk-t2-<code>. {%- endcomment -%}
+{%- case request.locale.iso_code -%}
+{%- when 'es' -%}{%- render 'lk-t2-es', k: k -%}
+{%- when 'pt-BR' -%}{%- render 'lk-t2-pt', k: k -%}
+{%- when 'zh-CN' -%}{%- render 'lk-t2-zh', k: k -%}
+{%- when 'hi' -%}{%- render 'lk-t2-hi', k: k -%}
+{%- when 'ar' -%}{%- render 'lk-t2-ar', k: k -%}
+{%- when 'bn' -%}{%- render 'lk-t2-bn', k: k -%}
+{%- when 'ru' -%}{%- render 'lk-t2-ru', k: k -%}
+{%- when 'ur' -%}{%- render 'lk-t2-ur', k: k -%}
+{%- else -%}
+{%- if request.locale.iso_code == 'fr' -%}{%- assign fr = true -%}{%- else -%}{%- assign fr = false -%}{%- endif -%}
+{%- case k -%}
+{%- when 'dp_kicker' -%}{% if fr %}(Campagne — Drop 02){% else %}(Campaign — Drop 02){% endif -%}
+{%- when 'dp_sub' -%}{% if fr %}Montre ton sourire{% else %}Show Your Smile{% endif -%}
+{%- when 'dp_s1' -%}{% if fr %}01{% else %}01{% endif -%}
+{%- when 'dp_s2' -%}{% if fr %}Le code{% else %}The code{% endif -%}
+{%- when 'dp_s3' -%}{% if fr %}Le look{% else %}The look{% endif -%}
+{%- when 'dp_lede' -%}{% if fr %}Le masque garde le secret. Le <em>sourire</em> le trahit.{% else %}The mask keeps the secret. The <em>smile</em> gives it away.{% endif -%}
+{%- when 'dp_body' -%}{% if fr %}S.Y.S., c'est le drop où le masque reste, mais la garde tombe. Laine orange brûlé, dentelle noire et un vrai sourire : un manteau fait pour être vu de l'autre bout de la rue, et un sourire qu'on n'oublie pas.{% else %}S.Y.S. is the drop where the mask stays on and the guard comes down. Burnt-orange wool, black lace and a real smile: a coat made to be seen from across the street, and a grin you can't unsee.{% endif -%}
+{%- when 'dp_cap1' -%}{% if fr %}Un vrai sourire, dentelle noire.{% else %}A real smile, black lace.{% endif -%}
+{%- when 'dp_cap2' -%}{% if fr %}Laine orange, col relevé.{% else %}Orange wool, collar up.{% endif -%}
+{%- when 'dp_cap3' -%}{% if fr %}Cheveux au vent, garde baissée.{% else %}Hair down, guard down.{% endif -%}
+{%- when 'dp_hint' -%}{% if fr %}Survolez et attendez pour voir dessous{% else %}Hover and hold to look beneath{% endif -%}
+{%- when 'dp_tap' -%}{% if fr %}Touchez pour voir dessous{% else %}Tap to look beneath{% endif -%}
+{%- when 'dp_grid' -%}{% if fr %}Les coloris{% else %}The colourways{% endif -%}
+{%- when 'dp_gridsub' -%}{% if fr %}Un manteau, six humeurs. Même coupe, même col, une femme différente chaque fois.{% else %}One coat, six moods. Same cut, same collar, a different woman every time.{% endif -%}
+{%- when 'btr_kicker' -%}{% if fr %}(Campagne — Drop 03){% else %}(Campaign — Drop 03){% endif -%}
+{%- when 'btr_sub' -%}{% if fr %}Du sac à la richesse{% else %}Bags To Riches{% endif -%}
+{%- when 'btr_lede' -%}{% if fr %}Tout commence par le sac. Le reste <em>suit</em>.{% else %}Start with the bag. The rest <em>follows</em>.{% endif -%}
+{%- when 'btr_body' -%}{% if fr %}B.T.R., c'est un drop de cuir structuré, de suède souple et de quincaillerie dorée. Cinq sacs, cinq looks. Pièces limitées, en ligne seulement.{% else %}B.T.R. is a drop of structured leather, soft suede and hard gold hardware. Five bags, five looks. Limited pieces, online only.{% endif -%}
+{%- when 'btr_cap3' -%}{% if fr %}Quincaillerie dorée, dentelle noire.{% else %}Gold hardware, black lace.{% endif -%}
+{%- when 'btr_end' -%}{% if fr %}Portez-le comme si l'endroit vous appartenait.{% else %}Carry it like you own the place.{% endif -%}
+{%- when 'btr_grid' -%}{% if fr %}Les sacs{% else %}The bags{% endif -%}
+{%- when 'btr_gridsub' -%}{% if fr %}Cinq formes, cinq femmes, une seule règle : tenir bon.{% else %}Five shapes, five women, one rule: hold on tight.{% endif -%}
+{%- when 'ldk_kicker' -%}{% if fr %}(Campagne — Drop 04){% else %}(Campaign — Drop 04){% endif -%}
+{%- when 'ldk_sub' -%}{% if fr %}Le look qui tue{% else %}Looks Do Kill{% endif -%}
+{%- when 'ldk_lede' -%}{% if fr %}Le denim, coupé <em>net</em>.{% else %}Denim, cut <em>sharp</em>.{% endif -%}
+{%- when 'ldk_body' -%}{% if fr %}L.D.K., c'est l'indigo brut, le noir délavé et une jambe large qui remplit l'embrasure. Coupes droites, jambes larges et rien à se faire pardonner.{% else %}L.D.K. is raw indigo, washed black and a wide leg that fills the doorway. Regular, wide bottoms and nothing to apologise for.{% endif -%}
+{%- when 'ldk_cap3' -%}{% if fr %}Indigo brut, jambe large.{% else %}Raw indigo, wide leg.{% endif -%}
+{%- when 'ldk_end' -%}{% if fr %}Habillez-vous pour tuer.{% else %}Dress to kill.{% endif -%}
+{%- when 'ldk_grid' -%}{% if fr %}Le denim{% else %}The denim{% endif -%}
+{%- when 'ldk_gridsub' -%}{% if fr %}Deux silhouettes, tous les délavages : jambe droite et jambe large.{% else %}Two silhouettes, every wash: straight and wide leg.{% endif -%}
+{%- when 'dp_end' -%}{% if fr %}Démasquez votre sourire.{% else %}Unmask your smile.{% endif -%}
+{%- else -%}{%- render 'lk-t', k: k -%}{%- endcase -%}
+{%- endcase -%}

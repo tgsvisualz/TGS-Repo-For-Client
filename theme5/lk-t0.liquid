@@ -1,0 +1,121 @@
+{%- comment -%} LK Fashion strings, EN + FR (Québec). Called through lk-t, which routes other languages to lk-tx-*. {%- endcomment -%}
+{%- if request.locale.iso_code == 'fr' -%}{%- assign fr = true -%}{%- else -%}{%- assign fr = false -%}{%- endif -%}
+{%- case k -%}
+{%- when 'loading' -%}{% if fr %}Chargement de la mascarade{% else %}Loading the masquerade{% endif -%}
+{%- when 'hero_hint' -%}{% if fr %}Survolez un visage{% else %}Hover a face{% endif -%}
+{%- when 'hero_tap' -%}{% if fr %}Touchez un visage{% else %}Tap a face{% endif -%}
+{%- when 'hero_line' -%}{% if fr %}Drops limités. En ligne seulement.{% else %}Limited drops. Online only.{% endif -%}
+{%- when 'statement' -%}{% if fr %}Un design européen fait main, offert <em>partout dans le monde</em>. Fait par des femmes, pour les femmes.{% else %}Hand-crafted European design, available <em>worldwide</em>. Made by women, for women.{% endif -%}
+{%- when 'statement_sub' -%}{% if fr %}Chaque pièce est produite en petite quantité et lancée en drops. Mode haut de gamme, aucun réassort.{% else %}Every piece is made in small numbers and released in drops. High fashion, no restocks.{% endif -%}
+{%- when 'w1' -%}{% if fr %}La mode{% else %}Fashion{% endif -%}
+{%- when 'w2' -%}{% if fr %}qui n'attend{% else %}that doesn't{% endif -%}
+{%- when 'w3' -%}{% if fr %}pas{% else %}wait{% endif -%}
+{%- when 'drop_tag' -%}{% if fr %}(Drop 01 — en ligne){% else %}(Drop 01 — live now){% endif -%}
+{%- when 's_index' -%}{% if fr %}Index{% else %}Index{% endif -%}
+{%- when 'index_sub' -%}{% if fr %}Le catalogue complet : chaque pièce, chaque taille, ce qu'il en reste.{% else %}The full catalogue: every piece, every size, what's left.{% endif -%}
+{%- when 'grid' -%}{% if fr %}Grille{% else %}Grid{% endif -%}
+{%- when 'list' -%}{% if fr %}Liste{% else %}List{% endif -%}
+{%- when 'view_as' -%}{% if fr %}Affichage{% else %}View as{% endif -%}
+{%- when 'quick_add' -%}{% if fr %}Ajout rapide{% else %}Quick add{% endif -%}
+{%- when 'low_stock' -%}{% if fr %}Presque épuisé{% else %}Almost gone{% endif -%}
+{%- when 'shop_all' -%}{% if fr %}Tout magasiner{% else %}Shop all{% endif -%}
+{%- when 'added' -%}{% if fr %}Ajouté{% else %}Added{% endif -%}
+{%- when 'change' -%}{% if fr %}Changer{% else %}Change{% endif -%}
+{%- when 'col_no' -%}{% if fr %}No{% else %}No.{% endif -%}
+{%- when 'col_piece' -%}{% if fr %}Pièce{% else %}Piece{% endif -%}
+{%- when 'col_type' -%}{% if fr %}Type{% else %}Type{% endif -%}
+{%- when 'col_price' -%}{% if fr %}Prix{% else %}Price{% endif -%}
+{%- when 'col_stock' -%}{% if fr %}Stock{% else %}Stock{% endif -%}
+{%- when 's_salon' -%}{% if fr %}Le salon{% else %}The salon{% endif -%}
+{%- when 'salon_title' -%}{% if fr %}Vos secrets <em>les mieux gardés</em>, à porter{% else %}Your best-kept <em>secrets</em>, yours to wear{% endif -%}
+{%- when 'view' -%}{% if fr %}Voir{% else %}View{% endif -%}
+{%- when 'scroll' -%}{% if fr %}Défiler{% else %}Scroll{% endif -%}
+{%- when 'the_list' -%}{% if fr %}La liste{% else %}The list{% endif -%}
+{%- when 'menu' -%}{% if fr %}Menu{% else %}Menu{% endif -%}
+{%- when 'shop' -%}{% if fr %}Boutique{% else %}Shop{% endif -%}
+{%- when 'close' -%}{% if fr %}Fermer{% else %}Close{% endif -%}
+{%- when 'search' -%}{% if fr %}Recherche{% else %}Search{% endif -%}
+{%- when 'bag' -%}{% if fr %}Panier{% else %}Bag{% endif -%}
+{%- when 'announce' -%}{% if fr %}Drops limités ✶ En ligne seulement ✶ Toujours masquées ✶ Nouveau drop en ligne{% else %}Limited drops ✶ Online only ✶ Masked, always ✶ New drop live now{% endif -%}
+{%- when 'see_collection' -%}{% if fr %}Voir la collection{% else %}See collection{% endif -%}
+{%- when 'view_all' -%}{% if fr %}Tout voir{% else %}View all{% endif -%}
+{%- when 'drag' -%}{% if fr %}Glisser{% else %}Drag{% endif -%}
+{%- when 'best_seller' -%}{% if fr %}Best-seller{% else %}Best seller{% endif -%}
+{%- when 'new' -%}{% if fr %}Nouveau{% else %}New{% endif -%}
+{%- when 'sale' -%}{% if fr %}Solde{% else %}Sale{% endif -%}
+{%- when 'sold_out' -%}{% if fr %}Épuisé{% else %}Sold out{% endif -%}
+{%- when 'add_to_bag' -%}{% if fr %}Ajouter au panier{% else %}Add to bag{% endif -%}
+{%- when 'adding' -%}{% if fr %}Ajout…{% else %}Adding…{% endif -%}
+{%- when 'size' -%}{% if fr %}Taille{% else %}Size{% endif -%}
+{%- when 'details' -%}{% if fr %}Détails{% else %}Details{% endif -%}
+{%- when 'shipping_returns' -%}{% if fr %}Livraison et retours{% else %}Shipping & returns{% endif -%}
+{%- when 'you_may_like' -%}{% if fr %}Vous aimerez aussi{% else %}You may also like{% endif -%}
+{%- when 'pieces' -%}{% if fr %}Pièces{% else %}Pieces{% endif -%}
+{%- when 'sort' -%}{% if fr %}Trier{% else %}Sort{% endif -%}
+{%- when 'all' -%}{% if fr %}Tout{% else %}All{% endif -%}
+{%- when 'subtotal' -%}{% if fr %}Sous-total{% else %}Subtotal{% endif -%}
+{%- when 'checkout' -%}{% if fr %}Payer{% else %}Checkout{% endif -%}
+{%- when 'bag_empty' -%}{% if fr %}Votre panier est vide{% else %}Your bag is empty{% endif -%}
+{%- when 'continue' -%}{% if fr %}Continuer à magasiner{% else %}Continue shopping{% endif -%}
+{%- when 'remove' -%}{% if fr %}Retirer{% else %}Remove{% endif -%}
+{%- when 'view_bag' -%}{% if fr %}Voir le panier{% else %}View bag{% endif -%}
+{%- when 'shipping_note' -%}{% if fr %}Livraison et taxes calculées au paiement.{% else %}Shipping and taxes calculated at checkout.{% endif -%}
+{%- when 'subscribe' -%}{% if fr %}Abonnez-vous{% else %}Subscribe{% endif -%}
+{%- when 'latest' -%}{% if fr %}(Derniers drops){% else %}(Latest drops){% endif -%}
+{%- when 'email' -%}{% if fr %}Courriel{% else %}Email{% endif -%}
+{%- when 'join' -%}{% if fr %}S'inscrire{% else %}Join{% endif -%}
+{%- when 'subscribed' -%}{% if fr %}Vous êtes sur la liste.{% else %}You're on the list.{% endif -%}
+{%- when 'newsletter_body' -%}{% if fr %}Accès en primeur à chaque drop. Jamais de pourriel.{% else %}First access to every drop. No spam, ever.{% endif -%}
+{%- when 'hero_l' -%}{% if fr %}Masquée{% else %}Masked{% endif -%}
+{%- when 'hero_r' -%}{% if fr %}Pas cachée{% else %}Not hidden{% endif -%}
+{%- when 'hero_cta' -%}{% if fr %}Magasiner le drop{% else %}Shop the drop{% endif -%}
+{%- when 'hero_tag' -%}{% if fr %}(Drop 01){% else %}(Drop 01){% endif -%}
+{%- when 'hero_side' -%}{% if fr %}Quantités limitées — en ligne seulement{% else %}Limited quantities — online only{% endif -%}
+{%- when 's_new' -%}{% if fr %}Nouveautés{% else %}New arrivals{% endif -%}
+{%- when 's_campaign' -%}{% if fr %}Campagne{% else %}Campaign{% endif -%}
+{%- when 's_categories' -%}{% if fr %}Catégories{% else %}Categories{% endif -%}
+{%- when 's_manifesto' -%}{% if fr %}Manifeste{% else %}Manifesto{% endif -%}
+{%- when 's_best' -%}{% if fr %}Meilleurs vendeurs{% else %}Best sellers{% endif -%}
+{%- when 'tag_new_drop' -%}{% if fr %}(Nouveau drop){% else %}(New drop){% endif -%}
+{%- when 'tag_best' -%}{% if fr %}(Les plus convoités){% else %}(Most wanted){% endif -%}
+{%- when 'campaign_title' -%}{% if fr %}La mascarade{% else %}The masquerade{% endif -%}
+{%- when 'campaign_tag' -%}{% if fr %}(Campagne 01){% else %}(Campaign 01){% endif -%}
+{%- when 'campaign_body' -%}{% if fr %}Trois femmes, trois masques, une seule règle : les vêtements parlent.{% else %}Three women, three masks, one rule: the clothes do the talking.{% endif -%}
+{%- when 'discover' -%}{% if fr %}Découvrir{% else %}Discover{% endif -%}
+{%- when 'm1_t' -%}{% if fr %}Transformation{% else %}Transformation{% endif -%}
+{%- when 'm1_k' -%}{% if fr %}(Espace){% else %}(Space){% endif -%}
+{%- when 'm1_b' -%}{% if fr %}S'habiller est un rituel. Satin, velours, dentelle et cuir, coupés pour changer votre façon d'entrer dans une pièce.{% else %}Getting dressed is a ritual. Satin, velvet, lace and leather, cut to change how you walk into a room.{% endif -%}
+{%- when 'm2_t' -%}{% if fr %}Liberté{% else %}Freedom{% endif -%}
+{%- when 'm2_k' -%}{% if fr %}(Créative){% else %}(Creative){% endif -%}
+{%- when 'm2_b' -%}{% if fr %}Glam un soir, grunge le lendemain. Mélangez les pièces : il n'y a pas de mauvaise façon de porter le drop.{% else %}Glam one night, grunge the next. Mix the pieces: there is no wrong way to wear the drop.{% endif -%}
+{%- when 'm3_t' -%}{% if fr %}Mystère{% else %}Secrecy{% endif -%}
+{%- when 'm3_k' -%}{% if fr %}(Masquée){% else %}(Masked){% endif -%}
+{%- when 'm3_b' -%}{% if fr %}Nos mannequins ne montrent jamais leur visage. Pas de noms, pas d'influence : seulement les vêtements et celle qui les portera.{% else %}Our models never show their faces. No names, no influence: just the clothes and the woman who wears them next.{% endif -%}
+{%- when 'footer_info' -%}{% if fr %}Info{% else %}Info{% endif -%}
+{%- when 'footer_follow' -%}{% if fr %}Suivre{% else %}Follow{% endif -%}
+{%- when 'rights' -%}{% if fr %}Tous droits réservés.{% else %}All rights reserved.{% endif -%}
+{%- when 'language' -%}{% if fr %}Langue{% else %}Language{% endif -%}
+{%- when 'search_placeholder' -%}{% if fr %}Rechercher dans le drop{% else %}Search the drop{% endif -%}
+{%- when 'results' -%}{% if fr %}Résultats{% else %}Results{% endif -%}
+{%- when 'no_results' -%}{% if fr %}Aucun résultat. Essayez un autre mot.{% else %}Nothing found. Try another word.{% endif -%}
+{%- when 'not_found' -%}{% if fr %}Perdue dans la mascarade{% else %}Lost in the masquerade{% endif -%}
+{%- when 'back_home' -%}{% if fr %}Retour à l'accueil{% else %}Back home{% endif -%}
+{%- when 'name' -%}{% if fr %}Nom{% else %}Name{% endif -%}
+{%- when 'message' -%}{% if fr %}Message{% else %}Message{% endif -%}
+{%- when 'send' -%}{% if fr %}Envoyer{% else %}Send{% endif -%}
+{%- when 'sent' -%}{% if fr %}Message envoyé. Nous vous répondrons bientôt.{% else %}Message sent. We'll answer soon.{% endif -%}
+{%- when 'left' -%}{% if fr %}restant(s){% else %}left{% endif -%}
+{%- when 'prev' -%}{% if fr %}Préc.{% else %}Prev{% endif -%}
+{%- when 'next' -%}{% if fr %}Suiv.{% else %}Next{% endif -%}
+{%- when 'home' -%}{% if fr %}Accueil{% else %}Home{% endif -%}
+{%- when 'sample' -%}{% if fr %}Échantillon{% else %}Sample{% endif -%}
+{%- when 'featured' -%}{% if fr %}Nouveautés{% else %}Newest{% endif -%}
+{%- when 'price_asc' -%}{% if fr %}Prix croissant{% else %}Price, low to high{% endif -%}
+{%- when 'price_desc' -%}{% if fr %}Prix décroissant{% else %}Price, high to low{% endif -%}
+{%- when 'best_selling' -%}{% if fr %}Meilleures ventes{% else %}Best selling{% endif -%}
+{%- when 'lang_more' -%}{% if fr %}Autres langues{% else %}More languages{% endif -%}
+{%- when 'region' -%}{% if fr %}Région et devise{% else %}Region & currency{% endif -%}
+{%- when 'from_price' -%}{% if fr %}À partir de{% else %}From{% endif -%}
+{%- when 'qty' -%}{% if fr %}Qté{% else %}Qty{% endif -%}
+{%- when 'error_generic' -%}{% if fr %}Une erreur est survenue. Réessayez.{% else %}Something went wrong. Try again.{% endif -%}
+{%- else -%}{{ k }}{%- endcase -%}
